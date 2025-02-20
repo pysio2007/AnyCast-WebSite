@@ -13,6 +13,18 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      script: [
+        {
+          async: true,
+          src: 'https://www.googletagmanager.com/gtag/js?id=G-P1L3MZ08KH'
+        },
+        {
+          children: `window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-P1L3MZ08KH');`
+        }
+      ],
       link: [
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
