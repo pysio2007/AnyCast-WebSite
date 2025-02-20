@@ -1,6 +1,9 @@
 <template>
-  <div>
+  <div class="flex flex-col min-h-screen">
     <NavBar />
-    <NuxtPage />
+    <main class="flex-grow">
+      <NuxtPage />
+    </main>
+    <Footer />
   </div>
 </template>
