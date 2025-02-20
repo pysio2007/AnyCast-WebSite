@@ -2,7 +2,9 @@
   <div class="flex flex-col min-h-screen">
     <NavBar />
     <main class="flex-grow">
-      <NuxtPage />
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
     </main>
     <Footer />
   </div>
