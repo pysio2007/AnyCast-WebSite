@@ -74,9 +74,64 @@
                 <p class="mt-4 text-base-content/70">正在追踪路由...</p>
               </div>
               
-              <div v-else-if="result" class="card bg-base-100/70 backdrop-blur shadow-lg">
+              <div v-else-if="parsedResult" class="card bg-base-100/70 backdrop-blur shadow-lg">
                 <div class="card-body">
-                  <pre class="whitespace-pre-wrap text-sm font-mono">{{ result }}</pre>
+                  <!-- 标题信息 -->
+                  <div class="text-sm font-mono mb-4">{{ parsedResult.header }}</div>
+                  
+                  <!-- 跳转信息表格 -->
+                  <div class="overflow-x-auto">
+                    <table class="table table-sm w-full">
+                      <thead>
+                        <tr>
+                          <th>跳数</th>
+                          <th>地址</th>
+                          <th>延迟</th>
+                          <th>位置</th>
+                          <th>ASN</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <template v-for="hop in parsedResult.hops" :key="hop.hop">
+                          <tr :class="{'opacity-50': hop.isPrivate}">
+                            <td>{{ hop.hop }}</td>
+                            <td class="font-mono">{{ hop.address }}</td>
+                            <td>{{ hop.delay }}</td>
+                            <td>
+                              <div v-if="!hop.isPrivate">
+                                <span v-if="hop.ipInfo?.loading" class="loading loading-dots loading-xs"></span>
+                                <span v-else-if="hop.ipInfo">
+                                  <i class="fas fa-globe-americas mr-1 opacity-50"></i>
+                                  {{ hop.ipInfo.country }}
+                                  <span v-if="hop.ipInfo.city">, {{ hop.ipInfo.city }}</span>
+                                </span>
+                                <span v-else class="text-base-content/50">获取失败</span>
+                              </div>
+                              <span v-else class="text-base-content/50">
+                                <i class="fas fa-home mr-1 opacity-50"></i>
+                                私有地址
+                              </span>
+                            </td>
+                            <td>
+                              <div v-if="!hop.isPrivate">
+                                <span v-if="hop.ipInfo?.loading" class="loading loading-dots loading-xs"></span>
+                                <span v-else-if="hop.ipInfo?.org" class="text-xs whitespace-nowrap">
+                                  <i class="fas fa-network-wired mr-1 opacity-50"></i>
+                                  {{ formatASN(hop.ipInfo.org) }}
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- 未响应跳数提示 -->
+                  <div v-if="parsedResult.noResponseHops" 
+                       class="mt-4 text-sm text-base-content/70">
+                    {{ parsedResult.noResponseHops }} 跳未响应
+                  </div>
                 </div>
               </div>
             </Transition>
@@ -104,6 +159,7 @@ const performTraceroute = async () => {
   
   loading.value = true
   result.value = ''
+  parsedResult.value = null;  // 重置解析结果
   
   try {
     const response = await fetch(apiUrl, {
@@ -118,12 +174,15 @@ const performTraceroute = async () => {
     
     const data = await response.json()
     if (data.error) {
-      result.value = `错误: ${data.error}`
+      result.value = `错误: ${data.error}`;
+      parsedResult.value = null;
     } else if (data.result && data.result.length > 0) {
-      result.value = data.result[0].data
+      result.value = data.result[0].data;
+      await parseTracerouteResult(data.result[0].data);
     }
   } catch (error) {
-    result.value = '请求失败: ' + (error instanceof Error ? error.message : String(error))
+    console.error('Traceroute error:', error);
+    result.value = '请求失败: ' + (error instanceof Error ? error.message : String(error));
   } finally {
     loading.value = false
   }
@@ -143,6 +202,195 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('keypress', handleKeyPress)
 })
+
+// 添加类型定义
+interface IpInfo {
+  ip: string;
+  hostname?: string;
+  city: string;
+  region: string;
+  country: string;
+  loc: string;
+  org: string;
+  postal: string;
+  timezone: string;
+  anycast?: boolean;
+  loading?: boolean;
+}
+
+interface TracerouteHop {
+  hop: number;
+  address: string;
+  delay: string;
+  isPrivate: boolean;
+  ipInfo?: IpInfo;
+}
+
+interface ParsedResult {
+  header: string;
+  hops: TracerouteHop[];
+  noResponseHops?: number;
+}
+
+const parsedResult = ref<ParsedResult | null>(null);
+
+// 判断是否为私有地址（支持 IPv4 和 IPv6）
+const isPrivateIP = (ip: string): boolean => {
+  // IPv4 私有地址检查
+  if (ip.includes('.')) {
+    const parts = ip.split('.').map(Number);
+    return (
+      parts[0] === 10 ||
+      (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
+      (parts[0] === 192 && parts[1] === 168) ||
+      parts[0] === 127 ||
+      (parts[0] === 169 && parts[1] === 254)
+    );
+  }
+  
+  // IPv6 私有地址检查
+  const ipv6Lower = ip.toLowerCase();
+  return (
+    ipv6Lower.startsWith('fe80:') || // Link-local
+    ipv6Lower.startsWith('fc00:') || // Unique local
+    ipv6Lower.startsWith('fd00:') || // Unique local
+    ipv6Lower === '::1' ||           // Loopback
+    ipv6Lower.startsWith('2001:db8:') // Documentation
+  );
+};
+
+// 修改ip地址提取函数以更好地支持IPv6
+const extractIP = (text: string): string | null => {
+  // IPv6 地址可能包含括号
+  const parenMatch = text.match(/\(([^)]+)\)/);
+  if (parenMatch) {
+    return parenMatch[1];
+  }
+
+  // 处理无括号的情况
+  const words = text.trim().split(/\s+/);
+  for (const word of words) {
+    // 检查是否是有效的 IP 地址（IPv4 或 IPv6）
+    if (
+      /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(word) || // IPv4
+      /^[0-9a-fA-F:]+$/.test(word)  // IPv6
+    ) {
+      return word;
+    }
+  }
+  
+  return null;
+};
+
+// 修改获取IP信息的函数以确保类型安全
+const fetchIpInfo = async (ip: string): Promise<IpInfo> => {
+  try {
+    const response = await fetch(`https://ipinfo.io/${ip}?token=29a9fd77d1bd76`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    // 显式类型转换和验证
+    const ipInfo: IpInfo = {
+      ip: data.ip || ip,
+      hostname: data.hostname,
+      city: data.city || '',
+      region: data.region || '',
+      country: data.country || '',
+      loc: data.loc || '',
+      org: data.org || '',
+      postal: data.postal || '',
+      timezone: data.timezone || '',
+      anycast: data.anycast || false,
+      loading: false
+    };
+    return ipInfo;
+  } catch (error) {
+    console.error(`Error fetching IP info for ${ip}:`, error);
+    throw error;
+  }
+};
+
+// 格式化 ASN 显示
+const formatASN = (org: string): string => {
+  const asnMatch = org.match(/^(AS\d+)\s/);
+  if (asnMatch) {
+    const [, asn] = asnMatch;
+    const name = org.replace(asn, '').trim();
+    return `${asn} ${name.length > 20 ? name.slice(0, 20) + '...' : name}`;
+  }
+  return org.length > 25 ? org.slice(0, 25) + '...' : org;
+};
+
+// 修改解析traceroute结果的函数
+const parseTracerouteResult = async (text: string) => {
+  const lines = text.split('\n').filter(line => line.trim());
+  const header = lines[0];
+  const hops: TracerouteHop[] = [];
+  let noResponseCount = 0;
+
+  // 更新正则表达式以更好地支持 IPv4 和 IPv6
+  const hopRegex = /^\s*(\d+)\s+([^\s].*?)\s+([0-9.]+\s*ms)/;
+
+  for (const line of lines.slice(1)) {
+    const match = line.match(hopRegex);
+    if (match) {
+      const [, hopNum, addressPart, delayPart] = match;
+      const ip = extractIP(addressPart);
+      const isPrivate = ip ? isPrivateIP(ip) : true;
+
+      const hop: TracerouteHop = {
+        hop: parseInt(hopNum),
+        address: addressPart.trim(),
+        delay: delayPart.trim(),
+        isPrivate,
+        ipInfo: isPrivate ? undefined : { loading: true } as IpInfo
+      };
+
+      hops.push(hop);
+
+      if (!isPrivate && ip) {
+        // 使用Promise.race添加超时处理
+        try {
+          const ipInfo = await Promise.race([
+            fetchIpInfo(ip),
+            new Promise<never>((_, reject) => 
+              setTimeout(() => reject(new Error('Timeout')), 5000)
+            )
+          ]);
+
+          // 使用nextTick确保视图更新
+          await nextTick(() => {
+            const targetHop = hops.find(h => h.hop === hop.hop);
+            if (targetHop) {
+              targetHop.ipInfo = ipInfo; // 现在这里的类型是安全的
+            }
+          });
+        } catch (error) {
+          console.error(`Error fetching info for hop ${hop.hop}:`, error);
+          await nextTick(() => {
+            const targetHop = hops.find(h => h.hop === hop.hop);
+            if (targetHop) {
+              targetHop.ipInfo = undefined;
+            }
+          });
+        }
+      }
+    }
+  }
+
+  // 计算未响应的跳数
+  const noResponseMatch = text.match(/(\d+) hops not responding/);
+  if (noResponseMatch) {
+    noResponseCount = parseInt(noResponseMatch[1]);
+  }
+
+  parsedResult.value = {
+    header,
+    hops: [...hops], // 创建新数组以触发响应式更新
+    noResponseHops: noResponseCount
+  };
+};
 </script>
 
 <style scoped>
@@ -208,5 +456,14 @@ onUnmounted(() => {
 
 .dropdown-content::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* 表格样式 */
+.table th {
+  @apply bg-base-200/50 text-base-content/70;
+}
+
+.table td {
+  @apply border-base-300/20 max-w-[200px] truncate;
 }
 </style>
