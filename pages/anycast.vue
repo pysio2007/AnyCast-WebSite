@@ -238,6 +238,7 @@ definePageMeta({
 })
 
 const nodeData = ref<Record<string, any>>({})
+const currentTime = ref<number>(0)
 
 const formatSpeed = (speed: number) => {
   if (speed < 1024) return `${speed.toFixed(1)} Kbps`
@@ -250,9 +251,13 @@ const formatTraffic = (bytes: number) => {
 }
 
 const isNodeOffline = (nodeName: string) => {
-  if (!nodeData.value[nodeName]) return false
+  if (!nodeData.value[nodeName] || !currentTime.value) return false
   const lastActive = new Date(nodeData.value[nodeName].status.last_active)
-  return Date.now() - lastActive.getTime() > 10 * 60 * 1000
+  return currentTime.value - lastActive.getTime() > 10 * 60 * 1000
+}
+
+const updateTime = () => {
+  currentTime.value = Date.now()
 }
 
 const fetchNodeData = async () => {
@@ -264,14 +269,19 @@ const fetchNodeData = async () => {
       nodesMap[server.name] = server
     })
     nodeData.value = nodesMap
+    updateTime()
   } catch (error) {
     console.error('Failed to fetch node data:', error)
   }
 }
 
 onMounted(() => {
+  updateTime()
   fetchNodeData()
-  setInterval(fetchNodeData, 30000) // 每10秒更新一次
+  setInterval(() => {
+    updateTime()
+    fetchNodeData()
+  }, 30000)
 })
 </script>
 
