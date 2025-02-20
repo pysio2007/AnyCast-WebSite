@@ -110,7 +110,7 @@ definePageMeta({
 })
 </script>
 
-<style>
+<style lang="postcss" scoped>
 .prose code {
   @apply px-2 py-0.5 rounded text-sm;
 }
