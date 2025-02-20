@@ -44,7 +44,10 @@
         <h2 class="text-2xl font-bold mb-4">节点列表</h2>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- New Jersey -->
-          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+          <div :class="[
+            'bg-gray-50 p-4 rounded-lg dark:bg-gray-800',
+            isNodeOffline('Anycast-NewJersey') ? 'bg-red-50 dark:bg-red-900/20' : ''
+          ]">
             <div class="flex items-center justify-between mb-2">
               <h3 class="font-bold flex items-center">
                 <span class="fi fi-us w-5 mr-2"></span>
@@ -57,11 +60,20 @@
               <li><i class="fas fa-server mr-2"></i>Vultr</li>
               <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
               <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+              <template v-if="nodeData['Anycast-NewJersey']">
+                <li><i class="fas fa-tachometer-alt mr-2"></i>CPU: {{ nodeData['Anycast-NewJersey'].status.cpu_usage.toFixed(1) }}%</li>
+                <li><i class="fas fa-arrow-down mr-2"></i>入站: {{ formatSpeed(nodeData['Anycast-NewJersey'].status.network.in_speed) }}</li>
+                <li><i class="fas fa-arrow-up mr-2"></i>出站: {{ formatSpeed(nodeData['Anycast-NewJersey'].status.network.out_speed) }}</li>
+                <li><i class="fas fa-exchange-alt mr-2"></i>总流量: {{ formatTraffic(nodeData['Anycast-NewJersey'].status.network.in) }} / {{ formatTraffic(nodeData['Anycast-NewJersey'].status.network.out) }}</li>
+              </template>
             </ul>
           </div>
 
           <!-- Tokyo -->
-          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+          <div :class="[
+            'bg-gray-50 p-4 rounded-lg dark:bg-gray-800',
+            isNodeOffline('Anycast-Tokyo') ? 'bg-red-50 dark:bg-red-900/20' : ''
+          ]">
             <div class="flex items-center justify-between mb-2">
               <h3 class="font-bold flex items-center">
                 <span class="fi fi-jp w-5 mr-2"></span>
@@ -74,11 +86,20 @@
               <li><i class="fas fa-server mr-2"></i>Vultr</li>
               <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
               <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+              <template v-if="nodeData['Anycast-Tokyo']">
+                <li><i class="fas fa-tachometer-alt mr-2"></i>CPU: {{ nodeData['Anycast-Tokyo'].status.cpu_usage.toFixed(1) }}%</li>
+                <li><i class="fas fa-arrow-down mr-2"></i>入站: {{ formatSpeed(nodeData['Anycast-Tokyo'].status.network.in_speed) }}</li>
+                <li><i class="fas fa-arrow-up mr-2"></i>出站: {{ formatSpeed(nodeData['Anycast-Tokyo'].status.network.out_speed) }}</li>
+                <li><i class="fas fa-exchange-alt mr-2"></i>总流量: {{ formatTraffic(nodeData['Anycast-Tokyo'].status.network.in) }} / {{ formatTraffic(nodeData['Anycast-Tokyo'].status.network.out) }}</li>
+              </template>
             </ul>
           </div>
 
           <!-- Amsterdam -->
-          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+          <div :class="[
+            'bg-gray-50 p-4 rounded-lg dark:bg-gray-800',
+            isNodeOffline('Anycast-Amsterdam') ? 'bg-red-50 dark:bg-red-900/20' : ''
+          ]">
             <div class="flex items-center justify-between mb-2">
               <h3 class="font-bold flex items-center">
                 <span class="fi fi-nl w-5 mr-2"></span>
@@ -91,11 +112,20 @@
               <li><i class="fas fa-server mr-2"></i>Vultr</li>
               <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
               <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+              <template v-if="nodeData['Anycast-Amsterdam']">
+                <li><i class="fas fa-tachometer-alt mr-2"></i>CPU: {{ nodeData['Anycast-Amsterdam'].status.cpu_usage.toFixed(1) }}%</li>
+                <li><i class="fas fa-arrow-down mr-2"></i>入站: {{ formatSpeed(nodeData['Anycast-Amsterdam'].status.network.in_speed) }}</li>
+                <li><i class="fas fa-arrow-up mr-2"></i>出站: {{ formatSpeed(nodeData['Anycast-Amsterdam'].status.network.out_speed) }}</li>
+                <li><i class="fas fa-exchange-alt mr-2"></i>总流量: {{ formatTraffic(nodeData['Anycast-Amsterdam'].status.network.in) }} / {{ formatTraffic(nodeData['Anycast-Amsterdam'].status.network.out) }}</li>
+              </template>
             </ul>
           </div>
 
           <!-- Mumbai -->
-          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+          <div :class="[
+            'bg-gray-50 p-4 rounded-lg dark:bg-gray-800',
+            isNodeOffline('Anycast-Mumbai') ? 'bg-red-50 dark:bg-red-900/20' : ''
+          ]">
             <div class="flex items-center justify-between mb-2">
               <h3 class="font-bold flex items-center">
                 <span class="fi fi-in w-5 mr-2"></span>
@@ -108,11 +138,20 @@
               <li><i class="fas fa-server mr-2"></i>Vultr</li>
               <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
               <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+              <template v-if="nodeData['Anycast-Mumbai']">
+                <li><i class="fas fa-tachometer-alt mr-2"></i>CPU: {{ nodeData['Anycast-Mumbai'].status.cpu_usage.toFixed(1) }}%</li>
+                <li><i class="fas fa-arrow-down mr-2"></i>入站: {{ formatSpeed(nodeData['Anycast-Mumbai'].status.network.in_speed) }}</li>
+                <li><i class="fas fa-arrow-up mr-2"></i>出站: {{ formatSpeed(nodeData['Anycast-Mumbai'].status.network.out_speed) }}</li>
+                <li><i class="fas fa-exchange-alt mr-2"></i>总流量: {{ formatTraffic(nodeData['Anycast-Mumbai'].status.network.in) }} / {{ formatTraffic(nodeData['Anycast-Mumbai'].status.network.out) }}</li>
+              </template>
             </ul>
           </div>
 
           <!-- Hong Kong -->
-          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+          <div :class="[
+            'bg-gray-50 p-4 rounded-lg dark:bg-gray-800',
+            isNodeOffline('Anycast-HongKong') ? 'bg-red-50 dark:bg-red-900/20' : ''
+          ]">
             <div class="flex items-center justify-between mb-2">
               <h3 class="font-bold flex items-center">
                 <span class="fi fi-hk w-5 mr-2"></span>
@@ -125,11 +164,20 @@
               <li><i class="fas fa-server mr-2"></i>Akile</li>
               <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
               <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session (Premium)</li>
+              <template v-if="nodeData['Anycast-HongKong']">
+                <li><i class="fas fa-tachometer-alt mr-2"></i>CPU: {{ nodeData['Anycast-HongKong'].status.cpu_usage.toFixed(1) }}%</li>
+                <li><i class="fas fa-arrow-down mr-2"></i>入站: {{ formatSpeed(nodeData['Anycast-HongKong'].status.network.in_speed) }}</li>
+                <li><i class="fas fa-arrow-up mr-2"></i>出站: {{ formatSpeed(nodeData['Anycast-HongKong'].status.network.out_speed) }}</li>
+                <li><i class="fas fa-exchange-alt mr-2"></i>总流量: {{ formatTraffic(nodeData['Anycast-HongKong'].status.network.in) }} / {{ formatTraffic(nodeData['Anycast-HongKong'].status.network.out) }}</li>
+              </template>
             </ul>
           </div>
 
           <!-- Florida -->
-          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+          <div :class="[
+            'bg-gray-50 p-4 rounded-lg dark:bg-gray-800',
+            isNodeOffline('Anycast-Florida') ? 'bg-red-50 dark:bg-red-900/20' : ''
+          ]">
             <div class="flex items-center justify-between mb-2">
               <h3 class="font-bold flex items-center">
                 <span class="fi fi-us w-5 mr-2"></span>
@@ -142,11 +190,20 @@
               <li><i class="fas fa-server mr-2"></i>Frantech</li>
               <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
               <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+              <template v-if="nodeData['Anycast-Florida']">
+                <li><i class="fas fa-tachometer-alt mr-2"></i>CPU: {{ nodeData['Anycast-Florida'].status.cpu_usage.toFixed(1) }}%</li>
+                <li><i class="fas fa-arrow-down mr-2"></i>入站: {{ formatSpeed(nodeData['Anycast-Florida'].status.network.in_speed) }}</li>
+                <li><i class="fas fa-arrow-up mr-2"></i>出站: {{ formatSpeed(nodeData['Anycast-Florida'].status.network.out_speed) }}</li>
+                <li><i class="fas fa-exchange-alt mr-2"></i>总流量: {{ formatTraffic(nodeData['Anycast-Florida'].status.network.in) }} / {{ formatTraffic(nodeData['Anycast-Florida'].status.network.out) }}</li>
+              </template>
             </ul>
           </div>
 
           <!-- Tallinn -->
-          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+          <div :class="[
+            'bg-gray-50 p-4 rounded-lg dark:bg-gray-800',
+            isNodeOffline('Anycast-Tallinn') ? 'bg-red-50 dark:bg-red-900/20' : ''
+          ]">
             <div class="flex items-center justify-between mb-2">
               <h3 class="font-bold flex items-center">
                 <span class="fi fi-ee w-5 mr-2"></span>
@@ -159,6 +216,12 @@
               <li><i class="fas fa-server mr-2"></i>V.PS</li>
               <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
               <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+              <template v-if="nodeData['Anycast-Tallinn']">
+                <li><i class="fas fa-tachometer-alt mr-2"></i>CPU: {{ nodeData['Anycast-Tallinn'].status.cpu_usage.toFixed(1) }}%</li>
+                <li><i class="fas fa-arrow-down mr-2"></i>入站: {{ formatSpeed(nodeData['Anycast-Tallinn'].status.network.in_speed) }}</li>
+                <li><i class="fas fa-arrow-up mr-2"></i>出站: {{ formatSpeed(nodeData['Anycast-Tallinn'].status.network.out_speed) }}</li>
+                <li><i class="fas fa-exchange-alt mr-2"></i>总流量: {{ formatTraffic(nodeData['Anycast-Tallinn'].status.network.in) }} / {{ formatTraffic(nodeData['Anycast-Tallinn'].status.network.out) }}</li>
+              </template>
             </ul>
           </div>
         </div>
@@ -168,8 +231,47 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
 definePageMeta({
   layout: 'default'
+})
+
+const nodeData = ref<Record<string, any>>({})
+
+const formatSpeed = (speed: number) => {
+  if (speed < 1024) return `${speed.toFixed(1)} Kbps`
+  return `${(speed / 1024).toFixed(1)} Mbps`
+}
+
+const formatTraffic = (bytes: number) => {
+  const gb = bytes / (1024 * 1024 * 1024)
+  return `${gb.toFixed(2)} GB`
+}
+
+const isNodeOffline = (nodeName: string) => {
+  if (!nodeData.value[nodeName]) return false
+  const lastActive = new Date(nodeData.value[nodeName].status.last_active)
+  return Date.now() - lastActive.getTime() > 10 * 60 * 1000
+}
+
+const fetchNodeData = async () => {
+  try {
+    const response = await fetch('https://anycast-node.akaere.online/')
+    const data = await response.json()
+    const nodesMap: Record<string, any> = {}
+    data.servers.forEach((server: any) => {
+      nodesMap[server.name] = server
+    })
+    nodeData.value = nodesMap
+  } catch (error) {
+    console.error('Failed to fetch node data:', error)
+  }
+}
+
+onMounted(() => {
+  fetchNodeData()
+  setInterval(fetchNodeData, 10000) // 每10秒更新一次
 })
 </script>
 
