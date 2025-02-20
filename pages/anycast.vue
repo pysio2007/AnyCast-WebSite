@@ -243,7 +243,7 @@ const currentTime = ref<number>(0)
 const formatSpeed = (speed: number | undefined) => {
   if (speed === undefined || isNaN(speed)) return '0.0K/s'
   if (speed < 1024) return `${speed.toFixed(1)}K/s`
-  return `${(speed / 1024).toFixed(1)}M/s`
+  return `${(speed / 10240).toFixed(1)}M/s`
 }
 
 const formatTraffic = (bytes: number | undefined) => {
