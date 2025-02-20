@@ -9,8 +9,8 @@
       </h1>
 
       <!-- 网络状态统计 -->
-      <div class="stats shadow bg-base-200 dark:bg-base-300 mb-8">
-        <div class="stat">
+      <div class="stats stats-vertical sm:stats-horizontal shadow bg-base-200 dark:bg-base-300 mb-8 w-full overflow-x-hidden">
+        <div class="stat min-w-[200px] sm:text-base text-sm">
           <div class="stat-figure">
             <i class="fas fa-server text-2xl text-base-content"></i>
           </div>
@@ -23,7 +23,7 @@
           </div>
         </div>
         
-        <div class="stat">
+        <div class="stat min-w-[200px] sm:text-base text-sm">
           <div class="stat-figure">
             <i class="fas fa-arrow-up text-2xl text-base-content"></i>
           </div>
@@ -35,7 +35,7 @@
           </div>
         </div>
         
-        <div class="stat">
+        <div class="stat min-w-[200px] sm:text-base text-sm">
           <div class="stat-figure">
             <i class="fas fa-arrow-down text-2xl text-base-content"></i>
           </div>
@@ -47,7 +47,7 @@
           </div>
         </div>
 
-        <div class="stat">
+        <div class="stat min-w-[200px] sm:text-base text-sm">
           <div class="stat-figure">
             <i class="fas fa-cloud-upload-alt text-2xl text-base-content"></i>
           </div>
@@ -56,7 +56,7 @@
           <div class="stat-desc">自节点启动以来</div>
         </div>
         
-        <div class="stat">
+        <div class="stat min-w-[200px] sm:text-base text-sm">
           <div class="stat-figure">
             <i class="fas fa-cloud-download-alt text-2xl text-base-content"></i>
           </div>
