@@ -8,53 +8,56 @@
         
         <div class="w-full max-w-4xl mx-auto">
           <!-- 输入区域 -->
-          <div class="flex flex-col md:flex-row gap-4 items-end">
-            <!-- 服务器选择 -->
-            <div class="form-control md:w-1/3">
-              <label class="label">
-                <span class="label-text">选择服务器</span>
-              </label>
-              <div class="dropdown w-full">
-                <label tabindex="0" class="btn btn-ghost w-full justify-between bg-base-100/70 hover:bg-base-200/70">
-                  <span class="normal-case">{{ selectedServer || '请选择服务器' }}</span>
-                  <i class="fas fa-chevron-down text-xs opacity-50"></i>
+          <div class="flex flex-col gap-4">
+            <!-- 第一行：服务器选择和目标输入 -->
+            <div class="flex flex-col md:flex-row gap-4 items-end">
+              <!-- 服务器选择 -->
+              <div class="form-control md:w-1/3">
+                <label class="label">
+                  <span class="label-text">选择服务器</span>
                 </label>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-lg bg-base-200/95 backdrop-blur-md rounded-box w-full max-h-60 overflow-auto">
-                  <li v-for="server in availableServers" :key="server">
-                    <a 
-                      @click="selectedServer = server"
-                      :class="{'active': selectedServer === server}"
-                    >
-                      <i class="fas fa-server text-xs opacity-50"></i>
-                      {{ server }}
-                    </a>
-                  </li>
-                </ul>
+                <div class="dropdown w-full">
+                  <label tabindex="0" class="btn btn-ghost w-full justify-between bg-base-100/70 hover:bg-base-200/70">
+                    <span class="normal-case">{{ selectedServer ? serverDisplayNames[selectedServer] : '请选择服务器' }}</span>
+                    <i class="fas fa-chevron-down text-xs opacity-50"></i>
+                  </label>
+                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-lg bg-base-200/95 backdrop-blur-md rounded-box w-full max-h-60 overflow-auto">
+                    <li v-for="server in availableServers" :key="server">
+                      <a 
+                        @click="selectedServer = server"
+                        :class="{'active': selectedServer === server}"
+                      >
+                        <i class="fas fa-server text-xs opacity-50"></i>
+                        {{ serverDisplayNames[server] }}
+                      </a>
+                    </li>
+                  </ul>
+                </div>
               </div>
-            </div>
 
-            <!-- 目标输入 -->
-            <div class="form-control flex-1">
-              <label class="label">
-                <span class="label-text">目标地址</span>
-              </label>
-              <div class="join w-full">
-                <input 
-                  v-model="target"
-                  type="text"
-                  placeholder="8.8.8.8 或 google.com"
-                  class="input input-bordered join-item flex-1 bg-base-100/70"
-                  :disabled="!selectedServer"
-                  @keyup.enter="performTraceroute"
-                />
-                <button 
-                  class="btn btn-primary join-item w-24"
-                  @click="performTraceroute"
-                  :disabled="!canQuery"
-                >
-                  <i class="fas fa-play mr-1"></i>
-                  <span class="hidden sm:inline">追踪</span>
-                </button>
+              <!-- 目标输入 -->
+              <div class="form-control flex-1">
+                <label class="label">
+                  <span class="label-text">目标地址</span>
+                </label>
+                <div class="join w-full">
+                  <input 
+                    v-model="target"
+                    type="text"
+                    placeholder="8.8.8.8 或 google.com"
+                    class="input input-bordered join-item flex-1 bg-base-100/70"
+                    :disabled="!selectedServer"
+                    @keyup.enter="performTraceroute"
+                  />
+                  <button 
+                    class="btn btn-primary join-item w-24"
+                    @click="performTraceroute"
+                    :disabled="!canQuery"
+                  >
+                    <i class="fas fa-play mr-1"></i>
+                    <span class="hidden sm:inline">追踪</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -71,7 +74,21 @@
             >
               <div v-if="loading" class="text-center p-8">
                 <span class="loading loading-spinner loading-lg"></span>
-                <p class="mt-4 text-base-content/70">正在追踪路由...</p>
+                <p class="mt-4 text-base-content/70">
+                  <template v-if="processingIpInfo">
+                    正在获取 IP 信息 ({{ processedCount }}/{{ totalHops }})
+                    <div class="w-64 mx-auto mt-2">
+                      <div class="flex justify-between text-xs opacity-70 mb-1">
+                        <span>进度</span>
+                        <span>{{ Math.round((processedCount / totalHops) * 100) }}%</span>
+                      </div>
+                      <progress class="progress progress-primary" :value="processedCount" :max="totalHops"></progress>
+                    </div>
+                  </template>
+                  <template v-else>
+                    正在追踪路由...
+                  </template>
+                </p>
               </div>
               
               <div v-else-if="parsedResult" class="card bg-base-100/70 backdrop-blur shadow-lg">
@@ -144,11 +161,19 @@
 
 <script setup lang="ts">
 const availableServers = ['dn42', 'bgp', 'home']
+const serverDisplayNames: Record<string, string> = {
+  'dn42': 'DN42',
+  'bgp': '法兰克福',
+  'home': '成都'
+}
 const selectedServer = ref('')
 const target = ref('')
 const loading = ref(false)
 const result = ref('')
 const apiUrl = 'https://lg.pysio.online/api/'
+const processingIpInfo = ref(false)
+const processedCount = ref(0)
+const totalHops = ref(0)
 
 const canQuery = computed(() => {
   return selectedServer.value && target.value.trim()
@@ -159,7 +184,10 @@ const performTraceroute = async () => {
   
   loading.value = true
   result.value = ''
-  parsedResult.value = null;  // 重置解析结果
+  parsedResult.value = null
+  processingIpInfo.value = false
+  processedCount.value = 0
+  totalHops.value = 0
   
   try {
     const response = await fetch(apiUrl, {
@@ -379,15 +407,36 @@ const parseTracerouteResult = async (text: string) => {
     }
   }
 
-  // 计算未响应的跳数
-  const noResponseMatch = text.match(/(\d+) hops not responding/);
-  if (noResponseMatch) {
-    noResponseCount = parseInt(noResponseMatch[1]);
-  }
+  // 更新进度状态 - 修改为包含所有跳数
+  processedCount.value = 0
+  totalHops.value = hops.length // 计算所有跳数，包括私有地址
 
+  // 处理IP信息
+  processingIpInfo.value = true
+  for (const hop of hops) {
+    if (!hop.isPrivate && extractIP(hop.address)) {
+      const ip = extractIP(hop.address)!;
+      try {
+        hop.ipInfo = { loading: true } as IpInfo;
+        const ipInfo = await Promise.race([
+          fetchIpInfo(ip),
+          new Promise<never>((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout')), 5000)
+          )
+        ]);
+        hop.ipInfo = ipInfo;
+      } catch (error) {
+        console.error(`Error fetching info for hop ${hop.hop}:`, error);
+        hop.ipInfo = undefined;
+      }
+    }
+    processedCount.value++;
+  }
+  
+  processingIpInfo.value = false;
   parsedResult.value = {
     header,
-    hops: [...hops], // 创建新数组以触发响应式更新
+    hops: [...hops],
     noResponseHops: noResponseCount
   };
 };
@@ -396,6 +445,12 @@ const parseTracerouteResult = async (text: string) => {
 <style scoped>
 .card {
   border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: rgba(9, 111, 220, 0.3);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .input, .select {
@@ -403,9 +458,10 @@ const parseTracerouteResult = async (text: string) => {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.input:focus, .select:focus {
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+.input:focus {
+  box-shadow: none;
+  border-color: rgba(255, 255, 255, 0.1);
+  outline: none;
 }
 
 .join {
@@ -465,5 +521,10 @@ const parseTracerouteResult = async (text: string) => {
 
 .table td {
   @apply border-base-300/20 max-w-[200px] truncate;
+}
+
+.progress {
+  height: 0.5rem;
+  @apply bg-base-200;
 }
 </style>

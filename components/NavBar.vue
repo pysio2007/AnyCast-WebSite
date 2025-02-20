@@ -15,7 +15,7 @@
         <li><NuxtLink to="/"><i class="fas fa-home mr-2"></i>首页</NuxtLink></li>
         <li><NuxtLink to="/anycast"><i class="fas fa-network-wired mr-2"></i>AnyCast</NuxtLink></li>
         <li><NuxtLink to="/dn42"><i class="fas fa-project-diagram mr-2"></i>DN42</NuxtLink></li>
-        <li><NuxtLink to="/lg"><i class="fas fa-search mr-2"></i>Looking Glass</NuxtLink></li>
+        <li><NuxtLink to="/tools"><i class="fas fa-tools mr-2"></i>工具箱</NuxtLink></li>
         <li><NuxtLink to="/blog"><i class="fas fa-blog mr-2"></i>Blog</NuxtLink></li>
       </ul>
     </div>
@@ -31,7 +31,7 @@
           <li><NuxtLink to="/"><i class="fas fa-home mr-2"></i>首页</NuxtLink></li>
           <li><NuxtLink to="/anycast"><i class="fas fa-network-wired mr-2"></i>AnyCast</NuxtLink></li>
           <li><NuxtLink to="/dn42"><i class="fas fa-project-diagram mr-2"></i>DN42</NuxtLink></li>
-          <li><NuxtLink to="/lg"><i class="fas fa-search mr-2"></i>Looking Glass</NuxtLink></li>
+          <li><NuxtLink to="/tools"><i class="fas fa-tools mr-2"></i>工具箱</NuxtLink></li>
           <li><NuxtLink to="/blog"><i class="fas fa-blog mr-2"></i>Blog</NuxtLink></li>
         </ul>
       </div>
