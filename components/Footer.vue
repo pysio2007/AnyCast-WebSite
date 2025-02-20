@@ -1,7 +1,7 @@
 <template>
   <footer class="footer px-4 py-3 bg-base-100 text-base-content border-t">
     <div class="flex items-center gap-2">
-      <p>Pysio's AnyCast {{ currentYear }}</p>
+      <p>Pysio's Network {{ currentYear }}</p>
       <span class="text-gray-400">/</span>
       <a 
         :href="`https://github.com/pysio2007/AnyCast-WebSite/commit/${gitHash}`"

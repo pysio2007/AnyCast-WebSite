@@ -4,7 +4,7 @@
     <div class="w-64">
       <NuxtLink to="/" class="btn btn-ghost normal-case text-xl">
         <img src="https://www.pysio.online/assets/imgs/avast.svg" class="w-8 h-8 mr-2" alt="Pysio Logo" />
-        Pysio AnyCast
+        Pysio Network
       </NuxtLink>
     </div>
 
