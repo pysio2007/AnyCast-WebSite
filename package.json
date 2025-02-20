@@ -12,7 +12,8 @@
   "dependencies": {
     "nuxt": "^3.15.4",
     "vue": "latest",
-    "vue-router": "latest"
+    "vue-router": "latest",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.13.1",
