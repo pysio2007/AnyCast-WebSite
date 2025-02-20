@@ -12,7 +12,12 @@
 
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body font-mono">
-        <pre v-if="errorMessage" class="text-error">{{ errorMessage }}</pre>
+        <!-- 添加加载状态提示 -->
+        <div v-if="loading" class="flex justify-center items-center">
+          <div class="loading loading-spinner loading-lg text-primary"></div>
+          <span class="ml-2">正在获取详情...</span>
+        </div>
+        <pre v-else-if="errorMessage" class="text-error">{{ errorMessage }}</pre>
         <pre v-else class="whitespace-pre-wrap text-sm">{{ protocolDetails }}</pre>
       </div>
     </div>

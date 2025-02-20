@@ -1,5 +1,11 @@
 <template>
   <div class="container mx-auto p-4">
+    <!-- 添加加载状态提示 -->
+    <div v-if="statusLoading" class="flex justify-center items-center mb-4">
+      <div class="loading loading-spinner loading-lg text-primary"></div>
+      <span class="ml-2">正在获取服务器状态...</span>
+    </div>
+
     <template v-for="server in serverStatus" :key="server.server">
       <div class="mb-8">
         <h2 class="text-xl font-bold mb-4">{{ server.server }}: show protocols</h2>
