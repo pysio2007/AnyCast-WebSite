@@ -39,6 +39,130 @@
           </a>
         </p>
       </section>
+
+      <section class="my-8">
+        <h2 class="text-2xl font-bold mb-4">节点列表</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- New Jersey -->
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold flex items-center">
+                <span class="fi fi-us w-5 mr-2"></span>
+                Anycast-NewJersey
+              </h3>
+              <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">$3.5/月</span>
+            </div>
+            <ul class="space-y-1 text-sm">
+              <li><i class="fas fa-network-wired mr-2"></i>1Gbps, 0.5TB/月</li>
+              <li><i class="fas fa-server mr-2"></i>Vultr</li>
+              <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
+              <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+            </ul>
+          </div>
+
+          <!-- Tokyo -->
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold flex items-center">
+                <span class="fi fi-jp w-5 mr-2"></span>
+                Anycast-Tokyo
+              </h3>
+              <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">$5/月</span>
+            </div>
+            <ul class="space-y-1 text-sm">
+              <li><i class="fas fa-network-wired mr-2"></i>1Gbps, 1TB/月</li>
+              <li><i class="fas fa-server mr-2"></i>Vultr</li>
+              <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
+              <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+            </ul>
+          </div>
+
+          <!-- Amsterdam -->
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold flex items-center">
+                <span class="fi fi-nl w-5 mr-2"></span>
+                Anycast-Amsterdam
+              </h3>
+              <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">$5/月</span>
+            </div>
+            <ul class="space-y-1 text-sm">
+              <li><i class="fas fa-network-wired mr-2"></i>1Gbps, 1TB/月</li>
+              <li><i class="fas fa-server mr-2"></i>Vultr</li>
+              <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
+              <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+            </ul>
+          </div>
+
+          <!-- Mumbai -->
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold flex items-center">
+                <span class="fi fi-in w-5 mr-2"></span>
+                Anycast-Mumbai
+              </h3>
+              <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">$5/月</span>
+            </div>
+            <ul class="space-y-1 text-sm">
+              <li><i class="fas fa-network-wired mr-2"></i>1Gbps, 1TB/月</li>
+              <li><i class="fas fa-server mr-2"></i>Vultr</li>
+              <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
+              <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+            </ul>
+          </div>
+
+          <!-- Hong Kong -->
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold flex items-center">
+                <span class="fi fi-hk w-5 mr-2"></span>
+                Anycast-HongKong
+              </h3>
+              <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">¥31/月</span>
+            </div>
+            <ul class="space-y-1 text-sm">
+              <li><i class="fas fa-network-wired mr-2"></i>500Mbps, 1TB/月</li>
+              <li><i class="fas fa-server mr-2"></i>Akile</li>
+              <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
+              <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session (Premium)</li>
+            </ul>
+          </div>
+
+          <!-- Florida -->
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold flex items-center">
+                <span class="fi fi-us w-5 mr-2"></span>
+                AnyCast-Florida
+              </h3>
+              <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">$3.5/月</span>
+            </div>
+            <ul class="space-y-1 text-sm">
+              <li><i class="fas fa-network-wired mr-2"></i>3Gbps, 100TB/月</li>
+              <li><i class="fas fa-server mr-2"></i>Frantech</li>
+              <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
+              <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+            </ul>
+          </div>
+
+          <!-- Tallinn -->
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold flex items-center">
+                <span class="fi fi-ee w-5 mr-2"></span>
+                Anycast-Tallinn
+              </h3>
+              <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">€18.95/季</span>
+            </div>
+            <ul class="space-y-1 text-sm">
+              <li><i class="fas fa-network-wired mr-2"></i>1Gbps, 1TB/月</li>
+              <li><i class="fas fa-server mr-2"></i>V.PS</li>
+              <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
+              <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+            </ul>
+          </div>
+        </div>
+      </section>
     </article>
   </div>
 </template>
