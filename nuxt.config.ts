@@ -6,6 +6,11 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
+  runtimeConfig: {
+    public: {
+      gitHash: process.env.NUXT_PUBLIC_GIT_HASH || 'development',
+    }
+  },
   app: {
     head: {
       link: [

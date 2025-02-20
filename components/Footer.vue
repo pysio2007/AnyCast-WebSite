@@ -18,9 +18,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { getGitHash } from '~/utils/git-info'
+import { computed } from 'vue'
 
-const gitHash = ref<string>(getGitHash().substring(0, 10))
+const config = useRuntimeConfig()
+const gitHash = computed(() => config.public.gitHash)
 const currentYear = computed<number>(() => new Date().getFullYear())
 </script>
