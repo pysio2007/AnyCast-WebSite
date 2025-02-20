@@ -271,7 +271,7 @@ const fetchNodeData = async () => {
 
 onMounted(() => {
   fetchNodeData()
-  setInterval(fetchNodeData, 10000) // 每10秒更新一次
+  setInterval(fetchNodeData, 30000) // 每10秒更新一次
 })
 </script>
 
