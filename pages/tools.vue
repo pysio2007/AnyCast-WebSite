@@ -3,10 +3,11 @@
     <h1 class="text-3xl font-bold text-center mb-8">
       <i class="fas fa-tools mr-2"></i>网络工具箱
     </h1>
-    
+
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <!-- Looking Glass 卡片 -->
-      <NuxtLink to="/lg" class="card bg-base-200/50 backdrop-blur-md hover:bg-base-200/70 transition-all duration-300 shadow-lg">
+      <NuxtLink to="/lg"
+        class="card bg-base-200/50 backdrop-blur-md hover:bg-base-200/70 transition-all duration-300 shadow-lg">
         <div class="card-body">
           <h2 class="card-title">
             <i class="fas fa-search text-primary"></i>
@@ -17,7 +18,8 @@
       </NuxtLink>
 
       <!-- 路由追踪卡片 -->
-      <NuxtLink to="/traceroute" class="card bg-base-200/50 backdrop-blur-md hover:bg-base-200/70 transition-all duration-300 shadow-lg">
+      <NuxtLink to="/traceroute"
+        class="card bg-base-200/50 backdrop-blur-md hover:bg-base-200/70 transition-all duration-300 shadow-lg">
         <div class="card-body">
           <h2 class="card-title">
             <i class="fas fa-route text-primary"></i>
@@ -27,8 +29,21 @@
         </div>
       </NuxtLink>
 
+      <!-- BGP分析器卡片 -->
+      <NuxtLink to="/bgp"
+        class="card bg-base-200/50 backdrop-blur-md hover:bg-base-200/70 transition-all duration-300 shadow-lg">
+        <div class="card-body">
+          <h2 class="card-title">
+            <i class="fas fa-network-wired text-primary"></i>
+            BGP分析器
+          </h2>
+          <p class="text-base-content/70">分析BGP路由可见性和路径信息</p>
+        </div>
+      </NuxtLink>
+
       <!-- WHOIS查询卡片 -->
-      <NuxtLink to="/whois" class="card bg-base-200/50 backdrop-blur-md hover:bg-base-200/70 transition-all duration-300 shadow-lg">
+      <NuxtLink to="/whois"
+        class="card bg-base-200/50 backdrop-blur-md hover:bg-base-200/70 transition-all duration-300 shadow-lg">
         <div class="card-body">
           <h2 class="card-title">
             <i class="fas fa-database text-primary"></i>

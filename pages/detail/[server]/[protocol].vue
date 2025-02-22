@@ -135,7 +135,7 @@ const analyzedData = ref<AnalyzedData>({
 const apiUrl = 'https://lg.pysio.online/api/'
 
 // 格式化统计类型名称
-const formatStatType = (type: string): string => {
+const formatStatType = (type: string | number): string => {
   const typeMap: { [key: string]: string } = {
     'Import updates': '导入更新',
     'Import withdraws': '导入撤回',
@@ -144,7 +144,7 @@ const formatStatType = (type: string): string => {
     'BGP Next hop': 'BGP下一跳',
     'IGP IPv6 table': 'IGP IPv6表'
   }
-  return typeMap[type] || type
+  return typeMap[String(type)] || String(type)
 }
 
 // 格式化数字
