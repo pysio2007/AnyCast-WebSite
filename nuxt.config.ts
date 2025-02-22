@@ -14,7 +14,9 @@ export default defineNuxtConfig({
   app: {
     head: {
       meta: [
-        { name: 'color-scheme', content: 'light' }
+        { name: 'color-scheme', content: 'light only' },
+        { name: 'forced-colors', content: 'none' },
+        { name: 'prefers-color-scheme', content: 'light' }
       ],
       script: [
         {
