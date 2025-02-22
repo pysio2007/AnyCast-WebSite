@@ -5,7 +5,7 @@
     </div>
     <div v-else>
       <h1 class="text-2xl font-bold mb-8">
-        欢迎来自 {{ organization }} 的用户
+        来自 {{ organization }} 欢迎来到 Pysio's Networks
       </h1>
 
       <!-- 网络状态统计 -->
@@ -65,6 +65,10 @@
           <div class="stat-desc">自节点启动以来</div>
         </div>
       </div>
+
+        <p class="text-lg mb-6">
+          这里是 Pysio Networks 的网络监控/工具平台。你可以在此查询节点/BGP路由状态
+        </p>
     </div>
   </div>
 </template>
