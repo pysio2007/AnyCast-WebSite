@@ -34,8 +34,8 @@
         <h2 class="text-2xl font-bold mb-4">Looking Glass</h2>
         <p class="mb-4">
           您可以通过我们的 Looking Glass 服务查看网络状态：
-          <a href="http://lg.pysio.online/" class="text-blue-500 hover:text-blue-600" target="_blank">
-            http://lg.pysio.online/
+          <a href="https://anycast.ink/lg" class="text-blue-500 hover:text-blue-600" target="_blank">
+            https://anycast.ink/lg
           </a>
         </p>
       </section>

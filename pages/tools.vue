@@ -26,6 +26,17 @@
           <p class="text-base-content/70">追踪网络数据包的传输路径</p>
         </div>
       </NuxtLink>
+
+      <!-- WHOIS查询卡片 -->
+      <NuxtLink to="/whois" class="card bg-base-200/50 backdrop-blur-md hover:bg-base-200/70 transition-all duration-300 shadow-lg">
+        <div class="card-body">
+          <h2 class="card-title">
+            <i class="fas fa-database text-primary"></i>
+            WHOIS查询
+          </h2>
+          <p class="text-base-content/70">查询域名和IP地址的注册信息</p>
+        </div>
+      </NuxtLink>
     </div>
   </div>
 </template>

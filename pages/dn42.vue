@@ -33,8 +33,8 @@
       <div class="mb-6">
         <p>
           Looking Glass: 
-          <a href="http://lg.pysio.online/" class="text-blue-500 hover:text-blue-600" target="_blank">
-            http://lg.pysio.online/
+          <a href="https://anycast.ink/lg" class="text-blue-500 hover:text-blue-600" target="_blank">
+            https://anycast.ink/lg
           </a>
         </p>
       </div>
