@@ -13,10 +13,10 @@
 
         <!-- 更新日志列表 -->
         <div class="space-y-8">
-          <div v-for="(changes, version) in groupedChangelog" :key="version" class="card bg-base-300">
+          <div v-for="(changes, date) in groupedChangelog" :key="date" class="card bg-base-300">
             <div class="card-body">
               <h2 class="card-title text-xl">
-                <i class="fas fa-tag mr-2"></i>{{ version }}
+                <i class="fas fa-calendar mr-2"></i>{{ formatDate(date) }}
               </h2>
               
               <!-- 按类型分组显示变更 -->
@@ -29,7 +29,6 @@
                   <ul class="list-disc list-inside space-y-1 ml-4">
                     <li v-for="item in changes.feat" :key="item.hash" class="text-sm">
                       {{ item.message }}
-                      <span class="text-xs opacity-50">{{ formatDate(item.date) }}</span>
                     </li>
                   </ul>
                 </div>
@@ -42,7 +41,18 @@
                   <ul class="list-disc list-inside space-y-1 ml-4">
                     <li v-for="item in changes.fix" :key="item.hash" class="text-sm">
                       {{ item.message }}
-                      <span class="text-xs opacity-50">{{ formatDate(item.date) }}</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- 文档更新 -->
+                <div v-if="changes.docs?.length" class="space-y-2">
+                  <h3 class="font-semibold flex items-center gap-2">
+                    <i class="fas fa-book text-info"></i>文档更新
+                  </h3>
+                  <ul class="list-disc list-inside space-y-1 ml-4">
+                    <li v-for="item in changes.docs" :key="item.hash" class="text-sm">
+                      {{ item.message }}
                     </li>
                   </ul>
                 </div>
@@ -55,7 +65,6 @@
                   <ul class="list-disc list-inside space-y-1 ml-4">
                     <li v-for="item in changes.perf" :key="item.hash" class="text-sm">
                       {{ item.message }}
-                      <span class="text-xs opacity-50">{{ formatDate(item.date) }}</span>
                     </li>
                   </ul>
                 </div>
@@ -68,7 +77,6 @@
                   <ul class="list-disc list-inside space-y-1 ml-4">
                     <li v-for="item in changes.other" :key="item.hash" class="text-sm">
                       {{ item.message }}
-                      <span class="text-xs opacity-50">{{ formatDate(item.date) }}</span>
                     </li>
                   </ul>
                 </div>
@@ -100,16 +108,17 @@ const loading = ref(false)
 const error = ref('')
 const changelog = ref([])
 
-// 按版本分组的更新日志
+// 按日期分组的更新日志
 const groupedChangelog = computed(() => {
   const groups = {}
   
   for (const commit of changelog.value) {
-    const version = commit.version || 'unreleased'
-    if (!groups[version]) {
-      groups[version] = {
+    const date = new Date(commit.date).toISOString().split('T')[0]
+    if (!groups[date]) {
+      groups[date] = {
         feat: [],
         fix: [],
+        docs: [],
         perf: [],
         other: []
       }
@@ -117,17 +126,24 @@ const groupedChangelog = computed(() => {
 
     // 根据提交类型分类
     if (commit.type === 'feat') {
-      groups[version].feat.push(commit)
+      groups[date].feat.push(commit)
     } else if (commit.type === 'fix') {
-      groups[version].fix.push(commit)
+      groups[date].fix.push(commit)
+    } else if (commit.type === 'docs') {
+      groups[date].docs.push(commit)
     } else if (commit.type === 'perf') {
-      groups[version].perf.push(commit)
+      groups[date].perf.push(commit)
     } else {
-      groups[version].other.push(commit)
+      groups[date].other.push(commit)
     }
   }
 
-  return groups
+  // 只返回最近10天的数据
+  return Object.fromEntries(
+    Object.entries(groups)
+      .sort((a, b) => b[0].localeCompare(a[0]))
+      .slice(0, 10)
+  )
 })
 
 // 格式化日期
@@ -141,7 +157,7 @@ function formatDate(date) {
 
 // 解析常规提交格式
 function parseConventionalCommit(message) {
-  const regex = /^(feat|fix|perf|chore|docs|style|refactor|test|build|ci|revert)(\(.+\))?: (.+)$/
+  const regex = /^(feat|fix|perf|docs|chore|style|refactor|test|build|ci|revert)(\(.+\))?: (.+)$/
   const match = message.match(regex)
   
   if (match) {
