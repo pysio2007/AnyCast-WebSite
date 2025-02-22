@@ -6,6 +6,13 @@
       <span class="ml-2">正在获取Bird状态...</span>
     </div>
 
+    <!-- 显示错误节点信息 -->
+    <div v-if="!statusLoading && errorServers.length > 0" 
+         class="alert alert-warning shadow-lg mb-4">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>以下节点无法连接: {{ errorServers.join(', ') }}</span>
+    </div>
+
     <template v-for="server in serverStatus" :key="server.server">
       <div class="mb-8">
         <h2 class="text-xl font-bold mb-4">{{ server.server }}: show protocols</h2>
@@ -65,12 +72,14 @@ interface ServerListItem {
 }
 
 const serverStatus = ref<ApiSummaryResultPair[]>([])
+const errorServers = ref<string[]>([])
 const statusLoading = ref(false)
 const apiUrl = 'https://lg.pysio.online/api/'
 
 // 获取所有服务器的BGP状态
 const fetchAllServerStatus = async () => {
   statusLoading.value = true
+  errorServers.value = [] // 重置错误服务器列表
   try {
     // 尝试从缓存获取数据
     const cachedData = Cache.get<ApiSummaryResultPair[]>('serverStatus');
@@ -103,8 +112,20 @@ const fetchAllServerStatus = async () => {
     })
     const data = await response.json() as ApiResponse<ApiSummaryResultPair>;
     if (data.result) {
-      serverStatus.value = data.result;
-      Cache.set('serverStatus', data.result);
+      // 分离正常和错误的服务器
+      const validResults: ApiSummaryResultPair[] = [];
+      data.result.forEach(item => {
+        if ('error' in item || !Array.isArray(item.data)) {
+          errorServers.value.push(item.server);
+        } else {
+          validResults.push(item);
+        }
+      });
+      
+      serverStatus.value = validResults;
+      if (validResults.length > 0) {
+        Cache.set('serverStatus', validResults);
+      }
     }
   } catch (error) {
     console.error('获取服务器状态失败:', error)
