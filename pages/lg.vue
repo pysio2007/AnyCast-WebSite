@@ -32,7 +32,7 @@
             <tbody>
               <tr v-for="peer in server.data" 
                   :key="peer.name"
-                  :class="getRowClass(peer.state)">
+                  :class="getRowClass(peer.state, peer.info)">
                 <td class="border">
                   <NuxtLink 
                     :to="`/detail/${server.server}/${peer.name}`"
@@ -135,7 +135,13 @@ const fetchAllServerStatus = async () => {
 }
 
 // 获取行样式
-const getRowClass = (state: string): string => {
+const getRowClass = (state: string, info?: string): string => {
+  // 检查 Info 中是否包含错误信息
+  if (info && info.toLowerCase().includes('error')) {
+    return 'bg-error/10 hover:bg-error/20'
+  }
+  
+  // 如果没有错误信息，则按照原来的状态判断
   switch (state.toLowerCase()) {
     case 'up':
       return 'bg-success/10 hover:bg-success/20'
