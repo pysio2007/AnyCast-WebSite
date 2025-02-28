@@ -28,6 +28,16 @@ export default defineNuxtConfig({
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', 'G-P1L3MZ08KH');`
+        },
+        {
+          async: true,
+          src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6547593871065949',
+          crossorigin: 'anonymous'
+        },
+        {
+          defer: true,
+          src: 'https://umami.pysio.online/script.js',
+          'data-website-id': 'dcab8ed3-861e-49d8-9fc2-9af34a0ad5bf'
         }
       ],
       link: [
