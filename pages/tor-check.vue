@@ -333,22 +333,6 @@ const handleFlagIconError = (event: Event, flag: string) => {
   }
 }
 
-// 获取节点角色描述
-const getRoleDescription = (flags: string[]) => {
-  if (!flags) return ''
-  
-  const roles = []
-  if (flags.includes('Exit')) roles.push('可以作为出口节点，允许流量离开Tor网络')
-  if (flags.includes('Guard')) roles.push('作为守卫节点，是进入Tor网络的第一跳')
-  if (flags.includes('Fast')) roles.push('这是一个高速节点')
-  if (flags.includes('Stable')) roles.push('这是一个稳定的节点')
-  if (flags.includes('Running')) roles.push('节点当前正在运行')
-  if (flags.includes('V2Dir')) roles.push('支持V2目录协议')
-  if (flags.includes('Valid')) roles.push('这是一个有效的节点')
-  if (flags.includes('HSDir')) roles.push('作为隐藏服务目录')
-  
-  return roles.join('；')
-}
 </script>
 
 <style scoped>
