@@ -3,31 +3,48 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/07a71781-e002-4a8b-ba2e-55b01e21109b/deploy-status)](https://app.netlify.com/sites/pysio-anycast/deploys)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-个人 BGP 站点，基于 Nuxt3 构建，使用 Tailwind CSS 和 DaisyUI 进行样式设计。
+个人 BGP 站点，基于 Nuxt3 构建，使用 Tailwind CSS 和 DaisyUI 进行样式设计。提供多种网络工具和信息查询服务。
 
-## 功能特性
+## 🌟 功能特性
 
-- 🌐 基于 BGP 的全球加速
-- 🎨 使用 DaisyUI 的现代化界面设计
-- 📱 完全响应式布局
-- 📝 集成博客 RSS 订阅功能
-- 🚀 由 Netlify 提供部署和托管
-- 🔒 完全开源，采用 AGPL-3.0 协议
-- 🌏 全球 CDN 加速
-- 📊 实时 IP 信息展示
-- 🔗 GitHub 提交历史追踪
-- 📦 模块化设计
+### 🛠️ 网络工具箱
+- **Looking Glass**: 查看网络路由信息和BGP状态
+- **路由追踪**: 追踪网络数据包的传输路径
+- **BGP分析器**: 分析BGP路由可见性和路径信息
+- **WHOIS查询**: 查询域名和IP地址的注册信息
+- **Tor节点查询**: 检查IP是否为Tor网络节点并显示详细信息
 
-## 技术栈
+### 🌐 网络服务
+- **Anycast**: 基于 BGP 的全球加速服务
+- **DN42**: DN42网络接入和信息
+- **Tor**: Tor网络出口节点服务
+- **BGP**: BGP路由和AS信息展示
 
-- Nuxt3
-- Vue3
-- TypeScript
-- Tailwind CSS
-- DaisyUI
-- RSS Parser
+### 📱 界面设计
+- 现代化的响应式设计
+- 支持亮色/暗色主题
+- 优雅的动画效果
+- 直观的数据可视化
 
-## 开发
+### 🔧 技术特性
+- 实时数据更新
+- 全球CDN加速
+- API健康监控
+- 安全的HTTPS访问
+
+## 🚀 技术栈
+
+- **框架**: Nuxt3 + Vue3
+- **语言**: TypeScript
+- **样式**: Tailwind CSS + DaisyUI
+- **部署**: Netlify
+- **API集成**:
+  - BGP.Tools API
+  - Tor Metrics API
+  - RIPE RIS API
+  - DN42 Registry API
+
+## 💻 开发
 
 ```bash
 # 安装依赖
@@ -35,11 +52,7 @@ npm install
 
 # 启动开发服务器
 npm run dev
-```
 
-## 构建
-
-```bash
 # 构建生产版本
 npm run build
 
@@ -47,18 +60,42 @@ npm run build
 npm run preview
 ```
 
-## 部署
+## 📦 项目结构
 
-项目自动部署在 Netlify 上，每次推送到 main 分支都会触发自动部署。
+```
+AnyCast-WebSite/
+├── pages/              # 页面组件
+│   ├── tools.vue       # 工具箱主页
+│   ├── lg.vue         # Looking Glass
+│   ├── traceroute.vue # 路由追踪
+│   ├── bgp.vue        # BGP分析器
+│   ├── whois.vue      # WHOIS查询
+│   ├── tor-check.vue  # Tor节点查询
+│   └── ...
+├── components/         # 可复用组件
+├── public/            # 静态资源
+└── utils/             # 工具函数
+```
 
-## 许可证
+## 🔄 自动部署
+
+项目配置了 Netlify 自动部署流程：
+- 推送到 `main` 分支自动触发部署
+- 自动化的构建和测试
+- 全球 CDN 分发
+
+## 📄 许可证
 
 本项目采用 [GNU Affero General Public License v3.0](LICENSE) 开源协议。
 根据 AGPL-3.0 协议的要求，任何对本软件的修改和使用都需要开源并保持同样的协议。
 
-## 作者
+## 👨‍💻 作者
 
 **Pysio**
 
 - GitHub: [@pysio2007](https://github.com/pysio2007)
 - Blog: [pysio.online](https://www.pysio.online)
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request 来帮助改进项目。
