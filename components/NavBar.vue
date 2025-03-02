@@ -14,6 +14,7 @@
       <ul class="hidden lg:flex menu menu-horizontal px-1 gap-2">
         <li><NuxtLink to="/"><i class="fas fa-home mr-2"></i>首页</NuxtLink></li>
         <li><NuxtLink to="/anycast"><i class="fas fa-network-wired mr-2"></i>AnyCast</NuxtLink></li>
+        <li><NuxtLink to="/tor"><i class="fas fa-user-secret mr-2"></i>Tor</NuxtLink></li>
         <li><NuxtLink to="/dn42"><i class="fas fa-project-diagram mr-2"></i>DN42</NuxtLink></li>
         <li><NuxtLink to="/tools"><i class="fas fa-tools mr-2"></i>工具箱</NuxtLink></li>
         <li><NuxtLink to="/blog"><i class="fas fa-blog mr-2"></i>Blog</NuxtLink></li>
@@ -30,6 +31,7 @@
         <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
           <li><NuxtLink to="/"><i class="fas fa-home mr-2"></i>首页</NuxtLink></li>
           <li><NuxtLink to="/anycast"><i class="fas fa-network-wired mr-2"></i>AnyCast</NuxtLink></li>
+          <li><NuxtLink to="/tor"><i class="fas fa-user-secret mr-2"></i>Tor</NuxtLink></li>
           <li><NuxtLink to="/dn42"><i class="fas fa-project-diagram mr-2"></i>DN42</NuxtLink></li>
           <li><NuxtLink to="/tools"><i class="fas fa-tools mr-2"></i>工具箱</NuxtLink></li>
           <li><NuxtLink to="/blog"><i class="fas fa-blog mr-2"></i>Blog</NuxtLink></li>
