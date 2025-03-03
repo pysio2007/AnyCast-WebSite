@@ -93,10 +93,55 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      htmlAttrs: {
+        lang: 'zh-CN'
+      },
+      title: 'Pysio Networks - Anycast Tools',
       meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'format-detection', content: 'telephone=no' },
         { name: 'color-scheme', content: 'light only' },
         { name: 'forced-colors', content: 'none' },
-        { name: 'prefers-color-scheme', content: 'light' }
+        { name: 'prefers-color-scheme', content: 'light' },
+        {
+          name: 'description',
+          content: 'Pysio Networks 提供 Anycast 网络服务与专业网络工具集，包括 Looking Glass、路由追踪、BGP分析器、WHOIS查询和Tor节点查询等功能。'
+        },
+        {
+          name: 'keywords',
+          content: 'Pysio Networks, Anycast, BGP, Looking Glass, 路由追踪, WHOIS, Tor, DN42, 网络工具'
+        },
+        // Open Graph
+        {
+          property: 'og:title',
+          content: 'Pysio Networks - Anycast Tools'
+        },
+        {
+          property: 'og:description',
+          content: 'Pysio Networks 提供 Anycast 网络服务与专业网络工具集，包括 Looking Glass、路由追踪、BGP分析器、WHOIS查询和Tor节点查询等功能。'
+        },
+        {
+          property: 'og:type',
+          content: 'website'
+        },
+        {
+          property: 'og:url',
+          content: 'https://anycast.ink'
+        },
+        // Twitter Card
+        {
+          name: 'twitter:card',
+          content: 'summary'
+        },
+        {
+          name: 'twitter:title',
+          content: 'Pysio Networks - Anycast Tools'
+        },
+        {
+          name: 'twitter:description',
+          content: 'Pysio Networks 提供 Anycast 网络服务与专业网络工具集，包括 Looking Glass、路由追踪、BGP分析器、WHOIS查询和Tor节点查询等功能。'
+        }
       ],
       script: [
         {
