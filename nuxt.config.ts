@@ -86,6 +86,12 @@ export default defineNuxtConfig({
             changefreq: 'weekly',
             priority: 0.6,
             lastmod: new Date().toISOString()
+          },
+          {
+            url: '/openbmclapi',
+            changefreq: 'hourly',
+            priority: 0.8,
+            lastmod: new Date().toISOString()
           }
         ]
       }
