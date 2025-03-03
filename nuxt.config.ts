@@ -13,7 +13,7 @@ export default defineNuxtConfig({
         siteUrl: 'https://anycast.ink',
         changefreq: 'daily',
         priority: 0.7,
-        exclude: ['/404'],
+        exclude: ['/404', '/openbmclapi/*'],
         urls: [
           {
             url: '/',

@@ -215,10 +215,13 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch, onUnmounted, nextTick } from 'vue'
 import { useHead } from 'unhead'
+import { useRoute } from 'vue-router'
 
 definePageMeta({
   layout: 'default'
 })
+
+const route = useRoute()
 
 // 添加 SEO meta 信息
 useHead({
@@ -373,6 +376,25 @@ const fetchNodes = async () => {
     const data = await response.json()
     nodes.value = data
     lastUpdate.value = new Date()
+
+    // 检查是否需要打开特定节点
+    if (route.query.node) {
+      const nodeToOpen = nodes.value.find(node => node.name === decodeURIComponent(route.query.node as string))
+      if (nodeToOpen) {
+        openNodeDetails(nodeToOpen)
+      }
+    } else if (process.client) {
+      // 检查 localStorage 中是否有需要打开的节点
+      const savedNode = localStorage.getItem('openNodeDetails')
+      if (savedNode) {
+        const nodeData = JSON.parse(savedNode)
+        const nodeToOpen = nodes.value.find(node => node.name === nodeData.name)
+        if (nodeToOpen) {
+          openNodeDetails(nodeToOpen)
+        }
+        localStorage.removeItem('openNodeDetails')
+      }
+    }
   } catch (error) {
     console.error('获取节点数据失败:', error)
   } finally {
