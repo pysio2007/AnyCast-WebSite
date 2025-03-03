@@ -1,5 +1,10 @@
 <template>
-  <div class="container mx-auto p-4">
+  <div class="container mx-auto px-4 py-8">
+    <PageSeo 
+      title="Looking Glass" 
+      description="专业的网络路由信息查看工具，提供 BGP 路由表查询、路由可达性测试等功能。"
+    />
+    <article class="prose dark:prose-invert max-w-none">
     <!-- 添加加载状态提示 -->
     <div v-if="statusLoading" class="flex justify-center items-center mb-4">
       <div class="loading loading-spinner loading-lg text-primary"></div>
@@ -61,6 +66,7 @@
         <i class="fas fa-sync-alt" :class="{ 'animate-spin': statusLoading }"></i>
       </button>
     </div>
+    </article>
   </div>
 </template>
 

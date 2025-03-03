@@ -1,5 +1,9 @@
 <template>
   <div class="container mx-auto px-4 py-8">
+    <PageSeo 
+      title="Tor 节点查询" 
+      description="查询 IP 地址是否为 Tor 网络节点，并显示详细的节点信息，包括带宽、地理位置、运行状态等。"
+    />
     <article class="prose dark:prose-invert max-w-none">
       <h1 class="text-4xl font-bold mb-6">Tor 节点查询</h1>
 

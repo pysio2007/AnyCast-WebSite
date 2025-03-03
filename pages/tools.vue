@@ -1,5 +1,9 @@
 <template>
   <div class="container mx-auto p-4">
+    <PageSeo 
+      title="网络工具箱" 
+      description="专业的网络工具集，提供 Looking Glass、路由追踪、BGP分析器、WHOIS查询和Tor节点查询等功能。"
+    />
     <h1 class="text-3xl font-bold text-center mb-8">
       <i class="fas fa-tools mr-2"></i>网络工具箱
     </h1>
