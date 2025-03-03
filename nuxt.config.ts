@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxtjs/tailwindcss','@nuxt/content'],
+  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/sitemap' , '@nuxt/content'],
   tailwindcss: {
     configPath: '~/tailwind.config.ts',
   },
@@ -9,6 +9,86 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       gitHash: process.env.NUXT_PUBLIC_GIT_HASH || 'development',
+      sitemap: {
+        siteUrl: 'https://anycast.ink',
+        changefreq: 'daily',
+        priority: 0.7,
+        exclude: ['/404'],
+        urls: [
+          {
+            url: '/',
+            changefreq: 'daily',
+            priority: 1.0,
+            lastmod: new Date().toISOString()
+          },
+          {
+            url: '/tools',
+            changefreq: 'weekly',
+            priority: 0.9,
+            lastmod: new Date().toISOString()
+          },
+          {
+            url: '/lg',
+            changefreq: 'daily',
+            priority: 0.8,
+            lastmod: new Date().toISOString()
+          },
+          {
+            url: '/traceroute',
+            changefreq: 'daily',
+            priority: 0.8,
+            lastmod: new Date().toISOString()
+          },
+          {
+            url: '/bgp',
+            changefreq: 'daily',
+            priority: 0.8,
+            lastmod: new Date().toISOString()
+          },
+          {
+            url: '/whois',
+            changefreq: 'daily',
+            priority: 0.8,
+            lastmod: new Date().toISOString()
+          },
+          {
+            url: '/tor-check',
+            changefreq: 'daily',
+            priority: 0.8,
+            lastmod: new Date().toISOString()
+          },
+          {
+            url: '/tor',
+            changefreq: 'daily',
+            priority: 0.8,
+            lastmod: new Date().toISOString()
+          },
+          {
+            url: '/anycast',
+            changefreq: 'weekly',
+            priority: 0.8,
+            lastmod: new Date().toISOString()
+          },
+          {
+            url: '/dn42',
+            changefreq: 'weekly',
+            priority: 0.8,
+            lastmod: new Date().toISOString()
+          },
+          {
+            url: '/blog',
+            changefreq: 'daily',
+            priority: 0.9,
+            lastmod: new Date().toISOString()
+          },
+          {
+            url: '/version',
+            changefreq: 'weekly',
+            priority: 0.6,
+            lastmod: new Date().toISOString()
+          }
+        ]
+      }
     }
   },
   app: {
@@ -60,5 +140,5 @@ export default defineNuxtConfig({
         }
       ]
     }
-  }
+  },
 })
