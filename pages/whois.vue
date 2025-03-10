@@ -496,7 +496,7 @@ async function handleQuery() {
         break
     }
 
-    const response = await fetch(`http://whois.akaere.online${endpoint}`)
+    const response = await fetch(`https://whois.akaere.online${endpoint}`)
     if (!response.ok) {
       throw new Error('查询失败')
     }
