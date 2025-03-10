@@ -1,33 +1,6 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <article class="prose dark:prose-invert max-w-none">
-      <!-- 提示信息 -->
-      <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 p-4 mb-8">
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <i class="fas fa-info-circle text-blue-400"></i>
-          </div>
-          <div class="ml-3">
-            <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
-              提示
-            </h3>
-            <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
-              <p class="flex items-center">
-                <span>此节点运行时间不足两周，正处于成长期。</span>
-                <a 
-                  href="https://metrics.torproject.org/rs.html#details/2F59BA21B8D07BE11FCD50C731CA5CAB638F624B" 
-                  target="_blank"
-                  class="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 ml-2"
-                >
-                  <span>在 Tor Metrics 查看完整统计信息</span>
-                  <i class="fas fa-external-link-alt ml-1"></i>
-                </a>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <h1 class="text-4xl font-bold mb-6">Tor 中继节点服务</h1>
 
       <!-- 节点基本信息卡片 -->
