@@ -13,9 +13,27 @@
 
     <!-- 显示错误节点信息 -->
     <div v-if="!statusLoading && errorServers.length > 0" 
-         class="alert alert-warning shadow-lg mb-4">
-      <i class="fas fa-exclamation-triangle"></i>
-      <span>以下节点无法连接: {{ errorServers.join(', ') }}</span>
+         class="alert alert-error mb-4">
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <div>
+          <h3 class="font-bold">无法连接的节点</h3>
+          <div class="text-sm">以下节点连接超时或出现错误：</div>
+          <div class="mt-1 space-x-2">
+            <span v-for="server in errorServers" 
+                  :key="server" 
+                  class="badge badge-ghost">
+              {{ server }}
+            </span>
+          </div>
+          <button class="btn btn-sm btn-ghost mt-2" @click="retryErrorServers">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            重试失败节点
+          </button>
+        </div>
+      </div>
     </div>
 
     <template v-for="server in serverStatus" :key="server.server">
@@ -91,6 +109,7 @@ const fetchAllServerStatus = async () => {
     const cachedData = Cache.get<ApiSummaryResultPair[]>('serverStatus');
     if (cachedData) {
       serverStatus.value = cachedData;
+      statusLoading.value = false;
       return;
     }
 
@@ -105,7 +124,25 @@ const fetchAllServerStatus = async () => {
       })
     })
     const serverListData = await serverListResponse.json() as ApiResponse<ServerListItem>;
-    const serverList = serverListData.result.map((item: ServerListItem) => item.server);
+    
+    // 检查是否有错误
+    if (serverListData.error) {
+      console.error('获取服务器列表失败:', serverListData.error);
+      errorServers.value = ['API服务器'];
+      serverStatus.value = [];
+      return;
+    }
+
+    if (!serverListData.result || !Array.isArray(serverListData.result)) {
+      console.error('服务器列表数据格式错误');
+      errorServers.value = ['API服务器'];
+      serverStatus.value = [];
+      return;
+    }
+
+    let serverList = serverListData.result
+      .map((item: ServerListItem) => item.server)
+      .filter(server => server !== 'OpenBmclapi-Bgp'); // 移除已知的故障节点
 
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -117,6 +154,53 @@ const fetchAllServerStatus = async () => {
       })
     })
     const data = await response.json() as ApiResponse<ApiSummaryResultPair>;
+    
+    if (data.error) {
+      // 如果返回错误，尝试解析错误信息找出故障节点
+      const errorMessage = data.error.toLowerCase();
+      const failedServer = serverList.find(server => errorMessage.includes(server.toLowerCase()));
+      
+      if (failedServer) {
+        // 将故障节点添加到错误列表
+        errorServers.value.push(failedServer);
+        // 从服务器列表中移除故障节点
+        serverList = serverList.filter(server => server !== failedServer);
+        
+        // 重试剩余节点
+        const retryResponse = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            servers: serverList,
+            type: 'summary',
+            args: ''
+          })
+        });
+        const retryData = await retryResponse.json() as ApiResponse<ApiSummaryResultPair>;
+        
+        if (retryData.result) {
+          const validResults: ApiSummaryResultPair[] = [];
+          retryData.result.forEach(item => {
+            if (!('error' in item) && Array.isArray(item.data)) {
+              validResults.push(item);
+            } else {
+              errorServers.value.push(item.server);
+            }
+          });
+          
+          serverStatus.value = validResults;
+          if (validResults.length > 0) {
+            Cache.set('serverStatus', validResults);
+          }
+        }
+      } else {
+        console.error('获取服务器状态失败:', data.error);
+        errorServers.value = serverList;
+        serverStatus.value = [];
+      }
+      return;
+    }
+
     if (data.result) {
       // 分离正常和错误的服务器
       const validResults: ApiSummaryResultPair[] = [];
@@ -132,11 +216,16 @@ const fetchAllServerStatus = async () => {
       if (validResults.length > 0) {
         Cache.set('serverStatus', validResults);
       }
+    } else {
+      errorServers.value = serverList;
+      serverStatus.value = [];
     }
   } catch (error) {
-    console.error('获取服务器状态失败:', error)
+    console.error('获取服务器状态失败:', error);
+    errorServers.value = ['API服务器'];
+    serverStatus.value = [];
   } finally {
-    statusLoading.value = false
+    statusLoading.value = false;
   }
 }
 
@@ -159,6 +248,101 @@ const getRowClass = (state: string, info?: string): string => {
       return 'hover:bg-base-200'
   }
 }
+
+const retryErrorServers = async () => {
+  if (errorServers.value.length === 0) return;
+  
+  statusLoading.value = true;
+  try {
+    // 过滤掉已知的故障节点
+    const serversToRetry = errorServers.value.filter(server => server !== 'OpenBmclapi-Bgp');
+    
+    if (serversToRetry.length === 0) {
+      console.log('没有可重试的节点');
+      return;
+    }
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        servers: serversToRetry,
+        type: 'summary',
+        args: ''
+      })
+    });
+    
+    const data = await response.json() as ApiResponse<ApiSummaryResultPair>;
+    
+    if (data.error) {
+      // 如果返回错误，尝试解析错误信息找出故障节点
+      const errorMessage = data.error.toLowerCase();
+      const failedServer = serversToRetry.find(server => errorMessage.includes(server.toLowerCase()));
+      
+      if (failedServer) {
+        // 保持故障节点在错误列表中
+        const remainingServers = serversToRetry.filter(server => server !== failedServer);
+        if (remainingServers.length > 0) {
+          // 重试剩余节点
+          const retryResponse = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              servers: remainingServers,
+              type: 'summary',
+              args: ''
+            })
+          });
+          const retryData = await retryResponse.json() as ApiResponse<ApiSummaryResultPair>;
+          
+          if (retryData.result) {
+            const validResults: ApiSummaryResultPair[] = [];
+            retryData.result.forEach(item => {
+              if (!('error' in item) && Array.isArray(item.data)) {
+                validResults.push(item);
+                // 从错误列表中移除成功的服务器
+                const index = errorServers.value.indexOf(item.server);
+                if (index > -1) {
+                  errorServers.value.splice(index, 1);
+                }
+              }
+            });
+            
+            if (validResults.length > 0) {
+              serverStatus.value = [...serverStatus.value, ...validResults];
+              Cache.set('serverStatus', serverStatus.value);
+            }
+          }
+        }
+      }
+      return;
+    }
+    
+    if (data.result) {
+      const validResults: ApiSummaryResultPair[] = [];
+      
+      data.result.forEach(item => {
+        if (!('error' in item) && Array.isArray(item.data)) {
+          validResults.push(item);
+          // 从错误列表中移除成功重试的服务器
+          const index = errorServers.value.indexOf(item.server);
+          if (index > -1) {
+            errorServers.value.splice(index, 1);
+          }
+        }
+      });
+      
+      if (validResults.length > 0) {
+        serverStatus.value = [...serverStatus.value, ...validResults];
+        Cache.set('serverStatus', serverStatus.value);
+      }
+    }
+  } catch (error) {
+    console.error('重试失败节点时出错:', error);
+  } finally {
+    statusLoading.value = false;
+  }
+};
 
 // 页面加载时获取状态
 onMounted(async () => {
