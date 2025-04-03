@@ -18,7 +18,7 @@ export default defineNuxtConfig({
         siteUrl: 'https://anycast.ink',
         changefreq: 'daily',
         priority: 0.7,
-        exclude: ['/404', '/openbmclapi/*'],
+        exclude: ['/404'],
         urls: [
           {
             url: '/',
@@ -93,8 +93,8 @@ export default defineNuxtConfig({
             lastmod: new Date().toISOString()
           },
           {
-            url: '/openbmclapi',
-            changefreq: 'hourly',
+            url: '/lir',
+            changefreq: 'weekly',
             priority: 0.8,
             lastmod: new Date().toISOString()
           }
