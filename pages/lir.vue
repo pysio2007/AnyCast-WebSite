@@ -12,11 +12,20 @@
         <img src="/RIR/RIPE-NCC-Member.png" alt="RIPE NCC Member Logo" class="h-16 max-w-[220px] object-contain" />
         <img src="/RIR/apnic-seeklogo.png" alt="APNIC Logo" class="h-14 max-w-[200px] object-contain" />
       </div>
-
-      <div class="bg-blue-50 border-l-4 border-blue-400 p-4 my-4 dark:bg-blue-900/20">
-        <p class="text-blue-700 dark:text-blue-200">
-          我们提供优质的 LIR 服务，支持中文服务，全程协助您完成资源申请和配置过程。所有价格已包含 RIPE/APNIC 会费分摊。
-        </p>
+      
+      <div class="mt-4 mb-2 text-sm flex flex-wrap gap-x-8 gap-y-2">
+        <div class="flex items-center">
+          <div class="w-4 h-4 bg-blue-50 dark:bg-blue-900/15 mr-2"></div>
+          <span>需要审核与 KYC 流程</span>
+        </div>
+        <div class="flex items-center">
+          <div class="w-4 h-4 bg-red-50 dark:bg-red-900/15 mr-2"></div>
+          <span>暂时无货</span>
+        </div>
+        <div class="flex items-center">
+          <div class="w-4 h-4 bg-yellow-50 dark:bg-yellow-900/15 mr-2"></div>
+          <span>即将缺货</span>
+        </div>
       </div>
 
       <section class="my-8">
@@ -34,14 +43,14 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>ASN Registration + /44 IPv6</td>
+              <tr class="bg-blue-50 dark:bg-blue-900/15 !odd:bg-blue-50 !even:bg-blue-50">
+                <td>RIPE ASN Registration + /44 IPv6</td>
                 <td>不适用</td>
                 <td>不适用</td>
                 <td>¥620/年</td>
                 <td>$85/年</td>
               </tr>
-              <tr>
+              <tr class="bg-yellow-50 dark:bg-yellow-900/15 !odd:bg-yellow-50 !even:bg-yellow-50">
                 <td>IPv6 PA /44 ~ /48</td>
                 <td>¥0/月</td>
                 <td>$0/月</td>
@@ -75,7 +84,14 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr class="bg-blue-50 dark:bg-blue-900/15 !odd:bg-blue-50 !even:bg-blue-50">
+                <td>APNIC ASN Registration</td>
+                <td>不适用</td>
+                <td>不适用</td>
+                <td>首年¥5090<br>后续¥730/年</td>
+                <td>首年$700<br>后续$100/年</td>
+              </tr>
+              <tr class="bg-red-50 dark:bg-red-900/15 !odd:bg-red-50 !even:bg-red-50">
                 <td>APNIC IPv6 PA /44 ~ /48</td>
                 <td>¥0/月</td>
                 <td>$0/月</td>
@@ -173,13 +189,6 @@
                 <td>¥16000/年</td>
                 <td>$2200/年</td>
               </tr>
-              <tr>
-                <td>APNIC ASN Registration</td>
-                <td>不适用</td>
-                <td>不适用</td>
-                <td>首年¥5090<br>后续¥730/年</td>
-                <td>首年$700<br>后续$100/年</td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -260,5 +269,60 @@ onMounted(() => {
   padding: 0.125rem 0.5rem;
   border-radius: 0.25rem;
   font-size: 0.875rem;
+}
+
+/* 确保颜色能覆盖zebra样式 */
+.table-zebra tbody tr.bg-red-50 {
+  background-color: rgb(254 242 242) !important;
+}
+
+.table-zebra tbody tr.bg-blue-50 {
+  background-color: rgb(239 246 255) !important;
+}
+
+.table-zebra tbody tr.bg-yellow-50 {
+  background-color: rgb(254 252 232) !important;
+}
+
+.table-zebra tbody tr.bg-red-100,
+.table-zebra tbody tr.bg-yellow-100 {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .table-zebra tbody tr.dark\:bg-red-900\/15 {
+    background-color: rgba(127, 29, 29, 0.15) !important;
+  }
+  
+  .table-zebra tbody tr.dark\:bg-blue-900\/15 {
+    background-color: rgba(30, 58, 138, 0.15) !important;
+  }
+  
+  .table-zebra tbody tr.dark\:bg-yellow-900\/15 {
+    background-color: rgba(113, 63, 18, 0.15) !important;
+  }
+
+  .table-zebra tbody tr.dark\:bg-red-900\/20,
+  .table-zebra tbody tr.dark\:bg-blue-900\/20,
+  .table-zebra tbody tr.dark\:bg-yellow-900\/20,
+  .table-zebra tbody tr.dark\:bg-red-900\/30,
+  .table-zebra tbody tr.dark\:bg-blue-900\/30,
+  .table-zebra tbody tr.dark\:bg-yellow-900\/30 {
+    display: none;
+  }
+}
+
+/* 禁止选中和拖动 */
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+img {
+  -webkit-user-drag: none;
+  pointer-events: none;
 }
 </style> 
