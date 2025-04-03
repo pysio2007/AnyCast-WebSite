@@ -155,7 +155,7 @@ export default defineNuxtConfig({
           src: 'https://www.googletagmanager.com/gtag/js?id=G-P1L3MZ08KH'
         },
         {
-          children: `window.dataLayer = window.dataLayer || [];
+          innerHTML: `window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', 'G-P1L3MZ08KH');`
