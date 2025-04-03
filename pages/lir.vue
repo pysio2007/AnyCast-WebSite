@@ -240,10 +240,10 @@
           如果您对我们的 LIR 服务有任何疑问或需要更多信息，请通过以下方式联系我们：
         </p>
         <div class="flex flex-wrap gap-4">
-          <a href="mailto:lir@example.com" class="btn btn-outline gap-2">
+          <a href="mailto:lir@pysio.online" class="btn btn-outline gap-2">
             <i class="fas fa-envelope"></i> 电子邮件
           </a>
-          <a href="https://t.me/example" class="btn btn-outline gap-2">
+          <a href="https://t.me/Pysio07" class="btn btn-outline gap-2">
             <i class="fab fa-telegram"></i> Telegram
           </a>
         </div>
