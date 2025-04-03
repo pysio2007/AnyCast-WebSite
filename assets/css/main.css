@@ -18,41 +18,63 @@
 
 /* 基础样式 */
 body {
-  @apply bg-base-100 text-base-content;
   font-family: "JetBrains Mono", PingFang SC, "Microsoft YaHei", sans-serif;
 }
 
 /* 响应式布局 */
-@layer components {
-  .container {
-    @apply mx-auto px-4;
-  }
+.container {
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 /* 博客卡片样式 */
 .card {
-  @apply bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out;
+  background-color: var(--b1);
+  box-shadow: var(--shadow-xl);
+  transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-2xl);
 }
 
 .card-title {
-  @apply text-2xl font-bold;
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 
 .card-body {
-  @apply p-6;
+  padding: 1.5rem;
 }
 
 /* 标签样式 */
 .badge {
-  @apply cursor-pointer transition-colors duration-200;
+  cursor: pointer;
+  transition: colors 0.2s ease;
 }
 
 /* 按钮样式 */
 .btn {
-  @apply transition-all duration-200;
+  transition: all 0.2s ease;
 }
 
 /* 加载动画 */
 .loading {
-  @apply text-primary;
+  color: var(--p);
+}
+
+/* 底部栏样式 */
+.footer {
+  border-top: 1px solid var(--b3);
+}
+
+.footer a {
+  color: var(--bc);
+  transition: color 0.2s ease;
+}
+
+.footer a:hover {
+  color: var(--p);
 } 

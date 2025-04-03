@@ -1,5 +1,5 @@
 <template>
-  <footer class="footer px-4 py-3 bg-base-100 text-base-content border-t">
+  <footer class="footer px-4 py-3 bg-base-100 text-base-content border-t border-base-300">
     <div class="flex items-center gap-2">
       <p>Pysio's Network {{ currentYear }}</p>
       <span class="text-gray-400">/</span>

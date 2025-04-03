@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto p-4">
-    <div class="card backdrop-blur-md bg-base-200/50 shadow-xl">
+    <div class="card backdrop-blur-md bg-opacity-50 bg-base-200 shadow-xl">
       <div class="card-body">
         <h2 class="card-title text-2xl mb-6 text-center justify-center">
           <i class="fas fa-route mr-2"></i>路由追踪
@@ -17,11 +17,11 @@
                   <span class="label-text">选择服务器</span>
                 </label>
                 <div class="dropdown w-full">
-                  <label tabindex="0" class="btn btn-ghost w-full justify-between bg-base-100/70 hover:bg-base-200/70">
+                  <label tabindex="0" class="btn btn-ghost w-full justify-between bg-opacity-70 bg-base-100 hover:bg-opacity-70 hover:bg-base-200">
                     <span class="normal-case">{{ selectedServer ? serverDisplayNames[selectedServer] : '请选择服务器' }}</span>
                     <i class="fas fa-chevron-down text-xs opacity-50"></i>
                   </label>
-                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-lg bg-base-200/95 backdrop-blur-md rounded-box w-full max-h-60 overflow-auto">
+                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-lg bg-opacity-95 bg-base-200 backdrop-blur-md rounded-box w-full max-h-60 overflow-auto">
                     <li v-for="server in availableServers" :key="server">
                       <a 
                         @click="selectedServer = server"
@@ -45,7 +45,7 @@
                     v-model="target"
                     type="text"
                     placeholder="8.8.8.8 或 google.com"
-                    class="input input-bordered join-item flex-1 bg-base-100/70"
+                    class="input input-bordered join-item flex-1 bg-opacity-70 bg-base-100"
                     :disabled="!selectedServer"
                     @keyup.enter="performTraceroute"
                   />
@@ -91,7 +91,7 @@
                 </p>
               </div>
               
-              <div v-else-if="parsedResult" class="card bg-base-100/70 backdrop-blur shadow-lg">
+              <div v-else-if="parsedResult" class="card bg-opacity-70 bg-base-100 backdrop-blur shadow-lg">
                 <div class="card-body">
                   <!-- 标题信息 -->
                   <div class="text-sm font-mono mb-4">{{ parsedResult.header }}</div>
@@ -516,15 +516,20 @@ const parseTracerouteResult = async (text: string) => {
 
 /* 表格样式 */
 .table th {
-  @apply bg-base-200/50 text-base-content/70;
+  background-color: rgba(var(--b2), 0.5);
+  color: rgba(var(--bc), 0.7);
 }
 
 .table td {
-  @apply border-base-300/20 max-w-[200px] truncate;
+  border-color: rgba(var(--b3), 0.2);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .progress {
   height: 0.5rem;
-  @apply bg-base-200;
+  background-color: var(--b2);
 }
 </style>

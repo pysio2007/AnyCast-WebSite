@@ -352,15 +352,21 @@ onMounted(async () => {
 
 <style lang="postcss" scoped>
 .table {
-  @apply text-sm;
+  font-size: 0.875rem;
 }
 
 .table th {
-  @apply bg-base-200 text-base-content/70 font-bold text-xs uppercase tracking-wider py-2 px-3;
+  background-color: var(--b2);
+  color: rgba(var(--bc), 0.7);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.5rem 0.75rem;
 }
 
 .table td {
-  @apply py-2 px-3;
+  padding: 0.5rem 0.75rem;
 }
 
 /* 确保表格在移动设备上可以水平滚动 */
@@ -371,11 +377,11 @@ onMounted(async () => {
 /* 保持表格紧凑 */
 .table-sm th,
 .table-sm td {
-  @apply py-1.5 px-2;
+  padding: 0.375rem 0.5rem;
 }
 
 /* 实心边框样式 */
 .border {
-  @apply border-base-300;
+  border-color: var(--b3);
 }
 </style>

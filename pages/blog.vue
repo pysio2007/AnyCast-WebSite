@@ -33,7 +33,7 @@
       <!-- 文章列表 -->
       <div class="flex flex-col gap-6">
         <div v-for="post in displayedPosts" :key="post.link" 
-             class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+             class="card hover:shadow-2xl transition-shadow">
           <div class="flex flex-col lg:flex-row">
             <figure v-if="post.image" class="lg:w-1/3">
               <img :src="post.image" :alt="post.title" 
@@ -41,7 +41,7 @@
                    @error="handleImageError"/>
             </figure>
             <div class="card-body lg:w-2/3">
-              <h2 class="card-title text-2xl">
+              <h2 class="card-title">
                 <a :href="post.link" target="_blank" class="hover:text-primary transition-colors">
                   {{ post.title }}
                 </a>

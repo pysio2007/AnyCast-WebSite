@@ -112,6 +112,10 @@ definePageMeta({
 
 <style lang="postcss" scoped>
 .prose code {
-  @apply px-2 py-0.5 rounded text-sm;
+  padding: 0 0.5rem;
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
 }
 </style>

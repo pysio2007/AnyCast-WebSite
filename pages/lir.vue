@@ -10,7 +10,7 @@
 
       <div class="flex flex-wrap gap-8 my-8 items-center justify-center">
         <img src="/RIR/RIPE-NCC-Member.png" alt="RIPE NCC Member Logo" class="h-16 max-w-[220px] object-contain" />
-        <img src="/RIR/APNIC_logo.svg" alt="APNIC Logo" class="h-14 max-w-[200px] object-contain" />
+        <img src="/RIR/apnic-seeklogo.png" alt="APNIC Logo" class="h-14 max-w-[200px] object-contain" />
       </div>
 
       <div class="bg-blue-50 border-l-4 border-blue-400 p-4 my-4 dark:bg-blue-900/20">

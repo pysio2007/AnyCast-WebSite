@@ -1,19 +1,19 @@
 <template>
   <div class="container mx-auto p-4">
     <!-- 头部导航和标题区域 -->
-    <div class="mb-6 flex flex-wrap items-center gap-4 bg-base-200/50 p-4 rounded-xl backdrop-blur-sm">
-      <NuxtLink to="/lg" class="btn btn-ghost btn-sm gap-2 hover:bg-base-300/50">
+    <div class="mb-6 flex flex-wrap items-center gap-4 bg-opacity-50 bg-base-200 p-4 rounded-xl backdrop-blur-sm">
+      <NuxtLink to="/lg" class="btn btn-ghost btn-sm gap-2 hover:bg-opacity-50 hover:bg-base-300">
         <i class="fas fa-arrow-left"></i>
         返回
       </NuxtLink>
       <div class="flex-1">
         <h2 class="text-xl font-bold">{{ $route.params.server }}</h2>
-        <p class="text-sm text-base-content/70">show protocols all {{ $route.params.protocol }}</p>
+        <p class="text-sm opacity-70 text-base-content">show protocols all {{ $route.params.protocol }}</p>
       </div>
       <div class="join">
         <button 
           class="join-item btn btn-sm"
-          :class="!showAnalysis ? 'btn-primary' : 'btn-ghost hover:bg-base-300/50'"
+          :class="!showAnalysis ? 'btn-primary' : 'btn-ghost hover:bg-opacity-50 hover:bg-base-300'"
           @click="() => (showAnalysis = false)"
           :disabled="loading"
         >
@@ -22,7 +22,7 @@
         </button>
         <button 
           class="join-item btn btn-sm"
-          :class="showAnalysis ? 'btn-primary' : 'btn-ghost hover:bg-base-300/50'"
+          :class="showAnalysis ? 'btn-primary' : 'btn-ghost hover:bg-opacity-50 hover:bg-base-300'"
           @click="() => (showAnalysis = true)"
           :disabled="loading"
         >
@@ -33,12 +33,12 @@
     </div>
 
     <!-- 内容区域 -->
-    <div class="card bg-base-100/50 shadow-xl backdrop-blur-sm">
+    <div class="card bg-opacity-50 bg-base-100 shadow-xl backdrop-blur-sm">
       <div class="card-body">
         <!-- 加载状态 -->
         <div v-if="loading" class="flex justify-center items-center py-8">
           <div class="loading loading-spinner loading-lg text-primary"></div>
-          <span class="ml-2 text-base-content/70">正在获取详情...</span>
+          <span class="ml-2 opacity-70 text-base-content">正在获取详情...</span>
         </div>
         
         <!-- 错误信息 -->
@@ -50,7 +50,7 @@
         <!-- 分析视图 -->
         <div v-else-if="showAnalysis" class="space-y-6">
           <!-- 基本信息卡片 -->
-          <div class="rounded-box bg-base-200/50 p-6 backdrop-blur-sm">
+          <div class="rounded-box bg-opacity-50 bg-base-200 p-6 backdrop-blur-sm">
             <h3 class="flex items-center gap-2 text-lg font-bold mb-4">
               <i class="fas fa-info-circle text-primary"></i>
               基本信息
@@ -58,15 +58,15 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div v-for="(value, key) in analyzedData.basic" 
                   :key="key" 
-                  class="flex items-center justify-between p-3 rounded-lg bg-base-100/30 hover:bg-base-300/30 transition-colors">
-                <span class="font-medium text-base-content/70">{{ key }}</span>
+                  class="flex items-center justify-between p-3 rounded-lg bg-opacity-30 bg-base-100 hover:bg-opacity-30 hover:bg-base-300 transition-colors">
+                <span class="font-medium opacity-70 text-base-content">{{ key }}</span>
                 <span class="font-mono text-primary">{{ value }}</span>
               </div>
             </div>
           </div>
 
           <!-- 路由统计表格 -->
-          <div class="rounded-box bg-base-200/50 p-6 backdrop-blur-sm">
+          <div class="rounded-box bg-opacity-50 bg-base-200 p-6 backdrop-blur-sm">
             <h3 class="flex items-center gap-2 text-lg font-bold mb-4">
               <i class="fas fa-chart-bar text-primary"></i>
               路由统计
@@ -75,22 +75,22 @@
               <table class="table table-zebra w-full">
                 <thead>
                   <tr>
-                    <th class="bg-base-300/50 font-bold">类型</th>
-                    <th class="bg-base-300/50 text-right">接收</th>
-                    <th class="bg-base-300/50 text-right">拒绝</th>
-                    <th class="bg-base-300/50 text-right">过滤</th>
-                    <th class="bg-base-300/50 text-right">忽略</th>
-                    <th class="bg-base-300/50 text-right">接受</th>
+                    <th class="bg-opacity-50 bg-base-300 font-bold">类型</th>
+                    <th class="bg-opacity-50 bg-base-300 text-right">接收</th>
+                    <th class="bg-opacity-50 bg-base-300 text-right">拒绝</th>
+                    <th class="bg-opacity-50 bg-base-300 text-right">过滤</th>
+                    <th class="bg-opacity-50 bg-base-300 text-right">忽略</th>
+                    <th class="bg-opacity-50 bg-base-300 text-right">接受</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(stats, type) in analyzedData.routeStats" :key="type">
-                    <td class="font-medium bg-base-100/30">{{ formatStatType(type) }}</td>
-                    <td class="text-right font-mono bg-base-100/30">{{ formatNumber(stats.received) }}</td>
-                    <td class="text-right font-mono bg-base-100/30">{{ formatNumber(stats.rejected) }}</td>
-                    <td class="text-right font-mono bg-base-100/30">{{ formatNumber(stats.filtered) }}</td>
-                    <td class="text-right font-mono bg-base-100/30">{{ formatNumber(stats.ignored) }}</td>
-                    <td class="text-right font-mono bg-base-100/30">{{ formatNumber(stats.accepted) }}</td>
+                    <td class="font-medium bg-opacity-30 bg-base-100">{{ formatStatType(type) }}</td>
+                    <td class="text-right font-mono bg-opacity-30 bg-base-100">{{ formatNumber(stats.received) }}</td>
+                    <td class="text-right font-mono bg-opacity-30 bg-base-100">{{ formatNumber(stats.rejected) }}</td>
+                    <td class="text-right font-mono bg-opacity-30 bg-base-100">{{ formatNumber(stats.filtered) }}</td>
+                    <td class="text-right font-mono bg-opacity-30 bg-base-100">{{ formatNumber(stats.ignored) }}</td>
+                    <td class="text-right font-mono bg-opacity-30 bg-base-100">{{ formatNumber(stats.accepted) }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -99,7 +99,7 @@
         </div>
 
         <!-- 原始数据 -->
-        <pre v-else class="whitespace-pre-wrap text-sm font-mono bg-base-200/30 p-4 rounded-lg">{{ protocolDetails }}</pre>
+        <pre v-else class="whitespace-pre-wrap text-sm font-mono bg-opacity-30 bg-base-200 p-4 rounded-lg">{{ protocolDetails }}</pre>
       </div>
     </div>
   </div>
@@ -256,32 +256,46 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .card {
-  @apply border border-base-300/20;
+  border: 1px solid rgba(var(--b3), 0.2);
 }
 
 .rounded-box {
-  @apply rounded-xl border border-base-300/20;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(var(--b3), 0.2);
 }
 
 .table {
-  @apply text-sm rounded-lg overflow-hidden;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 
 .table th {
-  @apply text-base-content/70 first:rounded-none last:rounded-none;
+  color: rgba(var(--bc), 0.7);
+}
+
+.table th:first-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.table th:last-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .table td {
-  @apply border-base-300/20;
+  border-color: rgba(var(--b3), 0.2);
 }
 
 .table-zebra tbody tr:nth-child(even) td {
-  @apply bg-base-200/30;
+  background-color: rgba(var(--b2), 0.3);
 }
 
 /* 确保表格在移动设备上可以水平滚动 */
 .overflow-x-auto {
-  @apply rounded-lg border border-base-300/20;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(var(--b3), 0.2);
   -webkit-overflow-scrolling: touch;
 }
 </style>
