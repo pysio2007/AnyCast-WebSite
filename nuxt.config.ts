@@ -2,11 +2,24 @@
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
-  modules: ['@nuxtjs/sitemap' , '@nuxt/content'],
+  modules: ['@nuxtjs/sitemap', '@nuxt/content', '@nuxt/image'],
   vite: {
     plugins: [
       tailwindcss(),
     ],
+  },
+  image: {
+    format: ['webp', 'avif', 'jpg', 'png'],
+    quality: 80,
+    screens: {
+      xs: 320,
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      xxl: 1536,
+    },
+    provider: 'ipx',
   },
   css: ['~/assets/css/main.css'],
   compatibilityDate: '2024-11-01',
@@ -164,11 +177,6 @@ export default defineNuxtConfig({
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', 'G-P1L3MZ08KH');`
-        },
-        {
-          async: true,
-          src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6547593871065949',
-          crossorigin: 'anonymous'
         },
         {
           defer: true,

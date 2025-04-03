@@ -10,8 +10,18 @@
       </p>
 
       <div class="flex flex-wrap gap-8 my-8 items-center justify-center">
-        <img src="/RIR/RIPE-NCC-Member.png" alt="RIPE NCC Member Logo" class="h-16 max-w-[220px] object-contain" />
-        <img src="/RIR/apnic-seeklogo.png" alt="APNIC Logo" class="h-14 max-w-[200px] object-contain" />
+        <img
+          src="/RIR/RIPE-NCC-Member.png"
+          alt="RIPE NCC Member Logo"
+          style="max-width: 240px; height: auto; object-fit: contain;"
+          loading="lazy"
+        />
+        <img
+          src="/RIR/apnic-seeklogo.png"
+          alt="APNIC Logo"
+          style="max-width: 220px; height: auto; object-fit: contain;"
+          loading="lazy"
+        />
       </div>
       
       <div class="mt-4 mb-2 text-sm flex flex-wrap gap-x-8 gap-y-2">
@@ -258,6 +268,24 @@ import { ref, onMounted } from 'vue'
 
 definePageMeta({
   layout: 'no-navbar'
+})
+
+// 预加载关键图片以提高性能
+useHead({
+  link: [
+    {
+      rel: 'preload',
+      as: 'image',
+      href: '/RIR/RIPE-NCC-Member.png',
+      type: 'image/png',
+    },
+    {
+      rel: 'preload',
+      as: 'image',
+      href: '/RIR/apnic-seeklogo.png',
+      type: 'image/png',
+    }
+  ]
 })
 
 onMounted(() => {
