@@ -1,6 +1,12 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <PageSeo title="LIR Service" />
+    <PageSeo 
+      title="LIR 服务 - RIPE NCC 和 APNIC 会员" 
+      description="作为 RIPE NCC 和 APNIC 的正式会员，我们提供全面的 LIR 服务，包括 ASN 分配和 IPv4/IPv6 地址空间管理"
+    />
+    <Head>
+      <Meta name="keywords" content="LIR服务, RIPE NCC, APNIC, ASN分配, IPv4地址, IPv6地址, 互联网号码分配, 互联网资源管理, 地址空间" />
+    </Head>
     <article class="prose dark:prose-invert max-w-none">
       <h1 class="text-4xl font-bold mb-6">LIR 服务</h1>
       
