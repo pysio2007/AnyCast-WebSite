@@ -257,6 +257,9 @@
           如果您对我们的 LIR 服务有任何疑问或需要更多信息，请通过以下方式联系我们：
         </p>
         <div class="flex flex-wrap gap-4">
+          <a href="https://forms.office.com/r/VUiuEN1H7D" class="btn btn-outline gap-2" target="_blank">
+            <i class="fas fa-file-alt"></i> 填写表单
+          </a>
           <a href="mailto:lir@pysio.online" class="btn btn-outline gap-2">
             <i class="fas fa-envelope"></i> 电子邮件
           </a>
