@@ -1,5 +1,6 @@
 <template>
   <div class="container mx-auto px-4 py-8">
+    <PageSeo title="LIR Service" />
     <article class="prose dark:prose-invert max-w-none">
       <h1 class="text-4xl font-bold mb-6">LIR 服务</h1>
       
