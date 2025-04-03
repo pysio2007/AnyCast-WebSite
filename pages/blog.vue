@@ -212,6 +212,6 @@ onMounted(async () => {
 
 <style scoped>
 .card {
-  @apply transition-all duration-300 ease-in-out;
+  transition: all 0.3s ease-in-out;
 }
 </style>

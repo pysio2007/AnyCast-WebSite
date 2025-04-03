@@ -1,0 +1,58 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark, cupcake;
+  root: ":root";
+  logs: true;
+}
+
+/* 自定义主题配置 */
+:root {
+  --theme-color: #1a1a1a;
+  --theme-bg: #ffffff;
+}
+
+[data-theme="dark"] {
+  --theme-color: #ffffff;
+  --theme-bg: #1a1a1a;
+}
+
+/* 基础样式 */
+body {
+  @apply bg-base-100 text-base-content;
+  font-family: "JetBrains Mono", PingFang SC, "Microsoft YaHei", sans-serif;
+}
+
+/* 响应式布局 */
+@layer components {
+  .container {
+    @apply mx-auto px-4;
+  }
+}
+
+/* 博客卡片样式 */
+.card {
+  @apply bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out;
+}
+
+.card-title {
+  @apply text-2xl font-bold;
+}
+
+.card-body {
+  @apply p-6;
+}
+
+/* 标签样式 */
+.badge {
+  @apply cursor-pointer transition-colors duration-200;
+}
+
+/* 按钮样式 */
+.btn {
+  @apply transition-all duration-200;
+}
+
+/* 加载动画 */
+.loading {
+  @apply text-primary;
+} 
