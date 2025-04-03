@@ -247,7 +247,7 @@
 import { ref, onMounted } from 'vue'
 
 definePageMeta({
-  layout: 'default'
+  layout: 'no-navbar'
 })
 
 onMounted(() => {
