@@ -206,14 +206,14 @@
                       <div 
                         id="ripe-map" 
                         class="w-full h-[400px] rounded-lg shadow-inner bg-base-200 bg-opacity-50"
-                        :class="{'loading-container': loadingMap}"
+                        :class="{'loading-container': loadingMap || loadingGeo}"
                       >
-                        <div v-if="loadingMap" class="flex h-full items-center justify-center">
+                        <div v-if="loadingMap || loadingGeo" class="flex h-full items-center justify-center">
                           <span class="loading loading-spinner loading-md"></span>
-                          <span class="ml-2">加载地图中...</span>
+                          <span class="ml-2">{{ loadingGeo ? '正在获取地理位置信息...' : '加载地图中...' }}</span>
                         </div>
                       </div>
-                      <div v-if="!loadingMap && mapError" class="text-error text-center mt-2">
+                      <div v-if="!loadingMap && !loadingGeo && mapError" class="text-error text-center mt-2">
                         <i class="fas fa-exclamation-triangle mr-1"></i>
                         {{ mapError }}
                       </div>
@@ -443,6 +443,13 @@ const refreshInterval = ref<any>(null)
 const showCopiedMessage = ref(false)
 const dbLoaded = ref(false)
 
+// 地图相关
+const loadingMap = ref(false)
+const loadingGeo = ref(false)
+const mapError = ref('')
+let map: any = null
+let markers: any[] = []
+
 // API KEY相关
 const showApiKeyModal = ref(false)
 const apiKeyInput = ref('')
@@ -665,12 +672,14 @@ const processResults = () => {
 // 获取地理位置信息
 const fetchLocationInfo = async () => {
   console.log('开始获取地理位置信息')
+  loadingGeo.value = true // 设置地理信息加载状态
   
   // 如果GeoIP数据库尚未加载，尝试再次加载
   if (!dbLoaded.value) {
     dbLoaded.value = await loadGeoIpDatabase()
     if (!dbLoaded.value) {
       console.error('GeoIP数据库加载失败，无法获取地理位置信息')
+      loadingGeo.value = false // 重置加载状态
       return
     }
   }
@@ -746,14 +755,17 @@ const fetchLocationInfo = async () => {
     }
   }
   
-  // 只有当至少有一个位置信息被获取到时才加载地图
-  if (locationsFetched) {
-    // 延迟一点时间初始化地图，确保DOM已更新
-    setTimeout(() => {
-      initMap()
-    }, 100)
-  } else {
-    loadingMap.value = false
+  loadingGeo.value = false // 地理信息加载完成
+  
+  // 有效坐标检查 - 仅用于日志记录
+  const probesWithCoords = processedResults.value.filter(
+    probe => probe.latitude && probe.longitude
+  )
+  
+  console.log(`地理信息加载完成，有 ${probesWithCoords.length} 个探针有有效坐标`)
+  
+  // 不再在这里调用initMap，而是通过loadingGeo状态监听器来处理
+  if (probesWithCoords.length === 0) {
     mapError.value = '无法获取任何探针的地理位置信息'
   }
 }
@@ -887,6 +899,56 @@ watch(selectedProbe, (newValue) => {
   }
 })
 
+// 监听地理信息加载状态
+watch(loadingGeo, (isLoading) => {
+  if (!isLoading) {
+    // 地理信息加载完成，检查是否有有效坐标
+    const probesWithCoords = processedResults.value.filter(
+      probe => probe.latitude && probe.longitude
+    )
+    
+    console.log(`地理信息加载完成，有 ${probesWithCoords.length} 个探针有有效坐标`)
+    
+    if (probesWithCoords.length === 0) {
+      // 检查是否已设置API KEY
+      if (!apiKeyMasked.value) {
+        mapError.value = '未找到有效的地理位置信息，请设置IPInfo API Key'
+        showApiKeyModal.value = true  // 自动打开API KEY设置对话框
+      } else {
+        mapError.value = '没有探针具有有效的地理位置信息，请检查API KEY设置'
+      }
+      loadingMap.value = false
+    } else {
+      // 有有效坐标，初始化地图
+      setTimeout(() => {
+        initMap().catch(err => {
+          console.error('初始化地图失败:', err)
+          mapError.value = '无法加载地图: ' + (err instanceof Error ? err.message : '未知错误')
+        })
+      }, 100)
+    }
+  }
+})
+
+// 监听结果数据变化
+watch(() => resultData.value, (newData) => {
+  if (newData) {
+    // 如果已有地图实例，清理它以便重新创建
+    if (map) {
+      try {
+        markers.forEach(marker => {
+          if (marker) map.removeLayer(marker);
+        });
+        markers = [];
+        map.remove();
+        map = null;
+      } catch (e) {
+        console.error('清理地图时发生错误:', e);
+      }
+    }
+  }
+}, { deep: true });
+
 // 页面加载时检查URL参数和加载GeoIP数据库
 onMounted(async () => {
   // 加载GeoIP数据库
@@ -981,12 +1043,6 @@ const copyShareLink = () => {
       console.error('复制链接失败:', err)
     })
 }
-
-// 地图相关
-const loadingMap = ref(false)
-const mapError = ref('')
-let map: any = null
-let markers: any[] = []
 
 // 初始化地图
 const initMap = async () => {
@@ -1202,25 +1258,6 @@ watch(selectedProbe, (newValue) => {
     map.setView(latLng, 6);
   }
 });
-
-// 当结果数据变化时，重新初始化地图
-watch(() => resultData.value, (newData) => {
-  if (newData) {
-    // 如果已有地图实例，清理它以便重新创建
-    if (map) {
-      try {
-        markers.forEach(marker => {
-          if (marker) map.removeLayer(marker);
-        });
-        markers = [];
-        map.remove();
-        map = null;
-      } catch (e) {
-        console.error('清理地图时发生错误:', e);
-      }
-    }
-  }
-}, { deep: true });
 
 // 页面卸载时清理地图
 onUnmounted(() => {
