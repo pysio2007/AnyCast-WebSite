@@ -191,6 +191,44 @@
                       </div>
                     </div>
                     
+                    <!-- 结果地图 -->
+                    <div class="mb-6 relative">
+                      <div class="flex justify-between items-center mb-2">
+                        <h4 class="text-md font-semibold">
+                          <i class="fas fa-map-marked-alt mr-1 opacity-70"></i>
+                          探针分布地图
+                        </h4>
+                        <div class="flex gap-2 text-xs">
+                          <div class="flex items-center">
+                            <span class="inline-block w-3 h-3 rounded-full bg-success mr-1"></span>
+                            低延迟
+                          </div>
+                          <div class="flex items-center">
+                            <span class="inline-block w-3 h-3 rounded-full bg-warning mr-1"></span>
+                            中延迟
+                          </div>
+                          <div class="flex items-center">
+                            <span class="inline-block w-3 h-3 rounded-full bg-error mr-1"></span>
+                            高延迟
+                          </div>
+                        </div>
+                      </div>
+                      <div 
+                        id="ripe-map" 
+                        class="w-full h-[400px] rounded-lg shadow-inner bg-base-200 bg-opacity-50"
+                        :class="{'loading-container': loadingMap || loadingGeo}"
+                      >
+                        <div v-if="loadingMap || loadingGeo" class="flex h-full items-center justify-center">
+                          <span class="loading loading-spinner loading-md"></span>
+                          <span class="ml-2">{{ loadingGeo ? '正在获取地理位置信息...' : '加载地图中...' }}</span>
+                        </div>
+                      </div>
+                      <div v-if="!loadingMap && !loadingGeo && mapError" class="text-error text-center mt-2">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                        {{ mapError }}
+                      </div>
+                    </div>
+                    
                     <!-- 结果表格 -->
                     <div class="overflow-x-auto">
                       <table class="table table-sm w-full">
@@ -198,15 +236,15 @@
                           <tr>
                             <th>探针</th>
                             <th>位置</th>
-                            <th>ISP</th>
-                            <th>最小延迟</th>
-                            <th>平均延迟</th>
-                            <th>最大延迟</th>
-                            <th>丢包</th>
+                            <th>ASN</th>
+                            <th>延迟 (ms)</th>
+                            <th>丢包率</th>
+                            <th>操作</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="result in processedResults" :key="result.probe_id">
+                          <tr v-for="result in processedResults" :key="result.probe_id"
+                              :class="{'bg-base-200 bg-opacity-30': selectedProbe === result.probe_id}">
                             <td>{{ result.probe_id }}</td>
                             <td>
                               <template v-if="result.loading_geo">
@@ -214,7 +252,7 @@
                               </template>
                               <template v-else>
                                 <i class="fas fa-globe-americas mr-1 opacity-50"></i>
-                                {{ result.country || '未知' }}
+                                {{ result.country_name || result.country || '未知' }}
                                 <span v-if="result.city">, {{ result.city }}</span>
                               </template>
                             </td>
@@ -224,14 +262,35 @@
                               </template>
                               <template v-else>
                                 <span class="text-xs whitespace-nowrap">
-                                  {{ result.asn || '未知' }}
+                                  <template v-if="result.asn">
+                                    AS{{ result.asn }}
+                                  </template>
+                                  <template v-else>
+                                    {{ result._raw?.as_v4 || result._raw?.as_v6 || result._raw?.as || '未知' }}
+                                  </template>
                                 </span>
                               </template>
                             </td>
-                            <td>{{ result.min_rtt }} ms</td>
-                            <td>{{ result.avg_rtt }} ms</td>
-                            <td>{{ result.max_rtt }} ms</td>
-                            <td>{{ result.packet_loss }}%</td>
+                            <td>
+                              <div class="flex flex-col">
+                                <span>{{ result.avg_rtt || '-' }}</span>
+                                <span class="text-xs opacity-70">{{ result.min_rtt || '-' }} - {{ result.max_rtt || '-' }}</span>
+                              </div>
+                            </td>
+                            <td>
+                              <span :class="result.packet_loss > 0 ? 'text-error' : 'text-success'">
+                                {{ result.packet_loss }}%
+                              </span>
+                            </td>
+                            <td>
+                              <button 
+                                @click="selectedProbe = result.probe_id"
+                                class="btn btn-xs btn-outline"
+                              >
+                                <i class="fas fa-eye mr-1"></i>
+                                查看
+                              </button>
+                            </td>
                           </tr>
                         </tbody>
                       </table>
@@ -290,6 +349,13 @@
 import { useRoute } from 'vue-router'
 import { loadGeoIpDatabase, getIpGeoLocation, isPrivateIP, getApiKey, setApiKey } from '~/utils/geoip'
 
+// 添加Leaflet的类型声明
+declare global {
+  interface Window {
+    L: any;
+  }
+}
+
 const target = ref('')
 const probes = ref('200')
 const ipv = ref('0')
@@ -298,6 +364,7 @@ const error = ref('')
 const measurementId = ref('')
 const resultData = ref<any>(null)
 const processedResults = ref<any[]>([])
+const selectedProbe = ref('') // 当前选中的探针ID
 const apiUrl = 'https://ping.akaere.online'
 const refreshInterval = ref<any>(null)
 const showCopiedMessage = ref(false)
@@ -445,12 +512,14 @@ const processResults = () => {
 // 获取地理位置信息
 const fetchLocationInfo = async () => {
   console.log('开始获取地理位置信息')
+  loadingGeo.value = true // 设置地理信息加载状态
   
   // 如果GeoIP数据库尚未加载，尝试再次加载
   if (!dbLoaded.value) {
     dbLoaded.value = await loadGeoIpDatabase()
     if (!dbLoaded.value) {
       console.error('GeoIP数据库加载失败，无法获取地理位置信息')
+      loadingGeo.value = false // 重置加载状态
       return
     }
   }
@@ -474,6 +543,16 @@ const fetchLocationInfo = async () => {
         probe.asn = geoData.asn || geoData.org || probe.asn
         probe.geo = geoData
         
+        // 更新地理坐标用于地图显示
+        if (geoData.latitude && geoData.longitude) {
+          probe.latitude = geoData.latitude;
+          probe.longitude = geoData.longitude;
+        } else if (geoData.loc) {
+          const [lat, lng] = geoData.loc.split(',').map(Number);
+          probe.latitude = lat;
+          probe.longitude = lng;
+        }
+        
         console.log(`获取IP ${probe.ip} 的地理位置成功:`, geoData)
       }
     } catch (err) {
@@ -484,6 +563,7 @@ const fetchLocationInfo = async () => {
   }
   
   console.log('完成地理位置信息获取')
+  loadingGeo.value = false // 地理信息加载完成
 }
 
 // 计算平均延迟
@@ -631,6 +711,344 @@ const updateApiKeyDisplay = () => {
     apiKeyMasked.value = '';
   }
 }
+
+// 添加地图相关变量
+const loadingMap = ref(false)
+const loadingGeo = ref(false)
+const mapError = ref('')
+let map: any = null
+let markers: any[] = []
+
+// 加载Leaflet库
+const loadLeaflet = () => {
+  return new Promise<void>((resolve, reject) => {
+    try {
+      if (window.L) {
+        console.log('Leaflet已加载，直接使用')
+        resolve()
+        return
+      }
+      
+      console.log('开始动态加载Leaflet库')
+      
+      // 使用CDN加载Leaflet CSS
+      const linkElement = document.createElement('link')
+      linkElement.rel = 'stylesheet'
+      linkElement.href = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css'
+      document.head.appendChild(linkElement)
+      
+      // 使用CDN加载Leaflet JS
+      const scriptElement = document.createElement('script')
+      scriptElement.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js'
+      
+      scriptElement.onload = () => {
+        console.log('Leaflet库加载成功')
+        setTimeout(() => resolve(), 100) // 给浏览器一点时间来处理
+      }
+      
+      scriptElement.onerror = (e) => {
+        console.error('Leaflet加载失败', e)
+        reject(new Error('Failed to load Leaflet: Network error'))
+      }
+      
+      document.head.appendChild(scriptElement)
+    } catch (e) {
+      console.error('加载Leaflet时发生异常:', e)
+      reject(e)
+    }
+  })
+}
+
+// 初始化地图
+const initMap = async () => {
+  if (!processedResults.value.length) {
+    console.error('没有处理结果，无法初始化地图')
+    return
+  }
+  
+  // 确保地图容器存在
+  const mapContainer = document.getElementById('ripe-map')
+  if (!mapContainer) {
+    console.error('找不到地图容器元素')
+    mapError.value = '地图容器不存在'
+    return
+  }
+  
+  loadingMap.value = true
+  mapError.value = ''
+  
+  try {
+    // 确保Leaflet已经加载
+    if (!window.L) {
+      console.log('开始加载Leaflet库')
+      await loadLeaflet()
+      console.log('Leaflet库加载完成')
+    }
+    
+    // 清理旧的地图实例
+    if (map) {
+      console.log('清理现有地图实例')
+      markers.forEach(marker => {
+        if (marker) map.removeLayer(marker)
+      })
+      markers = []
+      map.remove()
+      map = null
+    }
+    
+    // 准备地图容器
+    mapContainer.innerHTML = ''
+    mapContainer.style.height = '400px'
+    mapContainer.style.width = '100%'
+    
+    // 创建一个新的div元素，这样可以避免可能的DOM问题
+    const mapDiv = document.createElement('div')
+    mapDiv.id = 'leaflet-map'
+    mapDiv.style.height = '100%'
+    mapDiv.style.width = '100%'
+    mapContainer.appendChild(mapDiv)
+    
+    console.log('初始化地图')
+    
+    // 创建地图实例
+    map = window.L.map('leaflet-map', {
+      center: [20, 0],
+      zoom: 2,
+      minZoom: 1,
+      maxZoom: 18
+    })
+    
+    // 添加高可靠度的地图图层 - 使用CartoDB的Voyager底图
+    window.L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(map)
+    
+    // 等待地图完成初始渲染
+    map.on('load', () => console.log('地图加载完成'))
+    
+    // 计算有多少探针有有效的地理坐标
+    const probesWithCoords = processedResults.value.filter(
+      probe => probe.latitude && probe.longitude
+    )
+    
+    console.log(`有 ${probesWithCoords.length} 个探针有有效坐标`)
+    
+    // 如果没有有效的地理位置信息，显示错误
+    if (probesWithCoords.length === 0) {
+      mapError.value = '没有探针具有有效的地理位置信息'
+      loadingMap.value = false
+      return
+    }
+    
+    // 计算延迟的最小值和最大值，用于颜色映射
+    const rtts = probesWithCoords.map(probe => probe.avg_rtt).filter(rtt => rtt > 0 && rtt < 10000)
+    const minRtt = Math.min(...rtts)
+    const maxRtt = Math.max(...rtts)
+    const medianRtt = calculateMedianRtt()
+    
+    // 根据延迟返回颜色
+    const getRttColor = (rtt) => {
+      if (rtt <= 0 || rtt >= 10000) return '#ef4444' // 失败或异常值，红色
+      
+      if (rtt <= minRtt + (medianRtt - minRtt) * 0.5) {
+        return '#10b981' // 低延迟，绿色
+      } else if (rtt <= medianRtt * 1.5) {
+        return '#f59e0b' // 中延迟，黄色
+      } else {
+        return '#ef4444' // 高延迟，红色
+      }
+    }
+    
+    // 创建标记
+    probesWithCoords.forEach(probe => {
+      // 根据延迟选择不同的图标颜色
+      const markerColor = getRttColor(probe.avg_rtt)
+      
+      // 创建自定义图标
+      const markerIcon = window.L.divIcon({
+        className: 'custom-div-icon',
+        html: `<div style="width:12px;height:12px;border-radius:50%;background-color:${markerColor};box-shadow:0 0 0 2px white;"></div>`,
+        iconSize: [12, 12],
+        iconAnchor: [6, 6],
+        popupAnchor: [0, -6]
+      })
+      
+      // 创建标记并添加到地图
+      const marker = window.L.marker([probe.latitude, probe.longitude], { icon: markerIcon })
+        .addTo(map)
+        .bindPopup(`
+          <div class="map-popup-content">
+            <div class="popup-title">探针 ${probe.probe_id}</div>
+            <div class="popup-location">${probe.country_name || probe.country || '未知国家'}, ${probe.city || '未知城市'}</div>
+            <div class="popup-detail">
+              <div class="detail-item">
+                <span class="label">ASN:</span>
+                <span class="value">${probe.asn ? 'AS'+probe.asn : '未知'}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">平均延迟:</span>
+                <span class="value">${probe.avg_rtt.toFixed(2)} ms</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">最小延迟:</span>
+                <span class="value">${probe.min_rtt.toFixed(2)} ms</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">最大延迟:</span>
+                <span class="value">${probe.max_rtt.toFixed(2)} ms</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">丢包率:</span>
+                <span class="value ${probe.packet_loss > 0 ? 'error' : 'success'}">${probe.packet_loss.toFixed(1)}%</span>
+              </div>
+            </div>
+          </div>
+        `, { className: 'map-custom-popup' })
+      
+      markers.push(marker)
+      
+      // 当选中探针时，自动打开其弹窗
+      if (selectedProbe.value && probe.probe_id === selectedProbe.value) {
+        marker.openPopup()
+      }
+    })
+    
+    console.log(`已添加 ${markers.length} 个标记点到地图`)
+    
+    // 如果所有探针位置都已知，调整地图视图以包含所有标记
+    if (markers.length > 0) {
+      try {
+        const group = window.L.featureGroup(markers)
+        const bounds = group.getBounds()
+        if (bounds.isValid()) {
+          console.log('设置地图边界以显示所有标记')
+          map.fitBounds(bounds.pad(0.1))
+        } else {
+          console.log('标记边界无效，使用默认视图')
+          map.setView([20, 0], 2)
+        }
+      } catch (e) {
+        console.error('设置地图边界失败:', e)
+        map.setView([20, 0], 2)
+      }
+    }
+    
+    // 强制重新渲染地图
+    map.invalidateSize(true)
+    
+    // 额外添加一个重置地图大小的操作，确保完全渲染
+    setTimeout(() => {
+      if (map) {
+        map.invalidateSize(true)
+        console.log('地图尺寸已重新计算')
+      }
+    }, 300)
+  } catch (err) {
+    console.error('地图初始化失败:', err)
+    mapError.value = '地图加载失败: ' + (err instanceof Error ? err.message : String(err))
+  } finally {
+    loadingMap.value = false
+  }
+}
+
+// 计算中位数延迟
+const calculateMedianRtt = () => {
+  if (!processedResults.value.length) return 0
+  
+  const rtts = processedResults.value
+    .map(r => r.avg_rtt)
+    .filter(rtt => rtt > 0 && rtt < 10000)
+    .sort((a, b) => a - b)
+  
+  if (rtts.length === 0) return 0
+  const mid = Math.floor(rtts.length / 2)
+  return rtts.length % 2 === 0 ? (rtts[mid - 1] + rtts[mid]) / 2 : rtts[mid]
+}
+
+// 页面卸载时清理地图
+onUnmounted(() => {
+  if (map) {
+    try {
+      console.log('清理地图实例')
+      markers.forEach(marker => {
+        if (marker) map.removeLayer(marker);
+      });
+      markers = [];
+      map.remove();
+      map = null;
+    } catch (e) {
+      console.error('清理地图时出错:', e)
+    }
+  }
+})
+
+// 监听selectedProbe变化，更新地图上高亮的探针
+watch(selectedProbe, (newValue) => {
+  if (!newValue || !map || !markers.length) return;
+  
+  const probeIndex = processedResults.value.findIndex(probe => probe.probe_id === newValue);
+  if (probeIndex >= 0 && probeIndex < markers.length) {
+    const marker = markers[probeIndex];
+    marker.openPopup();
+    
+    // 将地图中心移动到标记位置
+    const latLng = marker.getLatLng();
+    map.setView(latLng, 6);
+  }
+});
+
+// 监听resultData，当结果改变时自动处理并获取地理信息
+watch(resultData, (newVal) => {
+  if (newVal) {
+    processResults()
+    fetchLocationInfo()
+  }
+}, { deep: true })
+
+// 监听地理信息加载状态
+watch(loadingGeo, (isLoading) => {
+  if (!isLoading) {
+    // 地理信息加载完成，检查是否有有效坐标
+    const probesWithCoords = processedResults.value.filter(
+      probe => probe.latitude && probe.longitude
+    )
+    
+    console.log(`地理信息加载完成，有 ${probesWithCoords.length} 个探针有有效坐标`)
+    
+    if (probesWithCoords.length === 0) {
+      // 检查是否已设置API KEY
+      if (!apiKeyMasked.value) {
+        mapError.value = '未找到有效的地理位置信息，请设置IPInfo API Key'
+        showApiKeyModal.value = true  // 自动打开API KEY设置对话框
+      } else {
+        mapError.value = '没有探针具有有效的地理位置信息，请检查API KEY设置'
+        // 尝试再次获取位置信息
+        setTimeout(() => {
+          fetchLocationInfo()
+        }, 2000)
+      }
+      loadingMap.value = false
+    } else {
+      // 有有效坐标，初始化地图
+      initMap().catch(err => {
+        console.error('初始化地图失败:', err)
+        mapError.value = '无法加载地图: ' + (err instanceof Error ? err.message : '未知错误')
+      })
+    }
+  }
+})
+
+// 加载GeoIP数据库和地图
+onMounted(async () => {
+  // 已有的其他初始化代码...
+  
+  // 提前加载Leaflet库
+  loadLeaflet().catch(err => {
+    console.error('预加载Leaflet库失败:', err)
+  })
+})
 </script>
 
 <style scoped>
@@ -691,5 +1109,125 @@ const updateApiKeyDisplay = () => {
 
 .stat-value {
   font-size: 1.75rem;
+}
+
+/* 地图相关样式 */
+.loading-container {
+  position: relative;
+}
+
+.loading-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  border-radius: 0.5rem;
+}
+
+/* 地图标记弹出窗口样式 */
+:global(.map-custom-popup) {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+:global(.map-custom-popup .leaflet-popup-content-wrapper) {
+  background-color: rgba(var(--b1), 0.75);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0;
+  overflow: hidden;
+}
+
+:global(.map-custom-popup .leaflet-popup-content) {
+  margin: 0;
+  padding: 0;
+  width: auto !important;
+}
+
+:global(.map-custom-popup .leaflet-popup-tip) {
+  background-color: rgba(var(--b1), 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+:global(.map-popup-content) {
+  padding: 10px;
+  min-width: 180px;
+}
+
+:global(.map-popup-content .popup-title) {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 5px;
+  text-align: center;
+  color: rgba(var(--pc), 1);
+}
+
+:global(.map-popup-content .popup-location) {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  text-align: center;
+  color: rgba(var(--bc), 0.9);
+}
+
+:global(.map-popup-content .popup-detail) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+}
+
+:global(.map-popup-content .detail-item) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+:global(.map-popup-content .label) {
+  color: rgba(var(--bc), 0.7);
+}
+
+:global(.map-popup-content .value) {
+  font-weight: 500;
+  color: rgba(var(--bc), 0.9);
+}
+
+:global(.map-popup-content .success) {
+  color: rgba(var(--su), 0.9);
+}
+
+:global(.map-popup-content .error) {
+  color: rgba(var(--er), 0.9);
+}
+
+:global(.custom-div-icon) {
+  background: transparent;
+  border: none;
+}
+
+:global(.leaflet-popup-content) {
+  margin: 5px;
+}
+
+:global(.leaflet-container) {
+  font-family: inherit;
+  background-color: rgba(var(--b2), 0.3);
+}
+
+:global(.leaflet-control-zoom a) {
+  background-color: rgba(var(--b1), 0.7);
+  color: rgba(var(--bc), 0.9);
+  border: 1px solid rgba(var(--bc), 0.2);
+}
+
+:global(.leaflet-control-zoom a:hover) {
+  background-color: rgba(var(--b1), 0.9);
+}
+
+:global(.leaflet-control-attribution) {
+  background-color: rgba(var(--b1), 0.5);
+  backdrop-filter: blur(4px);
 }
 </style> 
