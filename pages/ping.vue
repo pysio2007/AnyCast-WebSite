@@ -382,7 +382,24 @@ const canQuery = computed(() => {
 // 格式化日期
 const formatDate = (dateString: string) => {
   if (!dateString) return ''
-  const date = new Date(dateString)
+  
+  let date: Date
+  
+  // 检查是否为Unix时间戳（秒级）
+  if (/^\d+$/.test(dateString)) {
+    // 将秒级时间戳转换为毫秒级
+    const timestamp = parseInt(dateString) * 1000
+    date = new Date(timestamp)
+  } else {
+    // 尝试直接解析日期字符串
+    date = new Date(dateString)
+  }
+  
+  // 检查日期是否有效
+  if (isNaN(date.getTime())) {
+    return '未知日期'
+  }
+  
   return date.toLocaleString('zh-CN')
 }
 
