@@ -1281,14 +1281,25 @@ const initMap = async () => {
       const marker = window.L.marker([probe.latitude, probe.longitude], { icon: markerIcon })
         .addTo(map)
         .bindPopup(`
-          <div style="padding:5px;text-align:center;">
-            <div style="font-weight:bold;">探针 ${probe.probe_id}</div>
-            <div>${probe.country_name || probe.country || '未知国家'}, ${probe.city || '未知城市'}</div>
-            <div style="font-size:0.75rem;">${probe.asn || '未知 ASN'}</div>
-            <div style="font-size:0.75rem;margin-top:4px;">${probe.success ? '✅ 成功' : '❌ 失败'}</div>
-            <div style="font-size:0.75rem;">跃点数: ${probe.hops?.length || 0}</div>
+          <div class="map-popup-content">
+            <div class="popup-title">探针 ${probe.probe_id}</div>
+            <div class="popup-location">${probe.country_name || probe.country || '未知国家'}, ${probe.city || '未知城市'}</div>
+            <div class="popup-detail">
+              <div class="detail-item">
+                <span class="label">ASN:</span>
+                <span class="value">${probe.asn ? 'AS'+probe.asn : '未知'}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">状态:</span>
+                <span class="value ${probe.success ? 'success' : 'error'}">${probe.success ? '成功' : '失败'}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">跃点数:</span>
+                <span class="value">${probe.hops?.length || 0}</span>
+              </div>
+            </div>
           </div>
-        `)
+        `, { className: 'map-custom-popup' })
       
       markers.push(marker)
       
@@ -1523,5 +1534,82 @@ onUnmounted(() => {
   background-color: rgba(0, 0, 0, 0.2);
   z-index: 999;
   border-radius: 0.5rem;
+}
+
+/* 地图标记弹出窗口样式 */
+:global(.map-custom-popup) {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+:global(.map-custom-popup .leaflet-popup-content-wrapper) {
+  background-color: rgba(var(--b1), 0.75);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0;
+  overflow: hidden;
+}
+
+:global(.map-custom-popup .leaflet-popup-content) {
+  margin: 0;
+  padding: 0;
+  width: auto !important;
+}
+
+:global(.map-custom-popup .leaflet-popup-tip) {
+  background-color: rgba(var(--b1), 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+:global(.map-popup-content) {
+  padding: 10px;
+  min-width: 180px;
+}
+
+:global(.map-popup-content .popup-title) {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 5px;
+  text-align: center;
+  color: rgba(var(--pc), 1);
+}
+
+:global(.map-popup-content .popup-location) {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  text-align: center;
+  color: rgba(var(--bc), 0.9);
+}
+
+:global(.map-popup-content .popup-detail) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+}
+
+:global(.map-popup-content .detail-item) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+:global(.map-popup-content .label) {
+  color: rgba(var(--bc), 0.7);
+}
+
+:global(.map-popup-content .value) {
+  font-weight: 500;
+  color: rgba(var(--bc), 0.9);
+}
+
+:global(.map-popup-content .success) {
+  color: rgba(var(--su), 0.9);
+}
+
+:global(.map-popup-content .error) {
+  color: rgba(var(--er), 0.9);
 }
 </style> 
