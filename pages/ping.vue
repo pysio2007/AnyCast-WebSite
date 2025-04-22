@@ -200,16 +200,20 @@
                         </h4>
                         <div class="flex gap-2 text-xs">
                           <div class="flex items-center">
-                            <span class="inline-block w-3 h-3 rounded-full bg-success mr-1"></span>
-                            低延迟
+                            <span class="inline-block w-3 h-3 rounded-full bg-[#4ade80] mr-1"></span>
+                            ≤15ms
+                          </div>
+                          <div class="flex items-center">
+                            <span class="inline-block w-3 h-3 rounded-full bg-[#10b981] mr-1"></span>
+                            ≤60ms
                           </div>
                           <div class="flex items-center">
                             <span class="inline-block w-3 h-3 rounded-full bg-warning mr-1"></span>
-                            中延迟
+                            ≤180ms
                           </div>
                           <div class="flex items-center">
                             <span class="inline-block w-3 h-3 rounded-full bg-error mr-1"></span>
-                            高延迟
+                            >180ms
                           </div>
                         </div>
                       </div>
@@ -869,12 +873,14 @@ const initMap = async () => {
     const getRttColor = (rtt) => {
       if (rtt <= 0 || rtt >= 10000) return '#ef4444' // 失败或异常值，红色
       
-      if (rtt <= minRtt + (medianRtt - minRtt) * 0.5) {
-        return '#10b981' // 低延迟，绿色
-      } else if (rtt <= medianRtt * 1.5) {
-        return '#f59e0b' // 中延迟，黄色
+      if (rtt <= 15) {
+        return '#4ade80' // 15ms以下，浅绿色
+      } else if (rtt <= 60) {
+        return '#10b981' // 60ms以下，深绿色
+      } else if (rtt <= 180) {
+        return '#f59e0b' // 180ms以下，黄色
       } else {
-        return '#ef4444' // 高延迟，红色
+        return '#ef4444' // 180ms以上，红色
       }
     }
     
