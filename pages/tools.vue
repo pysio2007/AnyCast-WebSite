@@ -21,6 +21,18 @@
         </div>
       </NuxtLink>
 
+      <!-- 全球PING卡片 -->
+      <NuxtLink to="/ping"
+        class="card bg-base-200/50 backdrop-blur-md hover:bg-base-200/70 transition-all duration-300 shadow-lg">
+        <div class="card-body">
+          <h2 class="card-title">
+            <i class="fas fa-globe-asia text-primary"></i>
+            全球PING
+          </h2>
+          <p class="text-base-content/70">全球多点测试网络延迟和可达性</p>
+        </div>
+      </NuxtLink>
+
       <!-- 路由追踪卡片 -->
       <NuxtLink to="/traceroute"
         class="card bg-base-200/50 backdrop-blur-md hover:bg-base-200/70 transition-all duration-300 shadow-lg">
@@ -30,6 +42,18 @@
             路由追踪
           </h2>
           <p class="text-base-content/70">追踪网络数据包的传输路径</p>
+        </div>
+      </NuxtLink>
+
+      <!-- 全球路由追踪卡片 -->
+      <NuxtLink to="/global-traceroute"
+        class="card bg-base-200/50 backdrop-blur-md hover:bg-base-200/70 transition-all duration-300 shadow-lg">
+        <div class="card-body">
+          <h2 class="card-title">
+            <i class="fas fa-project-diagram text-primary"></i>
+            全球路由追踪
+          </h2>
+          <p class="text-base-content/70">全球多点测试网络路径和跃点</p>
         </div>
       </NuxtLink>
 
