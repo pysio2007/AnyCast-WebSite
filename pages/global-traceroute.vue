@@ -268,50 +268,36 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr v-for="(hop, index) in selectedProbeData.hops" :key="index">
-                              <td>{{ hop.hop || index + 1 }}</td>
-                              <td class="font-mono">{{ hop.address || '* * *' }}</td>
-                              <td>{{ hop.rtt ? hop.rtt + ' ms' : '-' }}</td>
+                            <tr v-for="(hop, index) in currentPathHops" :key="index" :class="{'bg-success bg-opacity-5': index === 0}">
                               <td>
-                                <template v-if="hop.address && hop.address !== '* * *'">
-                                  <template v-if="hop.geo">
-                                    <i class="fas fa-globe-americas mr-1 opacity-50"></i>
-                                    {{ hop.geo.country_name || countryCenters[hop.geo.country]?.country_name || hop.geo.country || '未知' }}
-                                    <span v-if="hop.geo.city">, {{ hop.geo.city }}</span>
+                                <span v-if="index === 0" class="badge badge-success badge-sm bg-opacity-70">起点</span>
+                                <span v-else>{{ hop.hop || index }}</span>
+                              </td>
+                              <td class="font-mono text-xs">{{ hop.address || '* * *' }}</td>
+                              <td class="text-xs">
+                                <template v-if="hop.geo">
+                                  {{ hop.geo.country_name || countryCenters[hop.geo.country]?.country_name || hop.geo.country || '未知' }}
+                                  <span v-if="hop.geo.city">, {{ hop.geo.city }}</span>
+                                </template>
+                                <span v-else-if="isPrivateIP(hop.address)" class="opacity-70">
+                                  私有地址
+                                </span>
+                                <span v-else>-</span>
+                              </td>
+                              <td class="text-xs">
+                                <template v-if="hop.geo">
+                                  <template v-if="hop.geo.asn">
+                                    AS{{ hop.geo.asn }}
                                   </template>
-                                  <span v-else-if="isPrivateIP(hop.address)" class="text-base-content/50">
-                                    <i class="fas fa-home mr-1 opacity-50"></i>
-                                    私有地址
-                                  </span>
-                                  <span v-else class="text-base-content/50">
-                                    <i class="fas fa-spinner fa-spin mr-1 opacity-50"></i>
-                                    正在查询
-                                  </span>
+                                  <template v-else-if="hop.geo.org">
+                                    {{ hop.geo.org }}
+                                  </template>
                                 </template>
                                 <span v-else>-</span>
                               </td>
-                              <td>
-                                <template v-if="hop.address && hop.address !== '* * *'">
-                                  <template v-if="hop.geo && (hop.geo.org || hop.geo.asn)">
-                                    <span class="text-xs whitespace-nowrap">
-                                      <i class="fas fa-network-wired mr-1 opacity-50"></i>
-                                      <template v-if="hop.geo.asn && hop.geo.org && !hop.geo.org.includes(hop.geo.asn)">
-                                        AS{{ hop.geo.asn }} {{ hop.geo.org }}
-                                      </template>
-                                      <template v-else-if="hop.geo.asn">
-                                        AS{{ hop.geo.asn }}
-                                      </template>
-                                      <template v-else>
-                                        {{ hop.geo.org }}
-                                      </template>
-                                    </span>
-                                  </template>
-                                  <span v-else-if="!isPrivateIP(hop.address)" class="text-xs text-base-content/50">
-                                    <i class="fas fa-spinner fa-spin mr-1 opacity-50"></i>
-                                    正在查询
-                                  </span>
-                                </template>
-                                <span v-else>-</span>
+                              <td class="text-xs">
+                                <span v-if="index === 0">0 ms</span>
+                                <span v-else>{{ hop.rtt ? hop.rtt + ' ms' : '-' }}</span>
                               </td>
                             </tr>
                           </tbody>
@@ -445,6 +431,78 @@
     >
       <i class="fas fa-times"></i>
     </button>
+    
+    <!-- 可拖动的路由跳跃表格 -->
+    <div 
+      ref="routeTableWindow"
+      class="route-table-window fixed left-4 bottom-4 z-50 w-1/3 max-h-[60%] bg-base-200 bg-opacity-80 backdrop-blur-md shadow-lg rounded-lg overflow-hidden"
+      :class="{'minimized': isTableMinimized}"
+      @mousedown="startDrag"
+    >
+      <div class="window-header p-2 flex justify-between items-center cursor-move bg-base-300 bg-opacity-80">
+        <div class="flex items-center">
+          <i class="fas fa-route mr-2"></i>
+          <span class="font-semibold">路由跃点</span>
+        </div>
+        <div class="flex gap-1">
+          <button 
+            @click.stop="isTableMinimized = !isTableMinimized" 
+            class="btn btn-xs btn-ghost btn-circle"
+            :title="isTableMinimized ? '展开' : '最小化'"
+          >
+            <i :class="isTableMinimized ? 'fas fa-expand' : 'fas fa-minus'"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div v-if="!isTableMinimized" class="window-content p-2 overflow-auto max-h-[calc(60vh-40px)]">
+        <table class="table table-compact w-full">
+          <thead>
+            <tr>
+              <th>跃点</th>
+              <th>IP地址</th>
+              <th>位置</th>
+              <th>ASN</th>
+              <th>延迟</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(hop, index) in currentPathHops" :key="index" :class="{'bg-success bg-opacity-5': index === 0}">
+              <td>
+                <span v-if="index === 0" class="badge badge-success badge-sm bg-opacity-70">起点</span>
+                <span v-else>{{ hop.hop || index }}</span>
+              </td>
+              <td class="font-mono text-xs">{{ hop.address || '* * *' }}</td>
+              <td class="text-xs">
+                <template v-if="hop.geo">
+                  {{ hop.geo.country_name || countryCenters[hop.geo.country]?.country_name || hop.geo.country || '未知' }}
+                  <span v-if="hop.geo.city">, {{ hop.geo.city }}</span>
+                </template>
+                <span v-else-if="isPrivateIP(hop.address)" class="opacity-70">
+                  私有地址
+                </span>
+                <span v-else>-</span>
+              </td>
+              <td class="text-xs">
+                <template v-if="hop.geo">
+                  <template v-if="hop.geo.asn">
+                    AS{{ hop.geo.asn }}
+                  </template>
+                  <template v-else-if="hop.geo.org">
+                    {{ hop.geo.org }}
+                  </template>
+                </template>
+                <span v-else>-</span>
+              </td>
+              <td class="text-xs">
+                <span v-if="index === 0">0 ms</span>
+                <span v-else>{{ hop.rtt ? hop.rtt + ' ms' : '-' }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -917,9 +975,41 @@ const stopResultRefresh = () => {
   }
 }
 
-// 页面卸载时清除定时器
+// 页面卸载时清理地图
 onUnmounted(() => {
   stopResultRefresh()
+  
+  // 清理事件监听器
+  document.removeEventListener('mousemove', handleDrag)
+  document.removeEventListener('mouseup', stopDrag)
+  
+  if (map) {
+    try {
+      console.log('清理地图实例')
+      markers.forEach(marker => {
+        if (marker) map.removeLayer(marker);
+      });
+      markers = [];
+      
+      // 清除路径线条和标记
+      clearPathLines();
+      
+      map.remove();
+      map = null;
+    } catch (e) {
+      console.error('清理地图时出错:', e)
+    }
+  }
+  
+  // 清理全屏地图
+  if (fullscreenMap) {
+    try {
+      fullscreenMap.remove();
+      fullscreenMap = null;
+    } catch (e) {
+      console.error('清理全屏地图时出错:', e)
+    }
+  }
 })
 
 // 监控选中的探针变化
@@ -1382,8 +1472,32 @@ const drawTraceroutePath = (probeData: any) => {
     if (marker) map.removeLayer(marker);
   });
   
-  // 过滤掉没有地理信息的hop和私有IP
-  const validHops = probeData.hops.filter((hop: any) => 
+  // 创建探针位置作为起始点对象
+  const probeStartPoint = {
+    address: probeData.ip,
+    hop: 0,
+    rtt: 0,
+    latitude: probeData.latitude,
+    longitude: probeData.longitude,
+    geo: {
+      country: probeData.country,
+      country_name: probeData.country_name || countryCenters[probeData.country]?.country_name,
+      city: probeData.city,
+      asn: probeData.asn,
+      org: probeData._raw?.as_v4_name || probeData._raw?.as_v6_name || ''
+    },
+    isProbe: true
+  };
+  
+  // 检查探针是否有有效位置
+  const hasValidProbeLocation = probeData.latitude && probeData.longitude;
+  
+  // 设置当前路径跃点供表格使用，包含起始探针点
+  const allHops = hasValidProbeLocation ? [probeStartPoint, ...probeData.hops] : [...probeData.hops];
+  currentPathHops.value = allHops;
+  
+  // 过滤出有效跃点用于地图显示(有地理位置数据且非私有IP)
+  let validHops = probeData.hops.filter((hop: any) => 
     hop.address && 
     hop.address !== '* * *' && 
     !isPrivateIP(hop.address) &&
@@ -1397,23 +1511,57 @@ const drawTraceroutePath = (probeData: any) => {
     return;
   }
   
-  // 添加探针位置作为起始点
-  if (probeData.latitude && probeData.longitude) {
-    validHops.unshift({
-      address: probeData.ip,
-      hop: 0,
-      latitude: probeData.latitude,
-      longitude: probeData.longitude,
+  // 处理起点（探针位置）
+  let startPointAdded = false;
+  
+  // 优先使用探针的真实位置
+  if (hasValidProbeLocation) {
+    validHops = [probeStartPoint, ...validHops];
+    startPointAdded = true;
+    console.log('使用探针真实位置作为起点:', probeStartPoint.latitude, probeStartPoint.longitude);
+  } 
+  // 如果没有真实位置，尝试使用国家中心位置
+  else if (probeData.country && countryCenters[probeData.country]) {
+    const countryData = countryCenters[probeData.country];
+    const [lat, lng] = countryData.loc.split(',').map(Number);
+    
+    // 创建一个从国家中心到第一跳的虚拟起点
+    const virtualStartPoint = {
+      ...probeStartPoint,
+      latitude: lat,
+      longitude: lng,
       geo: {
-        country: probeData.country,
-        country_name: probeData.country_name || countryCenters[probeData.country]?.country_name,
-        city: probeData.city,
-        asn: probeData.asn,
-        org: probeData._raw?.as_v4_name || probeData._raw?.as_v6_name || ''
+        ...probeStartPoint.geo,
+        country_name: countryData.country_name
       },
-      isProbe: true
-    });
+      isVirtualStart: true
+    };
+    
+    validHops = [virtualStartPoint, ...validHops];
+    startPointAdded = true;
+    console.log('使用国家中心位置作为起点:', lat, lng);
   }
+  // 如果都没有，使用第一跳位置附近的点作为虚拟起点
+  else if (validHops.length > 0) {
+    const firstHop = validHops[0];
+    // 创建一个偏移的虚拟起点
+    const virtualStartPoint = {
+      ...probeStartPoint,
+      latitude: firstHop.latitude + (Math.random() - 0.5) * 3,
+      longitude: firstHop.longitude + (Math.random() - 0.5) * 3,
+      isVirtualStart: true
+    };
+    
+    validHops = [virtualStartPoint, ...validHops];
+    startPointAdded = true;
+    console.log('使用第一跳附近位置作为虚拟起点');
+  }
+  
+  if (!startPointAdded) {
+    console.log('无法添加起点，将只显示跃点');
+  }
+  
+  console.log(`绘制路径: 有${validHops.length}个有效跃点，包含起点: ${startPointAdded}`);
   
   // 创建连线
   for (let i = 0; i < validHops.length - 1; i++) {
@@ -1442,7 +1590,7 @@ const drawTraceroutePath = (probeData: any) => {
   validHops.forEach((hop: any, index: number) => {
     // 使用不同样式标记起始点、中间点和终点
     let markerColor;
-    if (hop.isProbe) {
+    if (hop.isProbe || hop.isVirtualStart) {
       markerColor = '#10b981'; // 起始点(探针)为绿色
     } else if (index === validHops.length - 1) {
       markerColor = '#ef4444'; // 终点为红色
@@ -1451,7 +1599,7 @@ const drawTraceroutePath = (probeData: any) => {
     }
     
     // 标记大小根据重要性设置
-    const markerSize = hop.isProbe || index === validHops.length - 1 ? 10 : 6;
+    const markerSize = (hop.isProbe || hop.isVirtualStart || index === validHops.length - 1) ? 10 : 6;
     
     // 创建自定义图标
     const markerIcon = window.L.divIcon({
@@ -1469,13 +1617,21 @@ const drawTraceroutePath = (probeData: any) => {
     });
     
     // 创建ASN和地点显示文本
-    const hopCountry = hop.geo.country_name || countryCenters[hop.geo.country]?.country_name || hop.geo.country || '未知';
-    const hopCity = hop.geo.city ? `, ${hop.geo.city}` : '';
-    const hopAsn = hop.geo.asn ? `AS${hop.geo.asn}` : '';
-    const hopOrg = hop.geo.org && (!hop.geo.asn || !hop.geo.org.includes(hop.geo.asn)) ? hop.geo.org : '';
+    const hopCountry = hop.geo?.country_name || countryCenters[hop.geo?.country]?.country_name || hop.geo?.country || '未知';
+    const hopCity = hop.geo?.city ? `, ${hop.geo.city}` : '';
+    const hopAsn = hop.geo?.asn ? `AS${hop.geo.asn}` : '';
+    const hopOrg = hop.geo?.org && (!hop.geo.asn || !hop.geo.org.includes(hop.geo.asn)) ? hop.geo.org : '';
     
     // 格式化跃点/节点信息
-    const hopLabel = hop.isProbe ? `探针 ${probeData.probe_id}` : `跃点 ${hop.hop || index}`;
+    let hopLabel = '未知';
+    if (hop.isProbe) {
+      hopLabel = `探针 ${probeData.probe_id}`;
+    } else if (hop.isVirtualStart) {
+      hopLabel = `探针 ${probeData.probe_id} (估计位置)`;
+    } else {
+      hopLabel = `跃点 ${hop.hop || index}`;
+    }
+    
     const hopAddress = hop.address || 'Unknown';
     const hopRtt = hop.rtt ? `${hop.rtt} ms` : '';
     
@@ -1522,45 +1678,66 @@ const drawTraceroutePath = (probeData: any) => {
   }
 };
 
-// 页面卸载时清理地图
-onUnmounted(() => {
-  stopResultRefresh()
-  
-  if (map) {
-    try {
-      console.log('清理地图实例')
-      markers.forEach(marker => {
-        if (marker) map.removeLayer(marker);
-      });
-      markers = [];
-      
-      // 清除路径线条和标记
-      clearPathLines();
-      
-      map.remove();
-      map = null;
-    } catch (e) {
-      console.error('清理地图时出错:', e)
-    }
-  }
-  
-  // 清理全屏地图
-  if (fullscreenMap) {
-    try {
-      fullscreenMap.remove();
-      fullscreenMap = null;
-    } catch (e) {
-      console.error('清理全屏地图时出错:', e)
-    }
-  }
-})
-
 const isFullscreenMap = ref(false)
 let fullscreenMap: any = null
+const isTableMinimized = ref(false)
+const routeTableWindow = ref<HTMLElement | null>(null)
+const currentPathHops = ref<any[]>([])
+let isDragging = false
+let dragOffsetX = 0
+let dragOffsetY = 0
+
+// 开始拖动表格窗口
+const startDrag = (event: MouseEvent) => {
+  // 忽略来自按钮的点击事件
+  if ((event.target as HTMLElement).closest('button')) return;
+  
+  const element = routeTableWindow.value;
+  if (!element) return;
+  
+  isDragging = true;
+  
+  // 记录鼠标位置和元素当前位置的偏移量
+  const rect = element.getBoundingClientRect();
+  dragOffsetX = event.clientX - rect.left;
+  dragOffsetY = event.clientY - rect.top;
+  
+  // 添加移动和释放事件处理器
+  document.addEventListener('mousemove', handleDrag);
+  document.addEventListener('mouseup', stopDrag);
+  
+  // 防止选中文本等默认行为
+  event.preventDefault();
+};
+
+// 处理拖动移动
+const handleDrag = (event: MouseEvent) => {
+  if (!isDragging || !routeTableWindow.value) return;
+  
+  const element = routeTableWindow.value;
+  
+  // 计算新位置，确保不超出窗口边界
+  const newLeft = Math.max(0, Math.min(window.innerWidth - element.offsetWidth, event.clientX - dragOffsetX));
+  const newTop = Math.max(0, Math.min(window.innerHeight - element.offsetHeight, event.clientY - dragOffsetY));
+  
+  // 设置新位置
+  element.style.left = `${newLeft}px`;
+  element.style.top = `${newTop}px`;
+  element.style.bottom = 'auto';
+};
+
+// 停止拖动
+const stopDrag = () => {
+  isDragging = false;
+  document.removeEventListener('mousemove', handleDrag);
+  document.removeEventListener('mouseup', stopDrag);
+};
 
 // 清除选中的探针
 const clearSelectedProbe = () => {
   selectedProbe.value = ''
+  currentPathHops.value = []
+  isTableMinimized.value = false
   
   // 如果处于全屏模式，退出全屏
   if (isFullscreenMap.value) {
@@ -1602,41 +1779,77 @@ const toggleFullscreenMap = () => {
         subdomains: ['a', 'b', 'c']
       }).addTo(fullscreenMap)
       
-      // 复制原地图上的路径线条和标记到全屏地图
+      // 复制原地图上的路径线条到全屏地图
       pathLines.forEach(line => {
-        const latLngs = line.getLatLngs()
-        window.L.polyline(latLngs, {
-          color: '#3b82f6',
-          weight: 2,
-          opacity: 0.8,
-          smoothFactor: 1,
-          className: 'traceroute-path'
-        }).addTo(fullscreenMap)
+        if (!line) return;
+        
+        try {
+          const latLngs = line.getLatLngs()
+          window.L.polyline(latLngs, {
+            color: '#3b82f6',
+            weight: 2,
+            opacity: 0.8,
+            smoothFactor: 1,
+            className: 'traceroute-path'
+          }).addTo(fullscreenMap)
+        } catch (e) {
+          console.error('复制路径线条失败:', e)
+        }
       })
       
+      // 复制原地图上的标记到全屏地图
       pathMarkers.forEach(marker => {
-        const pos = marker.getLatLng()
-        const icon = marker.options.icon
-        const popup = marker.getPopup()
+        if (!marker) return;
         
-        const newMarker = window.L.marker(pos, { icon }).addTo(fullscreenMap)
-        
-        if (popup) {
-          newMarker.bindPopup(popup.getContent(), { className: 'map-custom-popup' })
+        try {
+          const pos = marker.getLatLng()
+          const icon = marker.options.icon
+          const popup = marker.getPopup()
+          
+          const newMarker = window.L.marker(pos, { icon }).addTo(fullscreenMap)
+          
+          if (popup) {
+            newMarker.bindPopup(popup.getContent(), { className: 'map-custom-popup' })
+          }
+        } catch (e) {
+          console.error('复制标记失败:', e)
         }
       })
       
       // 设置地图视图以包含所有标记
       try {
         if (pathLines.length > 0 || pathMarkers.length > 0) {
-          const bounds = window.L.featureGroup([...pathLines, ...pathMarkers]).getBounds()
-          if (bounds.isValid()) {
-            fullscreenMap.fitBounds(bounds.pad(0.1))
+          const allFeatures: any[] = [];
+          
+          // 收集所有有效的路径和标记
+          pathLines.forEach(line => {
+            if (line) allFeatures.push(line);
+          });
+          
+          pathMarkers.forEach(marker => {
+            if (marker) allFeatures.push(marker);
+          });
+          
+          if (allFeatures.length > 0) {
+            const group = window.L.featureGroup(allFeatures);
+            const bounds = group.getBounds();
+            if (bounds.isValid()) {
+              fullscreenMap.fitBounds(bounds.pad(0.1));
+            }
           }
         }
       } catch (e) {
         console.error('设置全屏地图边界失败:', e)
       }
+      
+      // 设置表格窗口初始位置
+      nextTick(() => {
+        if (routeTableWindow.value) {
+          routeTableWindow.value.style.left = '16px';
+          routeTableWindow.value.style.bottom = '16px';
+          routeTableWindow.value.style.top = 'auto';
+        }
+      });
     })
   } else {
     // 退出全屏模式
@@ -1841,5 +2054,48 @@ const toggleFullscreenMap = () => {
 
 :global(.map-popup-content .error) {
   color: rgba(var(--er), 0.9);
+}
+
+/* 可拖动窗口样式 */
+.route-table-window {
+  transition: height 0.3s ease;
+  user-select: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.route-table-window.minimized {
+  height: 40px !important;
+  width: auto !important;
+  overflow: hidden;
+}
+
+.window-header {
+  user-select: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 表格样式优化 */
+.route-table-window .table {
+  background: transparent;
+}
+
+.route-table-window .table th {
+  position: sticky;
+  top: 0;
+  background-color: rgba(var(--b3), 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+.route-table-window .table td {
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+
+@media (max-width: 768px) {
+  .route-table-window {
+    width: 90% !important;
+  }
 }
 </style> 
