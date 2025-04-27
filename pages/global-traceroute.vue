@@ -154,6 +154,22 @@
                         <i class="fas fa-external-link-alt mr-1"></i>
                         RIPE Atlas
                       </a>
+                      <button 
+                        v-if="selectedProbe && pathLines.length > 0"
+                        @click="toggleFullscreenMap"
+                        class="btn btn-sm btn-outline"
+                      >
+                        <i class="fas fa-expand mr-1"></i>
+                        全屏地图
+                      </button>
+                      <button 
+                        v-if="selectedProbe && pathLines.length > 0"
+                        @click="clearSelectedProbe"
+                        class="btn btn-sm btn-outline"
+                      >
+                        <i class="fas fa-times mr-1"></i>
+                        退出路径
+                      </button>
                     </div>
                   </div>
                   
@@ -415,6 +431,21 @@
     </div>
     <div class="modal-backdrop" @click="closeApiKeyModal"></div>
   </div>
+
+  <!-- 全屏地图容器 -->
+  <div 
+    v-if="isFullscreenMap" 
+    class="fixed inset-0 z-40 bg-base-100"
+  >
+    <div id="fullscreen-map" class="w-full h-full"></div>
+    <button 
+      @click="toggleFullscreenMap"
+      class="fixed right-4 top-4 z-50 btn btn-circle bg-base-200 bg-opacity-70 backdrop-blur shadow-lg"
+      title="退出全屏"
+    >
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -627,7 +658,7 @@ const processResults = () => {
       const targetIp = result.dst_addr || resultData.value.target
       
       // 对所有跃点进行检查，寻找目标IP
-      success = hops.some(hop => {
+      success = hops.some((hop: any) => {
         if (!hop.address || hop.address === '* * *') return false
         
         // 如果是数组形式的结果
@@ -771,7 +802,7 @@ const fetchLocationInfo = async () => {
 }
 
 // 更新探针的地理位置信息
-const updateProbeWithGeoData = (probe, geoData) => {
+const updateProbeWithGeoData = (probe: any, geoData: any) => {
   probe.country = geoData.country || probe.country;
   probe.country_name = geoData.country_name || geoData.country || probe.country_name;
   probe.city = geoData.city || probe.city;
@@ -811,7 +842,7 @@ const updateProbeWithGeoData = (probe, geoData) => {
 };
 
 // 更新跃点的地理位置信息
-const updateHopWithGeoData = (hop, geoData) => {
+const updateHopWithGeoData = (hop: any, geoData: any) => {
   hop.geo = geoData;
   
   // 提取ASN - 优先使用明确的ASN字段
@@ -1225,7 +1256,13 @@ const loadLeaflet = () => {
       scriptElement.onload = () => {
         console.log('Leaflet库加载成功')
         if (window.L) {
-          resolve()
+          // 加载旋转标记插件
+          loadRotatedMarker().then(() => {
+            resolve();
+          }).catch(err => {
+            console.warn('旋转标记插件加载失败，将继续使用无旋转功能', err);
+            resolve();
+          });
         } else {
           reject(new Error('Leaflet加载完成但L对象不存在'))
         }
@@ -1244,20 +1281,246 @@ const loadLeaflet = () => {
   })
 }
 
+// 加载旋转标记插件
+const loadRotatedMarker = () => {
+  return new Promise<void>((resolve, reject) => {
+    try {
+      // 检查是否已加载
+      if (window.L && window.L.Marker.prototype.setRotationAngle) {
+        resolve();
+        return;
+      }
+      
+      // 内联旋转标记插件代码，避免额外请求
+      const pluginCode = `
+        (function() {
+          // 在标记原型上添加旋转角度方法
+          L.Marker.prototype.options.rotationAngle = 0;
+          
+          L.Marker.prototype.setRotationAngle = function(angle) {
+            this.options.rotationAngle = angle;
+            
+            // 如果已有图标和元素，直接应用旋转
+            if (this._icon) {
+              this._icon.style.transform = this._icon.style.transform || '';
+              this._icon.style.transform += ' rotate(' + angle + 'deg)';
+            }
+            
+            return this;
+          };
+          
+          // 添加到原始创建图标的方法
+          const originalOnAdd = L.Marker.prototype.onAdd;
+          
+          L.Marker.prototype.onAdd = function(map) {
+            originalOnAdd.call(this, map);
+            
+            if (this.options.rotationAngle) {
+              this.setRotationAngle(this.options.rotationAngle);
+            }
+          };
+        })();
+      `;
+      
+      // 创建脚本元素并添加到文档
+      const scriptElement = document.createElement('script');
+      scriptElement.textContent = pluginCode;
+      document.head.appendChild(scriptElement);
+      
+      // 插件已加载
+      resolve();
+    } catch (e) {
+      console.error('加载旋转标记插件时发生异常:', e);
+      reject(e);
+    }
+  });
+};
+
 // 监听selectedProbe变化，更新地图上高亮的探针
 watch(selectedProbe, (newValue) => {
-  if (!newValue || !map || !markers.length) return;
+  if (!newValue || !map) return;
   
-  const probeIndex = processedResults.value.findIndex(probe => probe.probe_id === newValue);
-  if (probeIndex >= 0 && probeIndex < markers.length) {
-    const marker = markers[probeIndex];
-    marker.openPopup();
-    
-    // 将地图中心移动到标记位置
-    const latLng = marker.getLatLng();
-    map.setView(latLng, 6);
-  }
+  // 清除之前的路径线条和弹窗
+  clearPathLines();
+  
+  const probeData = processedResults.value.find(probe => probe.probe_id === newValue);
+  if (!probeData) return;
+  
+  // 绘制路由路径
+  drawTraceroutePath(probeData);
 });
+
+// 存储路径线条和标记的数组
+let pathLines: any[] = [];
+let pathMarkers: any[] = [];
+
+// 清除之前的路径线条和标记
+const clearPathLines = () => {
+  if (!map) return;
+  
+  // 移除所有路径线条
+  pathLines.forEach(line => {
+    if (line) map.removeLayer(line);
+  });
+  pathLines = [];
+  
+  // 移除所有路径标记
+  pathMarkers.forEach(marker => {
+    if (marker) map.removeLayer(marker);
+  });
+  pathMarkers = [];
+};
+
+// 绘制路由追踪路径
+const drawTraceroutePath = (probeData: any) => {
+  if (!map || !probeData || !probeData.hops || probeData.hops.length === 0) return;
+  
+  console.log('绘制路由路径，探针:', probeData.probe_id);
+  
+  // 隐藏其他探针标记
+  markers.forEach(marker => {
+    if (marker) map.removeLayer(marker);
+  });
+  
+  // 过滤掉没有地理信息的hop和私有IP
+  const validHops = probeData.hops.filter((hop: any) => 
+    hop.address && 
+    hop.address !== '* * *' && 
+    !isPrivateIP(hop.address) &&
+    hop.geo && 
+    hop.latitude && 
+    hop.longitude
+  );
+  
+  if (validHops.length === 0) {
+    console.log('没有有效的路由跃点可以显示');
+    return;
+  }
+  
+  // 添加探针位置作为起始点
+  if (probeData.latitude && probeData.longitude) {
+    validHops.unshift({
+      address: probeData.ip,
+      hop: 0,
+      latitude: probeData.latitude,
+      longitude: probeData.longitude,
+      geo: {
+        country: probeData.country,
+        country_name: probeData.country_name || countryCenters[probeData.country]?.country_name,
+        city: probeData.city,
+        asn: probeData.asn,
+        org: probeData._raw?.as_v4_name || probeData._raw?.as_v6_name || ''
+      },
+      isProbe: true
+    });
+  }
+  
+  // 创建连线
+  for (let i = 0; i < validHops.length - 1; i++) {
+    const from = validHops[i];
+    const to = validHops[i + 1];
+    
+    // 创建线条 - 使用实线替代虚线
+    const line = window.L.polyline(
+      [
+        [from.latitude, from.longitude],
+        [to.latitude, to.longitude]
+      ], 
+      {
+        color: '#3b82f6',
+        weight: 2,
+        opacity: 0.8,
+        smoothFactor: 1,
+        className: 'traceroute-path'
+      }
+    ).addTo(map);
+    
+    pathLines.push(line);
+  }
+  
+  // 为每个跃点创建标记
+  validHops.forEach((hop: any, index: number) => {
+    // 使用不同样式标记起始点、中间点和终点
+    let markerColor;
+    if (hop.isProbe) {
+      markerColor = '#10b981'; // 起始点(探针)为绿色
+    } else if (index === validHops.length - 1) {
+      markerColor = '#ef4444'; // 终点为红色
+    } else {
+      markerColor = '#3b82f6'; // 中间点为蓝色
+    }
+    
+    // 标记大小根据重要性设置
+    const markerSize = hop.isProbe || index === validHops.length - 1 ? 10 : 6;
+    
+    // 创建自定义图标
+    const markerIcon = window.L.divIcon({
+      className: 'custom-div-icon',
+      html: `<div style="
+        width:${markerSize}px;
+        height:${markerSize}px;
+        border-radius:50%;
+        background-color:${markerColor};
+        box-shadow:0 0 0 2px rgba(255,255,255,0.5);
+      "></div>`,
+      iconSize: [markerSize, markerSize],
+      iconAnchor: [markerSize/2, markerSize/2],
+      popupAnchor: [0, -markerSize/2]
+    });
+    
+    // 创建ASN和地点显示文本
+    const hopCountry = hop.geo.country_name || countryCenters[hop.geo.country]?.country_name || hop.geo.country || '未知';
+    const hopCity = hop.geo.city ? `, ${hop.geo.city}` : '';
+    const hopAsn = hop.geo.asn ? `AS${hop.geo.asn}` : '';
+    const hopOrg = hop.geo.org && (!hop.geo.asn || !hop.geo.org.includes(hop.geo.asn)) ? hop.geo.org : '';
+    
+    // 格式化跃点/节点信息
+    const hopLabel = hop.isProbe ? `探针 ${probeData.probe_id}` : `跃点 ${hop.hop || index}`;
+    const hopAddress = hop.address || 'Unknown';
+    const hopRtt = hop.rtt ? `${hop.rtt} ms` : '';
+    
+    // 创建标记并添加到地图
+    const marker = window.L.marker([hop.latitude, hop.longitude], { icon: markerIcon })
+      .addTo(map)
+      .bindPopup(`
+        <div class="map-popup-content">
+          <div class="popup-title">${hopLabel}</div>
+          <div class="popup-addr">${hopAddress}</div>
+          <div class="popup-location">
+            <i class="fas fa-globe-americas mr-1 opacity-50"></i>
+            ${hopCountry}${hopCity}
+          </div>
+          <div class="popup-detail">
+            ${hopRtt ? `<div class="detail-item">
+              <span class="label">延迟:</span>
+              <span class="value">${hopRtt}</span>
+            </div>` : ''}
+            ${hopAsn || hopOrg ? `<div class="detail-item">
+              <span class="label">ASN:</span>
+              <span class="value">${hopAsn} ${hopOrg}</span>
+            </div>` : ''}
+            <div class="detail-item">
+              <span class="label">序号:</span>
+              <span class="value">${index}/${validHops.length-1}</span>
+            </div>
+          </div>
+        </div>
+      `, { className: 'map-custom-popup' });
+    
+    pathMarkers.push(marker);
+  });
+  
+  // 调整地图视图以显示整个路径
+  try {
+    const group = window.L.featureGroup([...pathLines, ...pathMarkers]);
+    const bounds = group.getBounds();
+    if (bounds.isValid()) {
+      map.fitBounds(bounds.pad(0.1));
+    }
+  } catch (e) {
+    console.error('设置路径边界失败:', e);
+  }
+};
 
 // 页面卸载时清理地图
 onUnmounted(() => {
@@ -1270,13 +1533,119 @@ onUnmounted(() => {
         if (marker) map.removeLayer(marker);
       });
       markers = [];
+      
+      // 清除路径线条和标记
+      clearPathLines();
+      
       map.remove();
       map = null;
     } catch (e) {
       console.error('清理地图时出错:', e)
     }
   }
+  
+  // 清理全屏地图
+  if (fullscreenMap) {
+    try {
+      fullscreenMap.remove();
+      fullscreenMap = null;
+    } catch (e) {
+      console.error('清理全屏地图时出错:', e)
+    }
+  }
 })
+
+const isFullscreenMap = ref(false)
+let fullscreenMap: any = null
+
+// 清除选中的探针
+const clearSelectedProbe = () => {
+  selectedProbe.value = ''
+  
+  // 如果处于全屏模式，退出全屏
+  if (isFullscreenMap.value) {
+    toggleFullscreenMap()
+  }
+  
+  // 重新显示所有探针标记
+  if (map) {
+    markers.forEach(marker => {
+      if (marker) map.addLayer(marker)
+    })
+  }
+  
+  // 清除路径线条
+  clearPathLines()
+}
+
+// 切换地图全屏显示
+const toggleFullscreenMap = () => {
+  isFullscreenMap.value = !isFullscreenMap.value
+  
+  if (isFullscreenMap.value) {
+    // 进入全屏模式
+    nextTick(() => {
+      const fullscreenContainer = document.getElementById('fullscreen-map')
+      if (!fullscreenContainer) return
+      
+      // 创建全屏地图
+      fullscreenMap = window.L.map('fullscreen-map', {
+        center: map ? map.getCenter() : [20, 0],
+        zoom: map ? map.getZoom() : 2,
+        minZoom: 1,
+        maxZoom: 18
+      })
+      
+      // 添加地图底图
+      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        subdomains: ['a', 'b', 'c']
+      }).addTo(fullscreenMap)
+      
+      // 复制原地图上的路径线条和标记到全屏地图
+      pathLines.forEach(line => {
+        const latLngs = line.getLatLngs()
+        window.L.polyline(latLngs, {
+          color: '#3b82f6',
+          weight: 2,
+          opacity: 0.8,
+          smoothFactor: 1,
+          className: 'traceroute-path'
+        }).addTo(fullscreenMap)
+      })
+      
+      pathMarkers.forEach(marker => {
+        const pos = marker.getLatLng()
+        const icon = marker.options.icon
+        const popup = marker.getPopup()
+        
+        const newMarker = window.L.marker(pos, { icon }).addTo(fullscreenMap)
+        
+        if (popup) {
+          newMarker.bindPopup(popup.getContent(), { className: 'map-custom-popup' })
+        }
+      })
+      
+      // 设置地图视图以包含所有标记
+      try {
+        if (pathLines.length > 0 || pathMarkers.length > 0) {
+          const bounds = window.L.featureGroup([...pathLines, ...pathMarkers]).getBounds()
+          if (bounds.isValid()) {
+            fullscreenMap.fitBounds(bounds.pad(0.1))
+          }
+        }
+      } catch (e) {
+        console.error('设置全屏地图边界失败:', e)
+      }
+    })
+  } else {
+    // 退出全屏模式
+    if (fullscreenMap) {
+      fullscreenMap.remove()
+      fullscreenMap = null
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -1340,15 +1709,32 @@ onUnmounted(() => {
 }
 
 /* 地图样式 */
-#ripe-map {
+#ripe-map, #fullscreen-map {
   height: 400px;
   width: 100%;
   z-index: 1;
 }
 
+#fullscreen-map {
+  height: 100%;
+}
+
 :global(.custom-div-icon) {
   background: transparent;
   border: none;
+}
+
+:global(.traceroute-path) {
+  animation: flow 1.5s linear infinite;
+}
+
+@keyframes flow {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 20;
+  }
 }
 
 :global(.leaflet-popup-content) {
@@ -1410,6 +1796,14 @@ onUnmounted(() => {
   margin-bottom: 5px;
   text-align: center;
   color: rgba(var(--pc), 1);
+}
+
+:global(.map-popup-content .popup-addr) {
+  font-family: monospace;
+  font-size: 0.8rem;
+  margin-bottom: 5px;
+  text-align: center;
+  color: rgba(var(--bc), 0.8);
 }
 
 :global(.map-popup-content .popup-location) {
