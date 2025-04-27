@@ -436,8 +436,14 @@
     <div 
       ref="routeTableWindow"
       class="route-table-window fixed left-4 bottom-4 z-50 w-1/3 max-h-[60%] bg-base-200 bg-opacity-80 backdrop-blur-md shadow-lg rounded-lg overflow-hidden"
-      :class="{'minimized': isTableMinimized}"
+      :class="{
+        'minimized': isTableMinimized,
+        'collapsed': isTableCollapsed && !isTableMinimized,
+        'expanded': !isTableCollapsed && !isTableMinimized
+      }"
       @mousedown="startDrag"
+      @mouseenter="handleMouseEnter"
+      @mouseleave="handleMouseLeave"
     >
       <div class="window-header p-2 flex justify-between items-center cursor-move bg-base-300 bg-opacity-80">
         <div class="flex items-center">
@@ -445,6 +451,14 @@
           <span class="font-semibold">路由跃点</span>
         </div>
         <div class="flex gap-1">
+          <button 
+            @click.stop="toggleTableCollapse" 
+            class="btn btn-xs btn-ghost btn-circle"
+            :title="isTableCollapsed ? '展开' : '收起'"
+            v-if="!isTableMinimized"
+          >
+            <i :class="isTableCollapsed ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+          </button>
           <button 
             @click.stop="isTableMinimized = !isTableMinimized" 
             class="btn btn-xs btn-ghost btn-circle"
@@ -982,6 +996,12 @@ onUnmounted(() => {
   // 清理事件监听器
   document.removeEventListener('mousemove', handleDrag)
   document.removeEventListener('mouseup', stopDrag)
+  
+  // 清理自动收起计时器
+  if (autoCollapseTimer !== null) {
+    clearTimeout(autoCollapseTimer)
+    autoCollapseTimer = null
+  }
   
   if (map) {
     try {
@@ -1575,7 +1595,7 @@ const drawTraceroutePath = (probeData: any) => {
         [to.latitude, to.longitude]
       ], 
       {
-        color: '#3b82f6',
+    color: '#3b82f6',
         weight: 2,
         opacity: 0.8,
         smoothFactor: 1,
@@ -1645,7 +1665,7 @@ const drawTraceroutePath = (probeData: any) => {
           <div class="popup-location">
             <i class="fas fa-globe-americas mr-1 opacity-50"></i>
             ${hopCountry}${hopCity}
-          </div>
+        </div>
           <div class="popup-detail">
             ${hopRtt ? `<div class="detail-item">
               <span class="label">延迟:</span>
@@ -1658,9 +1678,9 @@ const drawTraceroutePath = (probeData: any) => {
             <div class="detail-item">
               <span class="label">序号:</span>
               <span class="value">${index}/${validHops.length-1}</span>
-            </div>
           </div>
-        </div>
+          </div>
+          </div>
       `, { className: 'map-custom-popup' });
     
     pathMarkers.push(marker);
@@ -1681,11 +1701,46 @@ const drawTraceroutePath = (probeData: any) => {
 const isFullscreenMap = ref(false)
 let fullscreenMap: any = null
 const isTableMinimized = ref(false)
+const isTableCollapsed = ref(false)
 const routeTableWindow = ref<HTMLElement | null>(null)
 const currentPathHops = ref<any[]>([])
 let isDragging = false
 let dragOffsetX = 0
 let dragOffsetY = 0
+let autoCollapseTimer: number | null = null
+let isMouseOverTable = false
+
+// 鼠标进入表格
+const handleMouseEnter = () => {
+  isMouseOverTable = true;
+  
+  // 如果表格处于折叠状态，自动展开
+  if (isTableCollapsed.value && !isTableMinimized.value) {
+    toggleTableCollapse();
+  }
+};
+
+// 鼠标离开表格
+const handleMouseLeave = () => {
+  isMouseOverTable = false;
+};
+
+// 切换表格收起/展开状态
+const toggleTableCollapse = () => {
+  isTableCollapsed.value = !isTableCollapsed.value;
+  
+  // 如果是展开，重置到左下角位置
+  if (!isTableCollapsed.value && routeTableWindow.value) {
+    // 延迟执行以确保动画完成后才设置位置
+    setTimeout(() => {
+      if (routeTableWindow.value && !isDragging) {
+        routeTableWindow.value.style.left = '16px';
+        routeTableWindow.value.style.bottom = '16px';
+        routeTableWindow.value.style.top = 'auto';
+      }
+    }, 350);
+  }
+};
 
 // 开始拖动表格窗口
 const startDrag = (event: MouseEvent) => {
@@ -1714,6 +1769,11 @@ const startDrag = (event: MouseEvent) => {
 const handleDrag = (event: MouseEvent) => {
   if (!isDragging || !routeTableWindow.value) return;
   
+  // 如果表格处于折叠状态，拖动时自动展开
+  if (isTableCollapsed.value) {
+    isTableCollapsed.value = false;
+  }
+  
   const element = routeTableWindow.value;
   
   // 计算新位置，确保不超出窗口边界
@@ -1731,6 +1791,8 @@ const stopDrag = () => {
   isDragging = false;
   document.removeEventListener('mousemove', handleDrag);
   document.removeEventListener('mouseup', stopDrag);
+  
+  // 移除自动折叠功能
 };
 
 // 清除选中的探针
@@ -1738,6 +1800,7 @@ const clearSelectedProbe = () => {
   selectedProbe.value = ''
   currentPathHops.value = []
   isTableMinimized.value = false
+  isTableCollapsed.value = false
   
   // 如果处于全屏模式，退出全屏
   if (isFullscreenMap.value) {
@@ -1760,6 +1823,10 @@ const toggleFullscreenMap = () => {
   isFullscreenMap.value = !isFullscreenMap.value
   
   if (isFullscreenMap.value) {
+    // 进入全屏模式时，确保表格处于展开状态
+    isTableCollapsed.value = false;
+    isTableMinimized.value = false;
+    
     // 进入全屏模式
     nextTick(() => {
       const fullscreenContainer = document.getElementById('fullscreen-map')
@@ -1842,12 +1909,23 @@ const toggleFullscreenMap = () => {
         console.error('设置全屏地图边界失败:', e)
       }
       
+      // 重置表格窗口状态
+      isTableMinimized.value = false
+      isTableCollapsed.value = false
+      
       // 设置表格窗口初始位置
       nextTick(() => {
         if (routeTableWindow.value) {
           routeTableWindow.value.style.left = '16px';
           routeTableWindow.value.style.bottom = '16px';
           routeTableWindow.value.style.top = 'auto';
+          
+          // 防止可拖动窗口在初始显示时闪烁
+          setTimeout(() => {
+            if (routeTableWindow.value) {
+              routeTableWindow.value.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            }
+          }, 100);
         }
       });
     })
@@ -2058,16 +2136,35 @@ const toggleFullscreenMap = () => {
 
 /* 可拖动窗口样式 */
 .route-table-window {
-  transition: height 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  transform-origin: bottom left;
+  width: 45% !important; /* 增加表格宽度 */
+  max-height: 70% !important; /* 增加表格高度 */
 }
 
 .route-table-window.minimized {
   height: 40px !important;
   width: auto !important;
   overflow: hidden;
+  transform: translateY(0) !important;
+  bottom: 16px !important;
+  left: 16px !important;
+  top: auto !important;
+}
+
+.route-table-window.collapsed {
+  transform: translateY(calc(100% - 40px));
+  width: 140px !important;
+  bottom: 16px !important;
+  left: 16px !important;
+  top: auto !important;
+}
+
+.route-table-window.expanded {
+  transform: translateY(0);
 }
 
 .window-header {
