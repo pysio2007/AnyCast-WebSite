@@ -1,9 +1,13 @@
 <template>
   <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-8">
-      来自 {{ organization }} 欢迎来到 Pysio's Networks
-    </h1>
-
+    <div v-if="loading" class="flex items-center justify-center h-32 bg-gray-200 dark:bg-gray-700 rounded mb-8 animate-pulse">
+      <span class="text-gray-500 dark:text-gray-300">正在获取组织信息...</span>
+    </div>
+    <div v-else>
+      <h1 class="text-2xl font-bold mb-8">
+        来自 {{ organization }} 欢迎来到 Pysio's Networks
+      </h1>
+    </div>
     <p class="text-lg mb-6">
       这里是 Pysio Networks 的网络监控/工具平台。你可以在此查询节点/BGP路由状态
     </p>
@@ -43,24 +47,24 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useFetch, useAsyncData } from 'nuxt/app'
+import { ref, onMounted } from 'vue'
 
-// 使用服务端渲染获取IP信息
 const organization = ref('')
+const loading = ref(true)
 
 async function fetchOrganizationData() {
   try {
-    // 使用Nuxt的useFetch在服务端获取数据
-    const { data } = await useFetch('https://ip.akaere.online/')
-    return data.value?.org || '未知组织'
+    const response = await fetch('https://ip.akaere.online/')
+    const data = await response.json()
+    return data.org || '未知组织'
   } catch (error) {
     console.error('Error fetching IP data:', error)
     return '未知组织'
   }
 }
 
-// 使用Nuxt的useAsyncData来处理服务端数据获取
-const { data: orgData } = await useAsyncData('organization', () => fetchOrganizationData())
-organization.value = orgData.value
+onMounted(async () => {
+  organization.value = await fetchOrganizationData()
+  loading.value = false
+})
 </script>
