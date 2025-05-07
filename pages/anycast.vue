@@ -12,7 +12,14 @@
 
       <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-4 dark:bg-yellow-900/20">
         <p class="text-yellow-700 dark:text-yellow-200">
-          本网络不接受任何对等互联请求。如果您对 DN42 网络感兴趣，请查看我们的 DN42 页面。
+          我们仅接受位于相同IX点的网络运营商的对等互联请求。如果您对 DN42 网络感兴趣，请查看我们的 DN42 页面。
+        </p>
+      </div>
+
+      <div class="bg-blue-50 border-l-4 border-blue-400 p-4 my-4 dark:bg-blue-900/20">
+        <p class="text-blue-700 dark:text-blue-200">
+          我们现在支持下游连接！如果您的网络位于FogIXP内，欢迎查看我们的
+          <a href="/downstream" class="text-blue-600 hover:text-blue-800 font-semibold dark:text-blue-300 dark:hover:text-blue-100">下游政策</a>。
         </p>
       </div>
 
