@@ -43,15 +43,15 @@
               <div class="grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <p class="font-medium">对等节点:</p>
-                  <p>8</p>
+                  <p>9</p>
                 </div>
                 <div>
                   <p class="font-medium">开放政策:</p>
-                  <p>7</p>
+                  <p>8</p>
                 </div>
                 <div>
                   <p class="font-medium">总速率:</p>
-                  <p>30G</p>
+                  <p>31G</p>
                 </div>
                 <div>
                   <p class="font-medium">IPv6 覆盖:</p>

@@ -50,6 +50,41 @@
       <section class="my-8">
         <h2 class="text-2xl font-bold mb-4">节点列表</h2>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- AKIX-Frankfurt -->
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold flex items-center">
+                <span class="fi fi-de w-5 mr-2"></span>
+                AKIX-Frankfurt
+              </h3>
+              <span class="text-sm bg-gray-100 text-gray-800 px-2 py-1 rounded dark:bg-gray-700 dark:text-gray-300">暂不公开/月</span>
+            </div>
+            <ul class="space-y-1 text-sm">
+              <li><i class="fas fa-network-wired mr-2"></i>10Gbps</li>
+              <li><i class="fas fa-server mr-2"></i>Digital Realty Frankfurt FRA1-16</li>
+              <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
+              <li><i class="fas fa-route mr-2"></i>AS210440 & AKIXP 主控</li>
+            </ul>
+          </div>
+
+          <!-- HongKong Master -->
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold flex items-center">
+                <span class="fi fi-hk w-5 mr-2"></span>
+                HongKong Master
+              </h3>
+              <span class="text-sm bg-gray-100 text-gray-800 px-2 py-1 rounded dark:bg-gray-700 dark:text-gray-300">暂不公开/月</span>
+            </div>
+            <ul class="space-y-1 text-sm">
+              <li><i class="fas fa-network-wired mr-2"></i>30Gbps</li>
+              <li><i class="fas fa-server mr-2"></i>Equinix HK2</li>
+              <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
+              <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+              <li><i class="fas fa-exchange-alt mr-2"></i>接入 AKIX</li>
+            </ul>
+          </div>
+
           <!-- New Jersey -->
           <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
             <div class="flex items-center justify-between mb-2">
@@ -129,7 +164,7 @@
             </div>
             <ul class="space-y-1 text-sm">
               <li><i class="fas fa-network-wired mr-2"></i>500Mbps, 1TB/月</li>
-              <li><i class="fas fa-server mr-2"></i>Akile</li>
+              <li><i class="fas fa-server mr-2"></i>SkyWolf</li>
               <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
               <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session (Premium)</li>
             </ul>
@@ -184,6 +219,7 @@
               <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
               <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
               <li><i class="fas fa-exchange-alt mr-2"></i>接入 FogIXP</li>
+              <li><i class="fas fa-cloud-download-alt mr-2"></i>支持下游</li>
             </ul>
           </div>
         </div>
