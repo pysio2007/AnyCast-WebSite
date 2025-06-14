@@ -17,13 +17,13 @@
 
       <div class="flex flex-wrap gap-8 my-8 items-center justify-center">
         <img
-          src="/RIR/RIPE-NCC-Member.png"
+          src="https://anycast.ink/cdn-cgi/image/f=webp,onerror=redirect,slow-connection-quality=50/https://anycast.ink/RIR/RIPE-NCC-Member.png"
           alt="RIPE NCC Member Logo"
           style="max-width: 240px; height: auto; object-fit: contain;"
           loading="lazy"
         />
         <img
-          src="/RIR/apnic-seeklogo.png"
+          src="https://anycast.ink/cdn-cgi/image/f=webp,onerror=redirect,slow-connection-quality=50/https://anycast.ink/RIR/apnic-seeklogo.png"
           alt="APNIC Logo"
           style="max-width: 220px; height: auto; object-fit: contain;"
           loading="lazy"
