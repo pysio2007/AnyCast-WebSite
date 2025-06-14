@@ -60,11 +60,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr class="bg-blue-50 dark:bg-blue-900/15 !odd:bg-blue-50 !even:bg-blue-50">
-                <td>RIPE ASN Registration + /44 IPv6</td>
+              <tr class="bg-red-50 dark:bg-red-900/15 !odd:bg-red-50 !even:bg-red-50">
+                <td>RIPE ASN Registration + /44 IPv6 * 暂不受理</td>
                 <td>不适用</td>
                 <td>不适用</td>
-                <td>¥620/年</td>
+                <td>¥621/年</td>
                 <td>$85/年</td>
               </tr>
               <tr class="bg-yellow-50 dark:bg-yellow-900/15 !odd:bg-yellow-50 !even:bg-yellow-50">
@@ -78,7 +78,7 @@
                 <td>IPv6 Subnet Rental (/40)</td>
                 <td>不适用</td>
                 <td>不适用</td>
-                <td>¥80/年</td>
+                <td>¥73/年</td>
                 <td>$10/年</td>
               </tr>
             </tbody>
@@ -101,11 +101,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr class="bg-blue-50 dark:bg-blue-900/15 !odd:bg-blue-50 !even:bg-blue-50">
-                <td>APNIC ASN Registration</td>
+              <tr class="bg-red-50 dark:bg-red-900/15 !odd:bg-red-50 !even:bg-red-50">
+                <td>APNIC ASN Registration * 暂不受理</td>
                 <td>不适用</td>
                 <td>不适用</td>
-                <td>首年¥5090<br>后续¥730/年</td>
+                <td>首年¥5110<br>后续¥730/年</td>
                 <td>首年$700<br>后续$100/年</td>
               </tr>
               <tr class="bg-red-50 dark:bg-red-900/15 !odd:bg-red-50 !even:bg-red-50">
@@ -117,94 +117,121 @@
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /43</td>
-                <td>¥40/月</td>
+                <td>¥37/月</td>
                 <td>$5/月</td>
-                <td>¥370/年</td>
+                <td>¥365/年</td>
                 <td>$50/年</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /42</td>
-                <td>¥50/月</td>
+                <td>¥44/月</td>
                 <td>$6/月</td>
-                <td>¥440/年</td>
+                <td>¥438/年</td>
                 <td>$60/年</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /41</td>
-                <td>¥60/月</td>
+                <td>¥51/月</td>
                 <td>$7/月</td>
-                <td>¥510/年</td>
+                <td>¥511/年</td>
                 <td>$70/年</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /40</td>
-                <td>¥60/月</td>
+                <td>¥58/月</td>
                 <td>$8/月</td>
-                <td>¥590/年</td>
+                <td>¥584/年</td>
                 <td>$80/年</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /39</td>
-                <td>¥100/月</td>
+                <td>¥95/月</td>
                 <td>$13/月</td>
-                <td>¥950/年</td>
+                <td>¥949/年</td>
                 <td>$130/年</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /38</td>
-                <td>¥150/月</td>
+                <td>¥146/月</td>
                 <td>$20/月</td>
                 <td>¥1460/年</td>
                 <td>$200/年</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /37</td>
-                <td>¥210/月</td>
+                <td>¥204/月</td>
                 <td>$28/月</td>
-                <td>¥2040/年</td>
+                <td>¥2044/年</td>
                 <td>$280/年</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /36</td>
-                <td>¥300/月</td>
+                <td>¥292/月</td>
                 <td>$40/月</td>
-                <td>¥2910/年</td>
+                <td>¥2920/年</td>
                 <td>$400/年</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /35</td>
-                <td>¥440/月</td>
+                <td>¥438/月</td>
                 <td>$60/月</td>
-                <td>¥4370/年</td>
+                <td>¥4380/年</td>
                 <td>$600/年</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /34</td>
-                <td>¥660/月</td>
+                <td>¥657/月</td>
                 <td>$90/月</td>
-                <td>¥6550/年</td>
+                <td>¥6570/年</td>
                 <td>$900/年</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /33</td>
-                <td>¥1170/月</td>
+                <td>¥1168/月</td>
                 <td>$160/月</td>
-                <td>¥11640/年</td>
+                <td>¥11680/年</td>
                 <td>$1600/年</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PI /48</td>
-                <td>¥40/月</td>
+                <td>¥37/月</td>
                 <td>$5/月</td>
-                <td>¥370/年</td>
+                <td>¥365/年</td>
                 <td>$50/年</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PI /32</td>
-                <td>¥1600/月</td>
+                <td>¥1606/月</td>
                 <td>$220/月</td>
-                <td>¥16000/年</td>
+                <td>¥16060/年</td>
                 <td>$2200/年</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="my-8">
+        <h2 class="text-2xl font-bold mb-4">ARIN 服务</h2>
+        
+        <div class="overflow-x-auto">
+          <table class="table table-zebra w-full">
+            <thead>
+              <tr>
+                <th>ARIN定价种类</th>
+                <th>价格（月付CNY）</th>
+                <th>价格（月付USD）</th>
+                <th>价格（年付CNY）</th>
+                <th>价格（年付USD）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ARIN IPv4 /24</td>
+                <td>¥876/月</td>
+                <td>$120/月</td>
+                <td>¥10512/年</td>
+                <td>$1440/年</td>
               </tr>
             </tbody>
           </table>
@@ -257,12 +284,6 @@
           如果您对我们的 LIR 服务有任何疑问或需要更多信息，请通过以下方式联系我们：
         </p>
         <div class="flex flex-wrap gap-4">
-          <a href="https://forms.office.com/r/VUiuEN1H7D" class="btn btn-outline gap-2" target="_blank">
-            <i class="fas fa-file-alt"></i> 填写表单
-          </a>
-          <a href="mailto:lir@pysio.online" class="btn btn-outline gap-2">
-            <i class="fas fa-envelope"></i> 电子邮件
-          </a>
           <a href="https://t.me/Pysio07" class="btn btn-outline gap-2">
             <i class="fab fa-telegram"></i> Telegram
           </a>
