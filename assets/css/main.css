@@ -5,6 +5,156 @@
   logs: true;
 }
 
+/* Apple-inspired Design System */
+:root {
+  /* Apple Colors */
+  --apple-blue: #007AFF;
+  --apple-blue-light: #5AC8FA;
+  --apple-blue-dark: #0051D5;
+  --apple-green: #34C759;
+  --apple-orange: #FF9500;
+  --apple-red: #FF3B30;
+  --apple-purple: #AF52DE;
+  --apple-pink: #FF2D92;
+  --apple-yellow: #FFCC00;
+  
+  /* Apple Grays */
+  --apple-gray-1: #8E8E93;
+  --apple-gray-2: #AEAEB2;
+  --apple-gray-3: #C7C7CC;
+  --apple-gray-4: #D1D1D6;
+  --apple-gray-5: #E5E5EA;
+  --apple-gray-6: #F2F2F7;
+  
+  /* Apple System Colors */
+  --apple-label: #000000;
+  --apple-secondary-label: #3C3C434D;
+  --apple-tertiary-label: #3C3C4326;
+  --apple-background: #FFFFFF;
+  --apple-secondary-background: #F2F2F7;
+  --apple-tertiary-background: #FFFFFF;
+  
+  /* Apple Elevation */
+  --apple-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --apple-shadow-2: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --apple-shadow-3: 0 8px 32px rgba(0, 0, 0, 0.16);
+  
+  /* Apple Blur Effects */
+  --apple-blur: blur(20px);
+  --apple-backdrop: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] {
+  /* Apple Dark Colors */
+  --apple-label: #FFFFFF;
+  --apple-secondary-label: #EBEBF54D;
+  --apple-tertiary-label: #EBEBF526;
+  --apple-background: #000000;
+  --apple-secondary-background: #1C1C1E;
+  --apple-tertiary-background: #2C2C2E;
+  --apple-backdrop: rgba(0, 0, 0, 0.8);
+}
+
+/* Apple Typography System */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--apple-background);
+  color: var(--apple-label);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Apple Component Styles */
+@layer components {
+  .apple-card {
+    @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 backdrop-blur-sm;
+    background-color: var(--apple-tertiary-background);
+    box-shadow: var(--apple-shadow-1);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  .apple-card:hover {
+    box-shadow: var(--apple-shadow-2);
+    transform: translateY(-2px);
+  }
+  
+  .apple-button {
+    @apply px-6 py-3 rounded-xl font-medium transition-all duration-200 ease-out;
+    background: linear-gradient(135deg, var(--apple-blue), var(--apple-blue-dark));
+    color: white;
+    border: none;
+    box-shadow: var(--apple-shadow-1);
+  }
+  
+  .apple-button:hover {
+    box-shadow: var(--apple-shadow-2);
+    transform: translateY(-1px);
+  }
+  
+  .apple-button:active {
+    transform: translateY(0);
+    box-shadow: var(--apple-shadow-1);
+  }
+  
+  .apple-button-secondary {
+    @apply px-6 py-3 rounded-xl font-medium transition-all duration-200 ease-out;
+    background-color: var(--apple-secondary-background);
+    color: var(--apple-label);
+    border: 1px solid var(--apple-gray-4);
+  }
+  
+  .apple-glass {
+    background: var(--apple-backdrop);
+    backdrop-filter: var(--apple-blur);
+    -webkit-backdrop-filter: var(--apple-blur);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .apple-nav {
+    @apply sticky top-0 z-50;
+    background: var(--apple-backdrop);
+    backdrop-filter: var(--apple-blur);
+    -webkit-backdrop-filter: var(--apple-blur);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .apple-text-large {
+    @apply text-3xl font-bold tracking-tight;
+    color: var(--apple-label);
+  }
+  
+  .apple-text-headline {
+    @apply text-xl font-semibold;
+    color: var(--apple-label);
+  }
+  
+  .apple-text-body {
+    @apply text-base;
+    color: var(--apple-secondary-label);
+  }
+  
+  .apple-text-caption {
+    @apply text-sm;
+    color: var(--apple-tertiary-label);
+  }
+  
+  .apple-gradient-blue {
+    background: linear-gradient(135deg, var(--apple-blue-light), var(--apple-blue));
+  }
+  
+  .apple-gradient-green {
+    background: linear-gradient(135deg, #34C759, #30D158);
+  }
+  
+  .apple-gradient-orange {
+    background: linear-gradient(135deg, #FF9500, #FF8C00);
+  }
+  
+  .apple-gradient-purple {
+    background: linear-gradient(135deg, #AF52DE, #BF5AF2);
+  }
+}
+
 /* 自定义主题配置 */
 :root {
   --theme-color: #1a1a1a;
