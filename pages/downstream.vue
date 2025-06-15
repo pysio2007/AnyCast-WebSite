@@ -4,7 +4,7 @@
       <h1 class="text-4xl font-bold mb-6">AS213605 下游政策</h1>
       
       <p class="mb-4">
-        AS213605欢迎位于FogIXP内的网络运营商建立下游连接。我们提供IPv6连接服务，并遵循以下政策。
+        AS213605欢迎位于FogIXP、AKIXP内以及香港/美国地区的网络运营商建立下游连接。我们提供IPv6连接服务，支持多种连接方式，并遵循以下政策。
       </p>
 
       <section class="my-8">
@@ -14,8 +14,14 @@
             <li class="flex items-start">
               <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
               <div>
-                <span class="font-semibold">必须位于FogIXP内：</span>
-                <span>所有希望建立下游连接的网络必须位于FogIXP交换点内。</span>
+                <span class="font-semibold">地理位置要求：</span>
+                <span>网络必须位于以下区域之一：</span>
+                <ul class="mt-2 ml-4 space-y-1 list-disc">
+                  <li>FogIXP交换点内</li>
+                  <li>AKIXP交换点内</li>
+                  <li>香港地区</li>
+                  <li>美国地区</li>
+                </ul>
               </div>
             </li>
             <li class="flex items-start">
@@ -45,13 +51,17 @@
 
       <section class="my-8">
         <h2 class="text-2xl font-bold mb-4">连接详情</h2>
-        <div class="grid md:grid-cols-2 gap-4">
+        <div class="grid md:grid-cols-2 gap-4 mb-6">
           <div class="bg-gray-50 p-5 rounded-lg shadow-sm dark:bg-gray-800">
             <div class="flex items-center mb-3">
               <i class="fas fa-network-wired text-blue-500 mr-3 text-xl"></i>
               <h3 class="font-bold text-lg">连接类型</h3>
             </div>
-            <p>IPv6 BGP会话</p>
+            <ul class="space-y-1">
+              <li>• IPv6 BGP会话</li>
+              <li>• VXLAN隧道</li>
+              <li>• GRE隧道</li>
+            </ul>
           </div>
           
           <div class="bg-gray-50 p-5 rounded-lg shadow-sm dark:bg-gray-800">
@@ -59,7 +69,12 @@
               <i class="fas fa-map-marker-alt text-blue-500 mr-3 text-xl"></i>
               <h3 class="font-bold text-lg">连接位置</h3>
             </div>
-            <p>FogIXP交换点</p>
+            <ul class="space-y-1">
+              <li>• FogIXP交换点</li>
+              <li>• AKIXP交换点</li>
+              <li>• 香港地区</li>
+              <li>• 美国地区</li>
+            </ul>
           </div>
           
           <div class="bg-gray-50 p-5 rounded-lg shadow-sm dark:bg-gray-800">
@@ -73,9 +88,33 @@
           <div class="bg-gray-50 p-5 rounded-lg shadow-sm dark:bg-gray-800">
             <div class="flex items-center mb-3">
               <i class="fas fa-globe text-blue-500 mr-3 text-xl"></i>
-              <h3 class="font-bold text-lg">本地IP</h3>
+              <h3 class="font-bold text-lg">连接IP</h3>
             </div>
-            <p class="font-mono">2001:7f8:ca:1::21:3605:1</p>
+            <div class="space-y-1 text-sm">
+              <p><span class="font-semibold">FogIXP:</span> <span class="font-mono">2001:7f8:ca:1::21:3605:1</span></p>
+              <p><span class="font-semibold">其他地区:</span> 根据具体情况分配</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-blue-50 p-6 rounded-lg shadow-sm dark:bg-blue-900/20 mb-6">
+          <h3 class="text-lg font-bold mb-3 flex items-center">
+            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+            隧道连接说明
+          </h3>
+          <div class="space-y-3 text-sm">
+            <div>
+              <span class="font-semibold">VXLAN隧道：</span>
+              <span>适用于跨地区连接，支持二层扩展，提供灵活的网络部署。</span>
+            </div>
+            <div>
+              <span class="font-semibold">GRE隧道：</span>
+              <span>传统三层隧道技术，兼容性好，适用于各种网络环境。</span>
+            </div>
+            <div class="text-gray-600 dark:text-gray-400">
+              <i class="fas fa-lightbulb mr-1"></i>
+              隧道连接需要提供端点IP地址和相关技术参数，我们将协助您完成配置。
+            </div>
           </div>
         </div>
       </section>
@@ -325,8 +364,9 @@
         <h2 class="text-2xl font-bold mb-4">申请流程</h2>
         <div class="bg-blue-50 p-6 rounded-lg shadow-sm dark:bg-blue-900/20">
           <ol class="space-y-4 list-decimal pl-6">
-            <li class="pl-2">确认您的网络位于FogIXP内</li>
+            <li class="pl-2">确认您的网络位于支持的地区（FogIXP、AKIXP、香港或美国）</li>
             <li class="pl-2">准备您的ASN和IPv6前缀信息</li>
+            <li class="pl-2">选择合适的连接方式（直连/VXLAN/GRE隧道）</li>
             <li class="pl-2">通过邮件联系我们：
               <a href="mailto:team@pysio.online" class="text-blue-500 hover:text-blue-600 font-medium">
                 team@pysio.online
@@ -339,7 +379,9 @@
             <ul class="space-y-2 pl-5 list-disc">
               <li>您的ASN</li>
               <li>您的IPv6前缀</li>
-              <li>您在FogIXP的连接信息</li>
+              <li>您的地理位置和连接信息</li>
+              <li>首选连接方式（直连/VXLAN/GRE）</li>
+              <li>如需隧道连接，请提供端点IP地址</li>
               <li>技术联系人信息</li>
             </ul>
           </div>

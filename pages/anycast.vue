@@ -25,14 +25,54 @@
 
       <section class="my-8">
         <h2 class="text-2xl font-bold mb-4">网络信息</h2>
-        <div class="grid md:grid-cols-2 gap-6">
-          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
-            <h3 class="font-bold mb-2">ASN</h3>
-            <code class="block bg-gray-100 p-2 rounded dark:bg-gray-700">AS213605</code>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200 shadow-sm hover:shadow-md transition duration-300 dark:from-blue-900/20 dark:to-blue-800/20 dark:border-blue-700">
+            <div class="flex items-center mb-3">
+              <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mr-3">
+                <i class="fas fa-network-wired text-blue-500 text-lg"></i>
+              </div>
+              <h3 class="font-bold text-blue-800 dark:text-blue-200">ASN</h3>
+            </div>
+            <code class="block bg-white/80 p-3 rounded-lg font-mono text-lg font-semibold text-blue-900 dark:bg-gray-800 dark:text-blue-300">AS213605</code>
           </div>
-          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
-            <h3 class="font-bold mb-2">IPv6 地址块</h3>
-            <code class="block bg-gray-100 p-2 rounded dark:bg-gray-700">2a14:67c1:a020::/44</code>
+          
+                     <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200 shadow-sm hover:shadow-md transition duration-300 dark:from-purple-900/20 dark:to-purple-800/20 dark:border-purple-700">
+             <div class="flex items-center mb-3">
+               <div class="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center mr-3">
+                 <i class="fas fa-globe text-purple-500 text-lg"></i>
+               </div>
+               <h3 class="font-bold text-purple-800 dark:text-purple-200">IPv6 地址块</h3>
+             </div>
+             <div class="space-y-2">
+               <code class="block bg-white/80 p-3 rounded-lg font-mono text-sm font-semibold text-purple-900 dark:bg-gray-800 dark:text-purple-300">2a14:67c1:a020::/44</code>
+               <code class="block bg-white/80 p-3 rounded-lg font-mono text-sm font-semibold text-purple-900 dark:bg-gray-800 dark:text-purple-300">2a14:67c1:b100::/40</code>
+             </div>
+           </div>
+
+          <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200 shadow-sm hover:shadow-md transition duration-300 dark:from-green-900/20 dark:to-green-800/20 dark:border-green-700">
+            <div class="flex items-center mb-3">
+              <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center mr-3">
+                <i class="fas fa-exchange-alt text-green-500 text-lg"></i>
+              </div>
+              <h3 class="font-bold text-green-800 dark:text-green-200">交换点</h3>
+            </div>
+            <div class="space-y-2">
+              <div class="bg-white/80 p-2 rounded text-sm font-medium text-green-900 dark:bg-gray-800 dark:text-green-300">AKIX</div>
+              <div class="bg-white/80 p-2 rounded text-sm font-medium text-green-900 dark:bg-gray-800 dark:text-green-300">FogIXP</div>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl border border-orange-200 shadow-sm hover:shadow-md transition duration-300 dark:from-orange-900/20 dark:to-orange-800/20 dark:border-orange-700">
+            <div class="flex items-center mb-3">
+              <div class="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center mr-3">
+                <i class="fas fa-handshake text-orange-500 text-lg"></i>
+              </div>
+              <h3 class="font-bold text-orange-800 dark:text-orange-200">对等政策</h3>
+            </div>
+            <div class="space-y-2">
+              <div class="bg-white/80 p-2 rounded text-sm font-medium text-orange-900 dark:bg-gray-800 dark:text-orange-300">开放对等</div>
+              <div class="bg-white/80 p-2 rounded text-sm font-medium text-orange-900 dark:bg-gray-800 dark:text-orange-300">支持下游</div>
+            </div>
           </div>
         </div>
       </section>
@@ -259,7 +299,10 @@
                 <span class="fi fi-ch w-5 mr-2"></span>
                 Schweiz
               </h3>
-              <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">CHF 12.00/季</span>
+              <div class="flex gap-2">
+                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">CHF 12.00/季</span>
+                <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded dark:bg-green-900 dark:text-green-200">下游服务</span>
+              </div>
             </div>
             <ul class="space-y-1 text-sm">
               <li><i class="fas fa-network-wired mr-2"></i>1Gbps, 1TB/月</li>
@@ -267,6 +310,48 @@
               <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
               <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
               <li><i class="fas fa-exchange-alt mr-2"></i>接入 FogIXP</li>
+              <li><i class="fas fa-cloud-download-alt mr-2"></i>支持下游</li>
+            </ul>
+          </div>
+
+          <!-- HK Downstreams -->
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold flex items-center">
+                <span class="fi fi-hk w-5 mr-2"></span>
+                HK-Downstreams
+              </h3>
+              <div class="flex gap-2">
+                <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded dark:bg-green-900 dark:text-green-200">下游服务</span>
+                <span class="text-sm bg-gray-100 text-gray-800 px-2 py-1 rounded dark:bg-gray-700 dark:text-gray-300">暂不公开/月</span>
+              </div>
+            </div>
+            <ul class="space-y-1 text-sm">
+              <li><i class="fas fa-network-wired mr-2"></i>1Gbps</li>
+              <li><i class="fas fa-server mr-2"></i>Equinix HK1</li>
+              <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
+              <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+              <li><i class="fas fa-cloud-download-alt mr-2"></i>支持下游</li>
+            </ul>
+          </div>
+
+          <!-- US Downstreams -->
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold flex items-center">
+                <span class="fi fi-us w-5 mr-2"></span>
+                US-Downstreams
+              </h3>
+              <div class="flex gap-2">
+                <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded dark:bg-green-900 dark:text-green-200">下游服务</span>
+                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">$2/月</span>
+              </div>
+            </div>
+            <ul class="space-y-1 text-sm">
+              <li><i class="fas fa-network-wired mr-2"></i>1Gbps</li>
+              <li><i class="fas fa-server mr-2"></i>SkyWolf</li>
+              <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
+              <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
               <li><i class="fas fa-cloud-download-alt mr-2"></i>支持下游</li>
             </ul>
           </div>

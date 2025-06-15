@@ -50,7 +50,7 @@
               <h3 class="apple-service-title">下游连接</h3>
             </div>
             <p class="apple-service-description">
-              FogIXP内的网络现可申请成为AS213605的下游，获取全球优质路由！
+              现支持FogIXP和AKIXP内网络，以及香港/美国地区的下游接入。
             </p>
             <NuxtLink to="/downstream" class="apple-service-link">
               <span>查看政策</span>
@@ -93,7 +93,7 @@ onMounted(async () => {
 }
 
 .apple-main-content {
-  @apply max-w-6xl mx-auto space-y-12;
+  @apply max-w-6xl mx-auto space-y-10;
 }
 
 .apple-hero-section {
@@ -145,33 +145,33 @@ onMounted(async () => {
 }
 
 .apple-services-grid {
-  @apply grid md:grid-cols-2 gap-6;
+  @apply grid md:grid-cols-2 gap-4;
 }
 
 .apple-service-card {
-  @apply p-8 rounded-2xl shadow-sm backdrop-blur-sm transition-all duration-300 ease-out;
+  @apply p-6 rounded-xl shadow-sm backdrop-blur-sm transition-all duration-300 ease-out;
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .apple-service-card:hover {
-  @apply transform -translate-y-2 shadow-lg;
+  @apply transform -translate-y-1 shadow-lg;
 }
 
 .apple-service-card-blue {
-  border-left: 4px solid #007AFF;
+  border-left: 3px solid #007AFF;
 }
 
 .apple-service-card-green {
-  border-left: 4px solid #34C759;
+  border-left: 3px solid #34C759;
 }
 
 .apple-service-header {
-  @apply flex items-center space-x-4 mb-4;
+  @apply flex items-center space-x-3 mb-3;
 }
 
 .apple-service-icon {
-  @apply w-12 h-12 rounded-xl flex items-center justify-center text-white;
+  @apply w-10 h-10 rounded-lg flex items-center justify-center text-white text-sm;
 }
 
 .apple-service-card-blue .apple-service-icon {
@@ -183,11 +183,11 @@ onMounted(async () => {
 }
 
 .apple-service-title {
-  @apply text-xl font-bold text-gray-900;
+  @apply text-lg font-bold text-gray-900;
 }
 
 .apple-service-description {
-  @apply text-gray-600 leading-relaxed mb-6;
+  @apply text-gray-600 leading-relaxed mb-4 text-sm;
 }
 
 .apple-service-link {
