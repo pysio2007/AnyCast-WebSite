@@ -180,8 +180,11 @@ export default defineNuxtConfig({
         },
         {
           defer: true,
-          src: 'https://umami.pysio.online/script.js',
-          'data-website-id': 'dcab8ed3-861e-49d8-9fc2-9af34a0ad5bf'
+          src: 'https://umami.pysio.online/js/script.outbound-links.js',
+          'data-domain': 'anycast.ink'
+        },
+        {
+          innerHTML: `window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }`
         }
       ],
       link: [
