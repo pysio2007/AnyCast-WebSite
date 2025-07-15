@@ -113,6 +113,20 @@
           <i class="fas fa-arrow-right"></i>
         </div>
       </NuxtLink>
+
+      <!-- 网络前缀查询 -->
+      <NuxtLink to="/prefixes" class="apple-tool-card apple-tool-card-blue">
+        <div class="apple-tool-icon">
+          <i class="fas fa-broadcast-tower"></i>
+        </div>
+        <div class="apple-tool-content">
+          <h2 class="apple-tool-title">网络前缀</h2>
+          <p class="apple-tool-description">查看 AS213605 公告的网络前缀信息</p>
+        </div>
+        <div class="apple-tool-arrow">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </NuxtLink>
     </div>
   </div>
 </template>
