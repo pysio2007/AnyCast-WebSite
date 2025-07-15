@@ -50,7 +50,7 @@
               <h3 class="apple-service-title">下游连接</h3>
             </div>
             <p class="apple-service-description">
-              现支持FogIXP和AKIXP内网络，以及香港/美国地区的下游接入。
+              现支持FogIXP、AKIXP和LOCIX FRANKFURT内网络，以及香港/美国地区的下游接入。
             </p>
             <NuxtLink to="/downstream" class="apple-service-link">
               <span>查看政策</span>

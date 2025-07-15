@@ -119,6 +119,111 @@
               </div>
             </div>
           </div>
+
+          <!-- LOCIX FRANKFURT -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <div class="bg-green-50 dark:bg-green-900/30 p-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-xl">LOCIX FRANKFURT</h3>
+                <div class="flex gap-2">
+                  <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded dark:bg-green-800 dark:text-green-200">
+                    Frankfurt am Main
+                  </span>
+                  <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-800 dark:text-blue-200">
+                    下游支持
+                  </span>
+                </div>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                LOCIX EXCHANGE FRANKFURT
+              </p>
+            </div>
+            <div class="p-4">
+              <div class="mb-3">
+                <a href="https://www.peeringdb.com/ix/2084" target="_blank" 
+                   class="text-blue-500 hover:text-blue-700 text-sm flex items-center">
+                  <i class="fas fa-external-link-alt mr-1"></i> PeeringDB: IX #2084
+                </a>
+              </div>
+              <div class="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p class="font-medium">对等节点:</p>
+                  <p>303</p>
+                </div>
+                <div>
+                  <p class="font-medium">开放政策:</p>
+                  <p>279</p>
+                </div>
+                <div>
+                  <p class="font-medium">总速率:</p>
+                  <p>2.6T</p>
+                </div>
+                <div>
+                  <p class="font-medium">IPv6 覆盖:</p>
+                  <p>100%</p>
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p class="font-medium mb-1">我们的对等信息:</p>
+                <div class="bg-gray-50 p-2 rounded dark:bg-gray-700 font-mono text-xs">
+                  <p>ASN: 213605</p>
+                  <p>IPv6: 2001:7f8:f2:e1:0:21:3605:1</p>
+                  <p>速率: 1G</p>
+                  <p>策略: RS PEER BFD Support</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- INTERIX -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <div class="bg-purple-50 dark:bg-purple-900/30 p-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-xl">INTERIX</h3>
+                <span class="text-sm bg-purple-100 text-purple-800 px-2 py-1 rounded dark:bg-purple-800 dark:text-purple-200">
+                  Amsterdam
+                </span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                InterIX Internet Exchange Amsterdam
+              </p>
+            </div>
+            <div class="p-4">
+              <div class="mb-3">
+                <a href="https://www.peeringdb.com/ix/3990" target="_blank" 
+                   class="text-blue-500 hover:text-blue-700 text-sm flex items-center">
+                  <i class="fas fa-external-link-alt mr-1"></i> PeeringDB: IX #3990
+                </a>
+              </div>
+              <div class="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p class="font-medium">对等节点:</p>
+                  <p>139</p>
+                </div>
+                <div>
+                  <p class="font-medium">开放政策:</p>
+                  <p>114</p>
+                </div>
+                <div>
+                  <p class="font-medium">总速率:</p>
+                  <p>5.1T</p>
+                </div>
+                <div>
+                  <p class="font-medium">IPv6 覆盖:</p>
+                  <p>98%</p>
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p class="font-medium mb-1">我们的对等信息:</p>
+                <div class="bg-gray-50 p-2 rounded dark:bg-gray-700 font-mono text-xs">
+                  <p>ASN: 213605</p>
+                  <p>IPv6: 2001:7f8:134::a0</p>
+                  <p>速率: 1G</p>
+                  <p>策略: RS PEER BFD Support</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

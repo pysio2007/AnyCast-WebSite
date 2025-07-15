@@ -12,7 +12,7 @@
 
       <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-4 dark:bg-yellow-900/20">
         <p class="text-yellow-700 dark:text-yellow-200">
-          我们目前接受位于<a href="/ix" class="text-yellow-600 hover:text-yellow-800 font-semibold dark:text-yellow-300 dark:hover:text-yellow-100">AKIX和FogIXP</a>交换点的网络运营商的对等互联请求。如果您对 DN42 网络感兴趣，请查看我们的 DN42 页面。
+          我们目前接受位于<a href="/ix" class="text-yellow-600 hover:text-yellow-800 font-semibold dark:text-yellow-300 dark:hover:text-yellow-100">AKIX、FogIXP、LOCIX FRANKFURT和INTERIX</a>交换点的网络运营商的对等互联请求。如果您对 DN42 网络感兴趣，请查看我们的 DN42 页面。
         </p>
       </div>
 
@@ -59,6 +59,8 @@
             <div class="space-y-2">
               <div class="bg-white/80 p-2 rounded text-sm font-medium text-green-900 dark:bg-gray-800 dark:text-green-300">AKIX</div>
               <div class="bg-white/80 p-2 rounded text-sm font-medium text-green-900 dark:bg-gray-800 dark:text-green-300">FogIXP</div>
+              <div class="bg-white/80 p-2 rounded text-sm font-medium text-green-900 dark:bg-gray-800 dark:text-green-300">LOCIX FRANKFURT</div>
+              <div class="bg-white/80 p-2 rounded text-sm font-medium text-green-900 dark:bg-gray-800 dark:text-green-300">INTERIX</div>
             </div>
           </div>
 

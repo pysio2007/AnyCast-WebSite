@@ -19,6 +19,7 @@
                 <ul class="mt-2 ml-4 space-y-1 list-disc">
                   <li>FogIXP交换点内</li>
                   <li>AKIXP交换点内</li>
+                  <li>LOCIX FRANKFURT交换点内</li>
                   <li>香港地区</li>
                   <li>美国地区</li>
                 </ul>
