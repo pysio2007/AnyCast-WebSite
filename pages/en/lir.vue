@@ -1,17 +1,17 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <PageSeo title="LIR 服务 - RIPE NCC 和 APNIC 会员"
-      description="作为 RIPE NCC 和 APNIC 的正式会员，我们提供全面的 LIR 服务，包括 ASN 分配和 IPv4/IPv6 地址空间管理" />
+    <PageSeo title="LIR Services - RIPE NCC and APNIC Member"
+      description="As an official member of RIPE NCC and APNIC, we provide comprehensive LIR services including ASN allocation and IPv4/IPv6 address space management" />
 
     <Head>
-      <Meta name="keywords" content="LIR服务, RIPE NCC, APNIC, ASN分配, IPv4地址, IPv6地址, 互联网号码分配, 互联网资源管理, 地址空间" />
+      <Meta name="keywords" content="LIR Services, RIPE NCC, APNIC, ASN Allocation, IPv4 Address, IPv6 Address, Internet Number Allocation, Internet Resource Management, Address Space" />
     </Head>
     <article class="prose dark:prose-invert max-w-none">
-      <h1 class="text-4xl font-bold mb-6">LIR 服务</h1>
+      <h1 class="text-4xl font-bold mb-6">LIR Services</h1>
 
       <p class="mb-4">
-        我们是 RIPE NCC 和 APNIC 的正式会员，提供全面的 LIR (Local Internet Registry) 服务，
-        包括 ASN 分配和 IPv4/IPv6 地址空间管理。
+        We are official members of RIPE NCC and APNIC, providing comprehensive LIR (Local Internet Registry) services,
+        including ASN allocation and IPv4/IPv6 address space management.
       </p>
 
       <div class="flex flex-wrap gap-8 my-8 items-center justify-center">
@@ -26,53 +26,53 @@
       <div class="mt-4 mb-2 text-sm flex flex-wrap gap-x-8 gap-y-2">
         <div class="flex items-center">
           <div class="w-4 h-4 bg-blue-50 dark:bg-blue-900/15 mr-2"></div>
-          <span>需要审核与 KYC 流程</span>
+          <span>Requires review & KYC process</span>
         </div>
         <div class="flex items-center">
           <div class="w-4 h-4 bg-red-50 dark:bg-red-900/15 mr-2"></div>
-          <span>暂时无货</span>
+          <span>Temporarily out of stock</span>
         </div>
         <div class="flex items-center">
           <div class="w-4 h-4 bg-yellow-50 dark:bg-yellow-900/15 mr-2"></div>
-          <span>即将缺货</span>
+          <span>Low stock</span>
         </div>
       </div>
 
       <section class="my-8">
-        <h2 class="text-2xl font-bold mb-4">RIPE NCC LIR 服务</h2>
+        <h2 class="text-2xl font-bold mb-4">RIPE NCC LIR Services</h2>
 
         <div class="overflow-x-auto">
           <table class="table table-zebra w-full">
             <thead>
               <tr>
-                <th>RIPE定价种类</th>
-                <th>价格（月付CNY）</th>
-                <th>价格（月付USD）</th>
-                <th>价格（年付CNY）</th>
-                <th>价格（年付USD）</th>
+                <th>RIPE Service Type</th>
+                <th>Price (Monthly CNY)</th>
+                <th>Price (Monthly USD)</th>
+                <th>Price (Annual CNY)</th>
+                <th>Price (Annual USD)</th>
               </tr>
             </thead>
             <tbody>
               <tr class="bg-red-50 dark:bg-red-900/15 !odd:bg-red-50 !even:bg-red-50">
-                <td>RIPE ASN Registration + /44 IPv6 * 暂不受理</td>
-                <td>不适用</td>
-                <td>不适用</td>
-                <td>¥621/年</td>
-                <td>$85/年</td>
+                <td>RIPE ASN Registration + /44 IPv6 * Currently unavailable</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>¥621/year</td>
+                <td>$85/year</td>
               </tr>
               <tr class="bg-yellow-50 dark:bg-yellow-900/15 !odd:bg-yellow-50 !even:bg-yellow-50">
                 <td>IPv6 PA /44 ~ /48</td>
-                <td>¥0/月</td>
-                <td>$0/月</td>
-                <td>¥0/年</td>
-                <td>$0/年</td>
+                <td>¥0/month</td>
+                <td>$0/month</td>
+                <td>¥0/year</td>
+                <td>$0/year</td>
               </tr>
               <tr>
                 <td>IPv6 Subnet Rental (/40)</td>
-                <td>不适用</td>
-                <td>不适用</td>
-                <td>¥73/年</td>
-                <td>$10/年</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>¥73/year</td>
+                <td>$10/year</td>
               </tr>
             </tbody>
           </table>
@@ -80,124 +80,124 @@
       </section>
 
       <section class="my-8">
-        <h2 class="text-2xl font-bold mb-4">APNIC LIR 服务</h2>
+        <h2 class="text-2xl font-bold mb-4">APNIC LIR Services</h2>
 
         <div class="overflow-x-auto">
           <table class="table table-zebra w-full">
             <thead>
               <tr>
-                <th>APNIC定价种类</th>
-                <th>价格（月付CNY）</th>
-                <th>价格（月付USD）</th>
-                <th>价格（年付CNY）</th>
-                <th>价格（年付USD）</th>
+                <th>APNIC Service Type</th>
+                <th>Price (Monthly CNY)</th>
+                <th>Price (Monthly USD)</th>
+                <th>Price (Annual CNY)</th>
+                <th>Price (Annual USD)</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>APNIC ASN Registration</td>
-                <td>不适用</td>
-                <td>不适用</td>
-                <td>首年¥3000<br>后续¥500/年</td>
-                <td>首年$450<br>后续$100/年</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>First year ¥3000<br>Renewal ¥500/year</td>
+                <td>First year $450<br>Renewal $100/year</td>
               </tr>
               <tr class="bg-red-50 dark:bg-red-900/15 !odd:bg-red-50 !even:bg-red-50">
                 <td>APNIC IPv6 PA /44 ~ /48</td>
-                <td>¥0/月</td>
-                <td>$0/月</td>
-                <td>¥0/年</td>
-                <td>$0/年</td>
+                <td>¥0/month</td>
+                <td>$0/month</td>
+                <td>¥0/year</td>
+                <td>$0/year</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /43</td>
-                <td>¥37/月</td>
-                <td>$5/月</td>
-                <td>¥365/年</td>
-                <td>$50/年</td>
+                <td>¥37/month</td>
+                <td>$5/month</td>
+                <td>¥365/year</td>
+                <td>$50/year</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /42</td>
-                <td>¥44/月</td>
-                <td>$6/月</td>
-                <td>¥438/年</td>
-                <td>$60/年</td>
+                <td>¥44/month</td>
+                <td>$6/month</td>
+                <td>¥438/year</td>
+                <td>$60/year</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /41</td>
-                <td>¥51/月</td>
-                <td>$7/月</td>
-                <td>¥511/年</td>
-                <td>$70/年</td>
+                <td>¥51/month</td>
+                <td>$7/month</td>
+                <td>¥511/year</td>
+                <td>$70/year</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /40</td>
-                <td>¥58/月</td>
-                <td>$8/月</td>
-                <td>¥584/年</td>
-                <td>$80/年</td>
+                <td>¥58/month</td>
+                <td>$8/month</td>
+                <td>¥584/year</td>
+                <td>$80/year</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /39</td>
-                <td>¥95/月</td>
-                <td>$13/月</td>
-                <td>¥949/年</td>
-                <td>$130/年</td>
+                <td>¥95/month</td>
+                <td>$13/month</td>
+                <td>¥949/year</td>
+                <td>$130/year</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /38</td>
-                <td>¥146/月</td>
-                <td>$20/月</td>
-                <td>¥1460/年</td>
-                <td>$200/年</td>
+                <td>¥146/month</td>
+                <td>$20/month</td>
+                <td>¥1460/year</td>
+                <td>$200/year</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /37</td>
-                <td>¥204/月</td>
-                <td>$28/月</td>
-                <td>¥2044/年</td>
-                <td>$280/年</td>
+                <td>¥204/month</td>
+                <td>$28/month</td>
+                <td>¥2044/year</td>
+                <td>$280/year</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /36</td>
-                <td>¥292/月</td>
-                <td>$40/月</td>
-                <td>¥2920/年</td>
-                <td>$400/年</td>
+                <td>¥292/month</td>
+                <td>$40/month</td>
+                <td>¥2920/year</td>
+                <td>$400/year</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /35</td>
-                <td>¥438/月</td>
-                <td>$60/月</td>
-                <td>¥4380/年</td>
-                <td>$600/年</td>
+                <td>¥438/month</td>
+                <td>$60/month</td>
+                <td>¥4380/year</td>
+                <td>$600/year</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /34</td>
-                <td>¥657/月</td>
-                <td>$90/月</td>
-                <td>¥6570/年</td>
-                <td>$900/年</td>
+                <td>¥657/month</td>
+                <td>$90/month</td>
+                <td>¥6570/year</td>
+                <td>$900/year</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PA /33</td>
-                <td>¥1168/月</td>
-                <td>$160/月</td>
-                <td>¥11680/年</td>
-                <td>$1600/年</td>
+                <td>¥1168/month</td>
+                <td>$160/month</td>
+                <td>¥11680/year</td>
+                <td>$1600/year</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PI /48</td>
-                <td>¥37/月</td>
-                <td>$5/月</td>
-                <td>¥365/年</td>
-                <td>$50/年</td>
+                <td>¥37/month</td>
+                <td>$5/month</td>
+                <td>¥365/year</td>
+                <td>$50/year</td>
               </tr>
               <tr>
                 <td>APNIC IPv6 PI /32</td>
-                <td>¥1606/月</td>
-                <td>$220/月</td>
-                <td>¥16060/年</td>
-                <td>$2200/年</td>
+                <td>¥1606/month</td>
+                <td>$220/month</td>
+                <td>¥16060/year</td>
+                <td>$2200/year</td>
               </tr>
             </tbody>
           </table>
@@ -205,26 +205,26 @@
       </section>
 
       <section class="my-8">
-        <h2 class="text-2xl font-bold mb-4">ARIN 服务</h2>
+        <h2 class="text-2xl font-bold mb-4">ARIN Services</h2>
 
         <div class="overflow-x-auto">
           <table class="table table-zebra w-full">
             <thead>
               <tr>
-                <th>ARIN定价种类</th>
-                <th>价格（月付CNY）</th>
-                <th>价格（月付USD）</th>
-                <th>价格（年付CNY）</th>
-                <th>价格（年付USD）</th>
+                <th>ARIN Service Type</th>
+                <th>Price (Monthly CNY)</th>
+                <th>Price (Monthly USD)</th>
+                <th>Price (Annual CNY)</th>
+                <th>Price (Annual USD)</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>ARIN IPv4 /24</td>
-                <td>¥876/月</td>
-                <td>$120/月</td>
-                <td>¥10512/年</td>
-                <td>$1440/年</td>
+                <td>¥876/month</td>
+                <td>$120/month</td>
+                <td>¥10512/year</td>
+                <td>$1440/year</td>
               </tr>
             </tbody>
           </table>
@@ -232,51 +232,49 @@
       </section>
 
       <section class="my-8">
-        <h2 class="text-2xl font-bold mb-4">LIR 服务说明</h2>
+        <h2 class="text-2xl font-bold mb-4">LIR Service Information</h2>
 
         <div class="grid md:grid-cols-2 gap-6">
           <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
-            <h3 class="font-bold mb-2">什么是 LIR?</h3>
-            <p>LIR (Local Internet Registry) 是互联网号码资源的本地注册机构，负责向终端用户或较小的 ISP 分配 IP 地址和 AS 号码。我们作为 RIPE 和 APNIC
-              的会员，可以帮助您申请和管理这些资源。</p>
+            <h3 class="font-bold mb-2">What is LIR?</h3>
+            <p>LIR (Local Internet Registry) is a local registration authority for Internet number resources, responsible for allocating IP addresses and AS numbers to end users or smaller ISPs. As members of RIPE and APNIC, we can help you apply for and manage these resources.</p>
           </div>
 
           <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
             <h3 class="font-bold mb-2">PA vs PI</h3>
-            <p>PA (Provider Aggregatable) 地址是通过 ISP 分配的地址，当您更换提供商时需要放弃。PI (Provider Independent) 地址是直接从 RIR 获得的，可以带到任何
-              ISP。PI 地址价格更高但提供更好的灵活性。</p>
+            <p>PA (Provider Aggregatable) addresses are allocated through ISPs and must be returned when changing providers. PI (Provider Independent) addresses are obtained directly from RIRs and can be taken to any ISP. PI addresses cost more but provide better flexibility.</p>
           </div>
 
           <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
-            <h3 class="font-bold mb-2">服务内容</h3>
+            <h3 class="font-bold mb-2">Service Content</h3>
             <ul class="list-disc pl-5">
-              <li>申请和分配 IP 地址空间</li>
-              <li>申请和分配 AS 号码</li>
-              <li>IP 地址反向解析 (rDNS) 配置</li>
-              <li>RPKI (Resource Public Key Infrastructure) 配置</li>
-              <li>IRR (Internet Routing Registry) 记录维护</li>
-              <li>专业技术支持和咨询</li>
+              <li>Apply for and allocate IP address space</li>
+              <li>Apply for and allocate AS numbers</li>
+              <li>IP address reverse DNS (rDNS) configuration</li>
+              <li>RPKI (Resource Public Key Infrastructure) configuration</li>
+              <li>IRR (Internet Routing Registry) record maintenance</li>
+              <li>Professional technical support and consultation</li>
             </ul>
           </div>
 
           <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
-            <h3 class="font-bold mb-2">申请流程</h3>
+            <h3 class="font-bold mb-2">Application Process</h3>
             <ol class="list-decimal pl-5">
-              <li>提交申请表格</li>
-              <li>完成资格审核</li>
-              <li>签署服务协议</li>
-              <li>缴纳相应费用</li>
-              <li>1-3 个工作日内完成资源分配</li>
-              <li>提供技术支持和配置指导</li>
+              <li>Submit application form</li>
+              <li>Complete qualification review</li>
+              <li>Sign service agreement</li>
+              <li>Pay applicable fees</li>
+              <li>Resource allocation completed within 1-3 business days</li>
+              <li>Provide technical support and configuration guidance</li>
             </ol>
           </div>
         </div>
       </section>
 
       <section class="my-8">
-        <h2 class="text-2xl font-bold mb-4">联系我们</h2>
+        <h2 class="text-2xl font-bold mb-4">Contact Us</h2>
         <p class="mb-4">
-          如果您对我们的 LIR 服务有任何疑问或需要更多信息，请通过以下方式联系我们：
+          If you have any questions about our LIR services or need more information, please contact us through:
         </p>
         <div class="flex flex-wrap gap-4">
           <a href="https://t.me/Pysio07" class="btn btn-outline gap-2">
@@ -295,7 +293,7 @@ definePageMeta({
   layout: 'no-navbar'
 })
 
-// 预加载关键图片以提高性能
+// Preload key images for better performance
 useHead({
   link: [
     {
@@ -314,7 +312,7 @@ useHead({
 })
 
 onMounted(() => {
-  // 基本页面初始化
+  // Basic page initialization
 })
 </script>
 
@@ -325,7 +323,7 @@ onMounted(() => {
   font-size: 0.875rem;
 }
 
-/* 确保颜色能覆盖zebra样式 */
+/* Ensure colors can override zebra styles */
 .table-zebra tbody tr.bg-red-50 {
   background-color: rgb(254 242 242) !important;
 }
@@ -366,7 +364,7 @@ onMounted(() => {
   }
 }
 
-/* 禁止选中和拖动 */
+/* Disable selection and dragging */
 body {
   -webkit-user-select: none;
   -moz-user-select: none;
