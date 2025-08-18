@@ -205,8 +205,7 @@
                         class="select select-bordered w-full md:w-1/3 bg-opacity-70 bg-base-100">
                         <option value="">请选择探针</option>
                         <option v-for="result in processedResults" :key="result.probe_id" :value="result.probe_id">
-                          {{ result.probe_id }} - {{ result.country_name || result.country || '未知' }}{{ result.city ? ',
-                          ' + result.city : '' }}
+                          {{ `${result.probe_id} - ${result.country_name || result.country || '未知'}${result.city ? ', ' + result.city : ''}` }}
                         </option>
                       </select>
                     </div>

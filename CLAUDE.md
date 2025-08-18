@@ -73,11 +73,70 @@ The application integrates with various external APIs:
 - Fallback to 'development' when git info unavailable
 - Hash displayed in version page for debugging
 
+## Key Architecture Patterns
+
+### Page Structure Pattern
+Most tool pages (lg.vue, ping.vue, traceroute.vue, etc.) follow this pattern:
+- Top search form with input validation
+- Results display with loading states and error handling  
+- Interactive data visualization using ECharts
+- Responsive cards layout for mobile/desktop
+- Caching integration using `Cache` utility class
+
+### API Integration Pattern
+All external API calls follow this pattern:
+```typescript
+// 1. Check cache first
+const cachedData = Cache.get(cacheKey)
+if (cachedData) return cachedData
+
+// 2. Fetch from API with error handling
+try {
+  const response = await $fetch(apiUrl)
+  Cache.set(cacheKey, response, ttl)
+  return response
+} catch (error) {
+  // Fallback to secondary API or show error
+}
+```
+
+### State Management Pattern
+Vue 3 Composition API with reactive refs:
+- `loading` - Boolean for loading states
+- `error` - String for error messages  
+- `results` - Array/Object for API responses
+- Computed properties for filtered/processed data
+
+### TypeScript Integration
+- Interface definitions in utils/cache.ts for API responses
+- Type-safe reactive refs throughout components
+- Proper error handling with typed catch blocks
+
+## External Dependencies & APIs
+
+### Required API Providers
+- **BGP.Tools**: `bgp.tools` for BGP route analysis and Looking Glass data
+- **Tor Metrics**: `metrics.torproject.org` for Tor node information
+- **RIPE RIS**: RIS API for routing information and traceroute
+- **GeoIP Services**: ipinfo.io (primary), ip-api.com (fallback)
+- **DN42 Registry**: For DN42 network data
+
+### Analytics & Monitoring
+- Google Analytics (G-P1L3MZ08KH) 
+- Umami Analytics (`umami.pysio.online`)
+- Both configured in nuxt.config.ts head scripts
+
+### Font & Icon Dependencies
+- FontAwesome 6.5.1 via CDN for icons
+- Flag Icons via jsdelivr CDN for country flags
+- JetBrains Mono from Google Fonts for monospace text
+
 ## Development Notes
 
-- The site is primarily in Chinese with some English technical terms
-- All network tools are designed for diagnostic purposes only
-- Private IP addresses are filtered out in GeoIP lookups
-- Multiple API providers ensure service reliability
-- Responsive design with mobile-first approach
-- No linting or testing commands are currently configured
+- Site is primarily Chinese with English technical terms
+- All network tools are diagnostic/read-only (no configuration changes)
+- Private IP addresses filtered out in GeoIP lookups to avoid unnecessary API calls
+- Multiple API providers with automatic failover for reliability
+- Mobile-first responsive design using Tailwind breakpoints
+- No linting or testing commands configured - manual code review process
+- AGPL-3.0 license requires derivative works to remain open source

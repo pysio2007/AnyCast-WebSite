@@ -3,8 +3,14 @@
     <article class="prose dark:prose-invert max-w-none">
       <h1 class="text-4xl font-bold mb-6">AS213605 下游政策</h1>
 
+      <div class="bg-green-50 border-l-4 border-green-400 p-4 my-4 dark:bg-green-900/20">
+        <p class="text-green-700 dark:text-green-200 mb-0">
+          <strong>我们支持所有地区和所有人的Peer和下游链接，无门槛，仅限非商业用途。</strong>
+        </p>
+      </div>
+
       <p class="mb-4">
-        AS213605欢迎位于FogIXP、AKIXP内以及香港/美国地区的网络运营商建立下游连接。我们提供IPv6连接服务，支持多种连接方式，并遵循以下政策。
+        AS213605提供IPv6下游连接服务，支持多种连接方式，欢迎所有非商业用途的网络运营商申请。
       </p>
 
       <section class="my-8">
@@ -14,15 +20,8 @@
             <li class="flex items-start">
               <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
               <div>
-                <span class="font-semibold">地理位置要求：</span>
-                <span>网络必须位于以下区域之一：</span>
-                <ul class="mt-2 ml-4 space-y-1 list-disc">
-                  <li>FogIXP交换点内</li>
-                  <li>AKIXP交换点内</li>
-                  <li>LOCIX FRANKFURT交换点内</li>
-                  <li>香港地区</li>
-                  <li>美国地区</li>
-                </ul>
+                <span class="font-semibold">使用用途：</span>
+                <span>仅限非商业用途，包括学习、研究、个人项目等。</span>
               </div>
             </li>
             <li class="flex items-start">
@@ -71,10 +70,7 @@
               <h3 class="font-bold text-lg">连接位置</h3>
             </div>
             <ul class="space-y-1">
-              <li>• FogIXP交换点</li>
-              <li>• AKIXP交换点</li>
-              <li>• 香港地区</li>
-              <li>• 美国地区</li>
+              <li>• 全球</li>
             </ul>
           </div>
 

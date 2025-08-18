@@ -33,7 +33,7 @@
               <h3 class="apple-service-title">IXP内对等互联</h3>
             </div>
             <p class="apple-service-description">
-              我们现在支持与位于相同IX交换点的网络运营商建立对等互联！
+              支持所有地区和所有人的Peer连接，无门槛，仅限非商业用途。
             </p>
             <NuxtLink to="/anycast" class="apple-service-link">
               <span>了解详情</span>
@@ -50,7 +50,7 @@
               <h3 class="apple-service-title">下游连接</h3>
             </div>
             <p class="apple-service-description">
-              现支持FogIXP、AKIXP和LOCIX FRANKFURT内网络，以及香港/美国地区的下游接入。
+              支持所有地区和所有人的下游连接，无门槛，仅限非商业用途。
             </p>
             <NuxtLink to="/downstream" class="apple-service-link">
               <span>查看政策</span>

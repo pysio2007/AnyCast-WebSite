@@ -10,9 +10,9 @@
         ) 目前在以下IX交换点提供对等互联服务。
       </p>
 
-      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-4 dark:bg-yellow-900/20">
-        <p class="text-yellow-700 dark:text-yellow-200">
-          我们仅接受位于相同IX点的网络运营商的对等互联请求。如果您对下游连接感兴趣，请查看我们的
+      <div class="bg-green-50 border-l-4 border-green-400 p-4 my-4 dark:bg-green-900/20">
+        <p class="text-green-700 dark:text-green-200">
+          我们支持所有地区和所有人的Peer和下游链接，无门槛，仅限非商业用途。如果您对下游连接感兴趣，请查看我们的
           <a href="/downstream"
             class="text-blue-600 hover:text-blue-800 font-semibold dark:text-blue-300 dark:hover:text-blue-100">下游政策</a>。
         </p>
@@ -231,6 +231,58 @@
               </div>
             </div>
           </div>
+
+          <!-- STUIX -->
+          <div
+            class="bg-white shadow-md rounded-lg overflow-hidden dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <div class="bg-red-50 dark:bg-red-900/30 p-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-xl">STUIX</h3>
+                <div class="flex gap-2">
+                  <span
+                    class="text-sm bg-red-100 text-red-800 px-2 py-1 rounded dark:bg-red-800 dark:text-red-200">
+                    Taipei City
+                  </span>
+                  <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-800 dark:text-blue-200">
+                    下游支持
+                  </span>
+                </div>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Student & Technology United Internet Exchanges
+              </p>
+            </div>
+            <div class="p-4">
+              <div class="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p class="font-medium">对等节点:</p>
+                  <p>108</p>
+                </div>
+                <div>
+                  <p class="font-medium">开放政策:</p>
+                  <p>94</p>
+                </div>
+                <div>
+                  <p class="font-medium">总速率:</p>
+                  <p>3.2T</p>
+                </div>
+                <div>
+                  <p class="font-medium">IPv6 覆盖:</p>
+                  <p>98%</p>
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p class="font-medium mb-1">我们的对等信息:</p>
+                <div class="bg-gray-50 p-2 rounded dark:bg-gray-700 font-mono text-xs">
+                  <p>ASN: 213605</p>
+                  <p>IPv4: 103.158.187.170</p>
+                  <p>IPv6: 2a0f:5707:ffe3::170</p>
+                  <p>速率: 10G</p>
+                  <p>策略: RS PEER BFD Support</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -242,7 +294,7 @@
               <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
               <div>
                 <span class="font-semibold">开放政策：</span>
-                <span>我们采用开放的对等互联政策，欢迎位于相同IX的网络建立对等连接。</span>
+                <span>我们支持所有地区和所有人的Peer和下游链接，无门槛，仅限非商业用途。</span>
               </div>
             </li>
             <li class="flex items-start">

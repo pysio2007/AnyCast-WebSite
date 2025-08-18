@@ -20,9 +20,9 @@
           <i class="apple-nav-icon fas fa-network-wired"></i>
           <span>AnyCast</span>
         </NuxtLink></li>
-        <li><NuxtLink to="/tor" class="apple-nav-item">
-          <i class="apple-nav-icon fas fa-user-secret"></i>
-          <span>Tor</span>
+        <li><NuxtLink to="/networks-map" class="apple-nav-item">
+          <i class="apple-nav-icon fas fa-globe"></i>
+          <span>网络地图</span>
         </NuxtLink></li>
         <li><NuxtLink to="/dn42" class="apple-nav-item">
           <i class="apple-nav-icon fas fa-project-diagram"></i>
@@ -56,9 +56,9 @@
               <i class="fas fa-network-wired"></i>
               <span>AnyCast</span>
             </NuxtLink></li>
-            <li><NuxtLink to="/tor" class="apple-mobile-nav-item" @click="closeMobileMenu">
-              <i class="fas fa-user-secret"></i>
-              <span>Tor</span>
+            <li><NuxtLink to="/networks-map" class="apple-mobile-nav-item" @click="closeMobileMenu">
+              <i class="fas fa-globe"></i>
+              <span>网络地图</span>
             </NuxtLink></li>
             <li><NuxtLink to="/dn42" class="apple-mobile-nav-item" @click="closeMobileMenu">
               <i class="fas fa-project-diagram"></i>
