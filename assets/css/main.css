@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: light --default, dark --prefersdark, cupcake;
+  themes: light;
   root: ":root";
   logs: true;
 }
@@ -155,15 +155,30 @@ body {
   }
 }
 
-/* 自定义主题配置 */
-:root {
+/* 强制亮色模式配置 */
+:root,
+html,
+html[data-theme] {
+  color-scheme: light only !important;
   --theme-color: #1a1a1a;
   --theme-bg: #ffffff;
 }
 
-[data-theme="dark"] {
-  --theme-color: #ffffff;
-  --theme-bg: #1a1a1a;
+/* 禁用所有暗色模式样式 */
+[data-theme="dark"],
+@media (prefers-color-scheme: dark) {
+  color-scheme: light only !important;
+}
+
+/* 强制禁用所有 dark: 类样式 */
+html {
+  color-scheme: light only !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  * {
+    color-scheme: light only !important;
+  }
 }
 
 /* 基础样式 */

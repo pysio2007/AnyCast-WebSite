@@ -118,7 +118,8 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: {
-        lang: 'zh-CN'
+        lang: 'zh-CN',
+        'data-theme': 'light'
       },
       title: 'Pysio Networks - Anycast Tools',
       meta: [
@@ -185,6 +186,29 @@ export default defineNuxtConfig({
         },
         {
           innerHTML: `window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }`
+        },
+        {
+          innerHTML: `
+            // 强制亮色模式
+            if (typeof document !== 'undefined') {
+              document.documentElement.setAttribute('data-theme', 'light');
+              document.documentElement.style.colorScheme = 'light only';
+              // 阻止任何暗色模式切换
+              const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                  if (mutation.attributeName === 'data-theme' || mutation.attributeName === 'class') {
+                    if (document.documentElement.getAttribute('data-theme') !== 'light') {
+                      document.documentElement.setAttribute('data-theme', 'light');
+                    }
+                  }
+                });
+              });
+              observer.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['data-theme', 'class']
+              });
+            }
+          `
         }
       ],
       link: [
