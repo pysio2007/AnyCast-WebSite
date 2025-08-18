@@ -15,26 +15,17 @@
             </span>
           </label>
           <div class="flex gap-2">
-            <input 
-              v-model="query" 
-              type="text" 
-              :placeholder="getPlaceholder" 
-              class="input input-bordered flex-1"
-              @keyup.enter="handleQuery"
-            />
-            <button 
-              class="btn btn-primary min-w-[120px]" 
-              @click="handleQuery"
-              :disabled="loading"
-            >
+            <input v-model="query" type="text" :placeholder="getPlaceholder" class="input input-bordered flex-1"
+              @keyup.enter="handleQuery" />
+            <button class="btn btn-primary min-w-[120px]" @click="handleQuery" :disabled="loading">
               <i class="fas fa-search mr-2"></i>查询
             </button>
           </div>
-          
+
           <!-- 查询类型提示 -->
           <div class="mt-2 text-sm text-base-content/70">
             <span class="mr-4">
-              <i :class="queryTypeIcon"></i> 
+              <i :class="queryTypeIcon"></i>
               当前识别为: {{ queryTypeText }}
             </span>
             <span v-if="queryExample" class="text-primary">
@@ -47,7 +38,7 @@
         <div v-if="loading" class="mt-6 text-center">
           <span class="loading loading-spinner loading-lg"></span>
         </div>
-        
+
         <div v-if="error" class="mt-6 alert alert-error">
           <i class="fas fa-exclamation-circle"></i>
           <span>{{ error }}</span>
@@ -56,11 +47,7 @@
         <div v-if="result" class="mt-6">
           <div class="flex justify-between items-center mb-2">
             <h3 class="text-lg font-semibold">查询结果</h3>
-            <button 
-              class="btn btn-sm btn-ghost"
-              @click="copyResult"
-              :class="{ 'btn-success': copied }"
-            >
+            <button class="btn btn-sm btn-ghost" @click="copyResult" :class="{ 'btn-success': copied }">
               <i class="fas" :class="copied ? 'fa-check' : 'fa-copy'"></i>
               {{ copied ? '已复制' : '复制' }}
             </button>
@@ -83,19 +70,19 @@ const copied = ref(false)
 const queryType = computed(() => {
   const value = query.value.trim()
   if (!value) return 'none'
-  
+
   // ASN判断
   if (/^(AS)?\d+$/i.test(value)) return 'asn'
-  
+
   // IP地址判断 (IPv4)
   if (/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(value)) return 'ip'
-  
+
   // IPv6判断
   if (ipv6Regex.test(value)) return 'ip'
-  
+
   // 域名判断
   if (domainRegex.test(value)) return 'domain'
-  
+
   return 'unknown'
 })
 
@@ -194,7 +181,7 @@ function formatResult(data, type) {
 function formatDomainResult(data) {
   const sections = []
   const raw = data.raw || data
-  
+
   // 基本信息
   sections.push(`域名信息：
   域名：      ${data.domainName || raw.ldhName || '未知'}
@@ -225,10 +212,6 @@ function formatDomainResult(data) {
   const registrant = raw.entities?.find(e => e.roles.includes('registrant'))
   if (registrant) {
     const vcard = registrant.vcardArray[1]
-    const getVCardValue = (key) => {
-      const field = vcard.find(f => f[0] === key)
-      return field ? field[3] : '未知'
-    }
     const adr = vcard.find(f => f[0] === 'adr')
     const address = adr ? adr[3] : []
 
@@ -273,7 +256,7 @@ ${notices.map(n => `  • ${n.title}：${n.description[0]}`).join('\n')}`)
 // 格式化IP查询结果
 function formatIPResult(data) {
   const sections = []
-  
+
   // 基本信息
   sections.push(`IP地址信息：
   IP范围：    ${data.startAddress} - ${data.endAddress}
@@ -362,14 +345,14 @@ ${remarks.map(remark => `  • ${remark}`).join('\n')}`)
   const events = data.events || []
   const regDate = events.find(e => e.eventAction === 'registration')?.eventDate
   const lastChanged = events.find(e => e.eventAction === 'last changed')?.eventDate
-  
+
   sections.push(`注册信息：
   注册时间：  ${formatDate(regDate)}
   最后更新：  ${formatDate(lastChanged)}`)
 
   // 重要提示
-  const notices = data.notices?.filter(n => 
-    !n.title.includes('Terms and Conditions') && 
+  const notices = data.notices?.filter(n =>
+    !n.title.includes('Terms and Conditions') &&
     !n.title.includes('Source')
   )
   if (notices?.length) {
@@ -383,7 +366,7 @@ ${notices.map(n => `  • ${n.title}：${n.description.join(' ')}`).join('\n')}`
 // 格式化ASN查询结果
 function formatASNResult(data) {
   const sections = []
-  
+
   // 基本信息
   sections.push(`ASN信息：
   ASN：       AS${data.startAutnum || '未知'}
@@ -444,14 +427,14 @@ function formatASNResult(data) {
   const events = data.events || []
   const regDate = events.find(e => e.eventAction === 'registration')?.eventDate
   const lastChanged = events.find(e => e.eventAction === 'last changed')?.eventDate
-  
+
   sections.push(`注册信息：
   注册时间：  ${formatDate(regDate)}
   最后更新：  ${formatDate(lastChanged)}`)
 
   // 重要提示
-  const notices = data.notices?.filter(n => 
-    !n.title.includes('Terms and Conditions') && 
+  const notices = data.notices?.filter(n =>
+    !n.title.includes('Terms and Conditions') &&
     !n.title.includes('Source')
   )
   if (notices?.length) {
@@ -481,7 +464,7 @@ async function handleQuery() {
     // 根据查询类型选择不同的API端点
     let endpoint = ''
     const queryValue = query.value.trim()
-    
+
     switch (queryType.value) {
       case 'ip':
         endpoint = `/ip/${queryValue}`
@@ -500,13 +483,13 @@ async function handleQuery() {
     if (!response.ok) {
       throw new Error('查询失败')
     }
-    
+
     const data = await response.json() // 改为JSON解析，因为API返回JSON格式
-    
+
     if (!data.success) {
       throw new Error(data.error || '查询失败')
     }
-    
+
     // 使用新的格式化函数处理结果
     result.value = formatResult(data.data, queryType.value)
 
@@ -535,4 +518,4 @@ const ipv6Regex = /^(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}$|^((?:[A-F0-9]{1,4}(?::[A
 pre {
   tab-size: 8;
 }
-</style> 
+</style>

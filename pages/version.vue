@@ -18,7 +18,7 @@
               <h2 class="card-title text-xl">
                 <i class="fas fa-calendar mr-2"></i>{{ formatDate(date) }}
               </h2>
-              
+
               <!-- 按类型分组显示变更 -->
               <div class="space-y-4 mt-4">
                 <!-- 新功能 -->
@@ -111,7 +111,7 @@ const changelog = ref([])
 // 按日期分组的更新日志
 const groupedChangelog = computed(() => {
   const groups = {}
-  
+
   for (const commit of changelog.value) {
     const date = new Date(commit.date).toISOString().split('T')[0]
     if (!groups[date]) {
@@ -159,7 +159,7 @@ function formatDate(date) {
 function parseConventionalCommit(message) {
   const regex = /^(feat|fix|perf|docs|chore|style|refactor|test|build|ci|revert)(\(.+\))?: (.+)$/
   const match = message.match(regex)
-  
+
   if (match) {
     return {
       type: match[1],
@@ -167,7 +167,7 @@ function parseConventionalCommit(message) {
       message: match[3]
     }
   }
-  
+
   return {
     type: 'other',
     scope: null,
@@ -179,11 +179,11 @@ function parseConventionalCommit(message) {
 async function fetchChangelog() {
   loading.value = true
   error.value = ''
-  
+
   try {
     const response = await fetch('https://api.github.com/repos/pysio2007/AnyCast-WebSite/commits')
     const commits = await response.json()
-    
+
     changelog.value = commits.map(commit => {
       const parsed = parseConventionalCommit(commit.commit.message)
       return {
@@ -214,4 +214,4 @@ onMounted(() => {
 .changelog-item:hover {
   transform: translateX(4px);
 }
-</style> 
+</style>

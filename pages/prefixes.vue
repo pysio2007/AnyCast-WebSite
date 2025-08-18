@@ -5,7 +5,7 @@
         <i class="fas fa-broadcast-tower mr-2"></i>
         网络前缀公告
       </h1>
-      
+
       <p class="mb-6 text-gray-600 dark:text-gray-400">
         查看 AS213605 (Pysio Networks) 公告的网络前缀信息，包括 IPv4 和 IPv6 地址块的详细信息。
       </p>
@@ -28,7 +28,8 @@
       <div v-if="prefixData && !loading" class="space-y-6">
         <!-- 统计信息 -->
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200 shadow-sm hover:shadow-md transition duration-300 dark:from-blue-900/20 dark:to-blue-800/20 dark:border-blue-700">
+          <div
+            class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200 shadow-sm hover:shadow-md transition duration-300 dark:from-blue-900/20 dark:to-blue-800/20 dark:border-blue-700">
             <div class="flex items-center mb-3">
               <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mr-3">
                 <i class="fas fa-globe text-blue-500 text-lg"></i>
@@ -40,7 +41,8 @@
             </div>
           </div>
 
-          <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200 shadow-sm hover:shadow-md transition duration-300 dark:from-green-900/20 dark:to-green-800/20 dark:border-green-700">
+          <div
+            class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200 shadow-sm hover:shadow-md transition duration-300 dark:from-green-900/20 dark:to-green-800/20 dark:border-green-700">
             <div class="flex items-center mb-3">
               <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center mr-3">
                 <i class="fas fa-network-wired text-green-500 text-lg"></i>
@@ -52,7 +54,8 @@
             </div>
           </div>
 
-          <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200 shadow-sm hover:shadow-md transition duration-300 dark:from-purple-900/20 dark:to-purple-800/20 dark:border-purple-700">
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200 shadow-sm hover:shadow-md transition duration-300 dark:from-purple-900/20 dark:to-purple-800/20 dark:border-purple-700">
             <div class="flex items-center mb-3">
               <div class="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center mr-3">
                 <i class="fas fa-shield-alt text-purple-500 text-lg"></i>
@@ -64,7 +67,8 @@
             </div>
           </div>
 
-          <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl border border-orange-200 shadow-sm hover:shadow-md transition duration-300 dark:from-orange-900/20 dark:to-orange-800/20 dark:border-orange-700">
+          <div
+            class="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl border border-orange-200 shadow-sm hover:shadow-md transition duration-300 dark:from-orange-900/20 dark:to-orange-800/20 dark:border-orange-700">
             <div class="flex items-center mb-3">
               <div class="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center mr-3">
                 <i class="fas fa-flag text-orange-500 text-lg"></i>
@@ -78,7 +82,8 @@
         </div>
 
         <!-- IPv4 前缀列表 -->
-        <div v-if="prefixData.ipv4_prefixes.length > 0" class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+        <div v-if="prefixData.ipv4_prefixes.length > 0"
+          class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <h2 class="text-2xl font-bold mb-4 flex items-center">
             <i class="fas fa-globe mr-2 text-blue-500"></i>
             IPv4 前缀
@@ -95,7 +100,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="prefix in prefixData.ipv4_prefixes" :key="prefix.prefix" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <tr v-for="prefix in prefixData.ipv4_prefixes" :key="prefix.prefix"
+                  class="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td class="py-3 px-4">
                     <code class="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm font-mono">
                       {{ prefix.prefix }}
@@ -111,8 +117,7 @@
                     <span v-else>-</span>
                   </td>
                   <td class="py-3 px-4">
-                    <span class="px-2 py-1 rounded text-xs font-medium"
-                          :class="getRoaStatusClass(prefix.roa_status)">
+                    <span class="px-2 py-1 rounded text-xs font-medium" :class="getRoaStatusClass(prefix.roa_status)">
                       {{ prefix.roa_status || 'Unknown' }}
                     </span>
                   </td>
@@ -123,7 +128,8 @@
         </div>
 
         <!-- IPv6 前缀列表 -->
-        <div v-if="prefixData.ipv6_prefixes.length > 0" class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+        <div v-if="prefixData.ipv6_prefixes.length > 0"
+          class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <h2 class="text-2xl font-bold mb-4 flex items-center">
             <i class="fas fa-network-wired mr-2 text-green-500"></i>
             IPv6 前缀
@@ -141,7 +147,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="prefix in prefixData.ipv6_prefixes" :key="prefix.prefix" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <tr v-for="prefix in prefixData.ipv6_prefixes" :key="prefix.prefix"
+                  class="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td class="py-3 px-4">
                     <code class="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm font-mono">
                       {{ prefix.prefix }}
@@ -157,8 +164,7 @@
                     <span v-else>-</span>
                   </td>
                   <td class="py-3 px-4">
-                    <span class="px-2 py-1 rounded text-xs font-medium"
-                          :class="getRoaStatusClass(prefix.roa_status)">
+                    <span class="px-2 py-1 rounded text-xs font-medium" :class="getRoaStatusClass(prefix.roa_status)">
                       {{ prefix.roa_status || 'Unknown' }}
                     </span>
                   </td>
@@ -195,7 +201,8 @@
               <strong>时区:</strong> {{ apiMeta.time_zone }}
             </div>
             <div>
-              <strong>数据提供:</strong> <a href="https://bgpview.io" target="_blank" class="text-blue-500 hover:text-blue-600">BGPView.io</a>
+              <strong>数据提供:</strong> <a href="https://bgpview.io" target="_blank"
+                class="text-blue-500 hover:text-blue-600">BGPView.io</a>
             </div>
           </div>
         </div>
@@ -284,7 +291,7 @@ const getRoaStatusClass = (status: string) => {
 // 获取前缀数据
 const fetchPrefixData = async () => {
   const cacheKey = 'prefix_data_213605'
-  
+
   // 检查缓存
   const cachedData = Cache.get<ApiResponse>(cacheKey)
   if (cachedData) {
@@ -298,20 +305,20 @@ const fetchPrefixData = async () => {
 
   try {
     const response = await fetch('https://cdn.akaere.online/https://api.bgpview.io/asn/213605/prefixes')
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
 
     const data: ApiResponse = await response.json()
-    
+
     if (data.status !== 'ok') {
       throw new Error(data.status_message || '获取数据失败')
     }
 
     prefixData.value = data.data
     apiMeta.value = data['@meta']
-    
+
     // 缓存数据 1 小时
     Cache.set(cacheKey, data, 60 * 60 * 1000)
   } catch (err) {

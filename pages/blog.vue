@@ -7,24 +7,14 @@
       <!-- 分类和标签过滤器 -->
       <div class="mb-8">
         <div class="flex flex-wrap gap-2 mb-4">
-          <button 
-            v-for="category in categories" 
-            :key="category"
-            @click="toggleCategory(category)"
-            class="btn btn-sm"
-            :class="selectedCategory === category ? 'btn-primary' : 'btn-ghost'"
-          >
+          <button v-for="category in categories" :key="category" @click="toggleCategory(category)" class="btn btn-sm"
+            :class="selectedCategory === category ? 'btn-primary' : 'btn-ghost'">
             {{ getCategoryDisplayName(category) }}
           </button>
         </div>
         <div class="flex flex-wrap gap-2">
-          <span 
-            v-for="tag in tags" 
-            :key="tag"
-            @click="toggleTag(tag)"
-            class="badge badge-lg cursor-pointer"
-            :class="selectedTags.includes(tag) ? 'badge-primary' : 'badge-ghost'"
-          >
+          <span v-for="tag in tags" :key="tag" @click="toggleTag(tag)" class="badge badge-lg cursor-pointer"
+            :class="selectedTags.includes(tag) ? 'badge-primary' : 'badge-ghost'">
             {{ tag }}
           </span>
         </div>
@@ -32,13 +22,12 @@
 
       <!-- 文章列表 -->
       <div class="flex flex-col gap-6">
-        <div v-for="post in displayedPosts" :key="post.link" 
-             class="card hover:shadow-2xl transition-shadow">
+        <div v-for="post in displayedPosts" :key="post.link" class="card hover:shadow-2xl transition-shadow">
           <div class="flex flex-col lg:flex-row">
             <figure v-if="post.image" class="lg:w-1/3">
-              <img :src="post.image" :alt="post.title" 
-                   class="h-64 w-full object-cover rounded-t-xl lg:rounded-l-xl lg:rounded-t-none"
-                   @error="handleImageError"/>
+              <img :src="post.image" :alt="post.title"
+                class="h-64 w-full object-cover rounded-t-xl lg:rounded-l-xl lg:rounded-t-none"
+                @error="handleImageError" />
             </figure>
             <div class="card-body lg:w-2/3">
               <h2 class="card-title">
@@ -55,10 +44,12 @@
               <p class="text-sm text-gray-500">{{ formatDate(post.pubDate) }}</p>
               <p class="line-clamp-3 text-gray-600">{{ post.description }}</p>
               <div class="card-actions justify-end mt-4">
-                 <a :href="post.link" target="_blank" class="btn btn-primary">
+                <a :href="post.link" target="_blank" class="btn btn-primary">
                   阅读全文
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
                 </a>
               </div>
@@ -69,18 +60,10 @@
 
       <!-- 分页控制 -->
       <div class="join grid grid-cols-2 w-60 mx-auto mt-8">
-        <button 
-          class="join-item btn btn-outline"
-          :disabled="currentPage === 1"
-          @click="currentPage--"
-        >
+        <button class="join-item btn btn-outline" :disabled="currentPage === 1" @click="currentPage--">
           上一页
         </button>
-        <button 
-          class="join-item btn btn-outline"
-          :disabled="currentPage >= maxPage"
-          @click="currentPage++"
-        >
+        <button class="join-item btn btn-outline" :disabled="currentPage >= maxPage" @click="currentPage++">
           下一页
         </button>
       </div>
@@ -100,7 +83,7 @@ const selectedTags = ref([])
 
 // 分类名称映射和过滤配置
 const categoryConfig = {
-  excludeList: ['NekoXii','resource'],
+  excludeList: ['NekoXii', 'resource'],
   displayNames: {
     'daily': '日常',
     'develop': '开发'
@@ -122,10 +105,10 @@ const filteredPosts = computed(() => {
   return posts.value
     .filter(post => !categoryConfig.excludeList.includes(post.category))
     .filter(post => {
-      const categoryMatch = !selectedCategory.value || selectedCategory.value === '全部' || 
-                          post.category === selectedCategory.value
-      const tagsMatch = selectedTags.value.length === 0 || 
-                       selectedTags.value.every(tag => post.tags.includes(tag))
+      const categoryMatch = !selectedCategory.value || selectedCategory.value === '全部' ||
+        post.category === selectedCategory.value
+      const tagsMatch = selectedTags.value.length === 0 ||
+        selectedTags.value.every(tag => post.tags.includes(tag))
       return categoryMatch && tagsMatch
     })
 })
@@ -187,12 +170,12 @@ onMounted(async () => {
     const response = await fetch('https://www.pysio.online/rss.xml')
     const xmlText = await response.text()
     const result = await parseStringPromise(xmlText)
-    
+
     // 在数据源处就过滤掉不需要的分类
     const filteredItems = result.rss.channel[0].item.filter(
       item => !categoryConfig.excludeList.includes(item.category?.[0])
     )
-    
+
     posts.value = filteredItems.map(item => ({
       title: item.title[0],
       link: item.link[0],

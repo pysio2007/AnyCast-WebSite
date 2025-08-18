@@ -1,9 +1,6 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <PageSeo 
-      title="Tor 节点查询" 
-      description="查询 IP 地址是否为 Tor 网络节点，并显示详细的节点信息，包括带宽、地理位置、运行状态等。"
-    />
+    <PageSeo title="Tor 节点查询" description="查询 IP 地址是否为 Tor 网络节点，并显示详细的节点信息，包括带宽、地理位置、运行状态等。" />
     <article class="prose dark:prose-invert max-w-none">
       <h1 class="text-4xl font-bold mb-6">Tor 节点查询</h1>
 
@@ -11,19 +8,10 @@
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
         <div class="flex flex-col md:flex-row gap-4">
           <div class="flex-1">
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="输入IP地址..."
-              class="input input-bordered w-full"
-              @keyup.enter="searchNode"
-            />
+            <input v-model="searchQuery" type="text" placeholder="输入IP地址..." class="input input-bordered w-full"
+              @keyup.enter="searchNode" />
           </div>
-          <button
-            @click="searchNode"
-            class="btn btn-primary"
-            :disabled="isLoading"
-          >
+          <button @click="searchNode" class="btn btn-primary" :disabled="isLoading">
             <i class="fas fa-search mr-2"></i>
             {{ isLoading ? '查询中...' : '查询' }}
           </button>
@@ -46,37 +34,37 @@
         <!-- 状态横幅 -->
         <div :class="[
           'mb-8 rounded-lg border p-4',
-          nodeInfo.isNode 
-            ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800' 
+          nodeInfo.isNode
+            ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800'
             : 'bg-yellow-50 dark:bg-yellow-900/10 border-yellow-200 dark:border-yellow-800'
         ]">
           <div class="flex items-start">
             <div class="flex-shrink-0 mt-0.5">
               <i :class="[
                 'text-xl',
-                nodeInfo.isNode 
-                  ? 'text-green-600 dark:text-green-400 fas fa-check-circle' 
+                nodeInfo.isNode
+                  ? 'text-green-600 dark:text-green-400 fas fa-check-circle'
                   : 'text-yellow-600 dark:text-yellow-400 fas fa-exclamation-triangle'
               ]"></i>
             </div>
             <div class="ml-3">
               <h3 :class="[
                 'text-base font-semibold',
-                nodeInfo.isNode 
-                  ? 'text-green-800 dark:text-green-300' 
+                nodeInfo.isNode
+                  ? 'text-green-800 dark:text-green-300'
                   : 'text-yellow-800 dark:text-yellow-300'
               ]">
                 {{ nodeInfo.isNode ? '这是一个Tor节点' : '这不是一个Tor节点' }}
               </h3>
               <div :class="[
                 'mt-1 text-sm',
-                nodeInfo.isNode 
-                  ? 'text-green-700 dark:text-green-300' 
+                nodeInfo.isNode
+                  ? 'text-green-700 dark:text-green-300'
                   : 'text-yellow-700 dark:text-yellow-300'
               ]">
-                {{ nodeInfo.isNode 
-                  ? `这是一个${getNodeType(nodeInfo.flags)}节点` 
-                  : '该IP地址未在Tor网络中注册' 
+                {{ nodeInfo.isNode
+                  ? `这是一个${getNodeType(nodeInfo.flags)}节点`
+                  : '该IP地址未在Tor网络中注册'
                 }}
               </div>
             </div>
@@ -101,14 +89,10 @@
               </p>
             </div>
             <div class="flex flex-wrap gap-2">
-              <span v-for="flag in nodeInfo.flags" :key="flag" 
-                    class="bg-green-100 dark:bg-green-900/20 px-3 py-1 rounded-full text-sm flex items-center">
-                <img 
-                  :src="getFlagIconUrl(flag)" 
-                  :alt="flag"
-                  @error="handleFlagIconError($event, flag)"
-                  class="w-4 h-4 mr-1.5 flag-icon"
-                >
+              <span v-for="flag in nodeInfo.flags" :key="flag"
+                class="bg-green-100 dark:bg-green-900/20 px-3 py-1 rounded-full text-sm flex items-center">
+                <img :src="getFlagIconUrl(flag)" :alt="flag" @error="handleFlagIconError($event, flag)"
+                  class="w-4 h-4 mr-1.5 flag-icon">
                 <span class="text-green-800 dark:text-green-200">{{ flag }}</span>
               </span>
             </div>
@@ -203,7 +187,7 @@
                   <h4 class="text-sm font-medium text-red-800 dark:text-red-200 mb-2">拒绝端口</h4>
                   <div class="flex flex-wrap gap-2">
                     <span v-for="port in nodeInfo.exit_policy_summary.reject" :key="port"
-                          class="px-2 py-0.5 bg-red-100 dark:bg-red-800/30 rounded text-red-800 dark:text-red-200 text-sm">
+                      class="px-2 py-0.5 bg-red-100 dark:bg-red-800/30 rounded text-red-800 dark:text-red-200 text-sm">
                       {{ port }}
                     </span>
                   </div>
@@ -274,7 +258,7 @@ const searchNode = async () => {
   try {
     // 尝试主要API
     let response = await fetch(`https://onionoo.torproject.org/details?search=${searchQuery.value}`)
-    
+
     // 如果主要API失败，尝试备用API
     if (!response.ok) {
       response = await fetch(`https://cdn.akaere.online/https://onionoo.torproject.org/details?search=${searchQuery.value}`)
@@ -285,7 +269,7 @@ const searchNode = async () => {
     }
 
     const data = await response.json()
-    
+
     if (data.relays && data.relays.length > 0) {
       nodeInfo.value = {
         isNode: true,
@@ -307,12 +291,12 @@ const searchNode = async () => {
 // 获取节点类型
 const getNodeType = (flags: string[]) => {
   if (!flags) return '未知'
-  
+
   const types = []
   if (flags.includes('Exit')) types.push('出口')
   if (flags.includes('Guard')) types.push('守卫')
   if (!flags.includes('Exit') && !flags.includes('Guard')) types.push('中继')
-  
+
   return types.join('、') || '未知'
 }
 
@@ -329,7 +313,7 @@ const handleFlagIconError = (event: Event, flag: string) => {
   if (img) {
     const flagName = flag.toLowerCase()
     const backupUrl = `https://cdn.akaere.online/https://metrics.torproject.org/images/flags/${flagName}.png`
-    
+
     // 如果当前不是备用地址，则切换到备用地址
     if (!img.src.includes('cdn.akaere.online')) {
       img.src = backupUrl
@@ -349,4 +333,4 @@ const handleFlagIconError = (event: Event, flag: string) => {
   height: 16px;
   object-fit: contain;
 }
-</style> 
+</style>

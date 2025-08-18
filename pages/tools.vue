@@ -1,10 +1,7 @@
 <template>
   <div class="apple-tools-page">
-    <PageSeo 
-      title="网络工具箱" 
-      description="专业的网络工具集，提供 Looking Glass、路由追踪、BGP分析器、WHOIS查询和Tor节点查询等功能。"
-    />
-    
+    <PageSeo title="网络工具箱" description="专业的网络工具集，提供 Looking Glass、路由追踪、BGP分析器、WHOIS查询和Tor节点查询等功能。" />
+
     <!-- Page Header -->
     <div class="apple-header-section">
       <div class="apple-header-icon">
@@ -235,7 +232,7 @@
     background: rgba(0, 0, 0, 0.8);
     border-color: rgba(255, 255, 255, 0.1);
   }
-  
+
   .apple-tool-card:hover .apple-tool-arrow {
     @apply text-gray-300;
   }

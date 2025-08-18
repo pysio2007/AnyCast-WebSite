@@ -6,7 +6,7 @@
       <div class="apple-hero-section">
         <h1 class="apple-hero-title">
           <span class="apple-hero-from-container">
-            来自 
+            来自
             <span class="apple-hero-org-wrapper">
               <span class="">{{ organization || '加载中...' }}</span>
             </span>
@@ -22,7 +22,7 @@
 
       <!-- Services Update Section -->
       <div class="apple-services-section">
-        
+
         <div class="apple-services-grid">
           <!-- IXP Peering Card -->
           <div class="apple-service-card apple-service-card-blue">
@@ -40,7 +40,7 @@
               <i class="fas fa-arrow-right apple-service-arrow"></i>
             </NuxtLink>
           </div>
-          
+
           <!-- Downstream Connection Card -->
           <div class="apple-service-card apple-service-card-green">
             <div class="apple-service-header">
@@ -214,22 +214,22 @@ onMounted(async () => {
   .apple-page {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   }
-  
+
   .apple-service-card {
     background: rgba(0, 0, 0, 0.8);
     border-color: rgba(255, 255, 255, 0.1);
   }
-  
+
   .apple-hero-title,
   .apple-section-title,
   .apple-service-title {
     @apply text-white;
   }
-  
+
   .apple-hero-subtitle {
     @apply text-gray-300;
   }
-  
+
   .apple-hero-description,
   .apple-service-description {
     @apply text-gray-400;

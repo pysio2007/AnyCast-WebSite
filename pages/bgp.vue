@@ -55,15 +55,15 @@
                   <span>{{ selectedServers.length ? `已选择 ${selectedServers.length} 个节点` : '选择节点' }}</span>
                   <i class="fas fa-chevron-down"></i>
                 </label>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-full max-h-60 overflow-y-auto">
+                <ul tabindex="0"
+                  class="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-full max-h-60 overflow-y-auto">
                   <li v-for="server in filteredServers" :key="server">
-                    <a @click="toggleServer(server)" 
-                       class="flex items-center gap-2 px-4 py-2 hover:bg-base-300 rounded-lg transition-colors"
-                       :class="{ 'bg-primary/10': selectedServers.includes(server) }">
+                    <a @click="toggleServer(server)"
+                      class="flex items-center gap-2 px-4 py-2 hover:bg-base-300 rounded-lg transition-colors"
+                      :class="{ 'bg-primary/10': selectedServers.includes(server) }">
                       <div class="flex-none w-5 h-5 rounded border-2 flex items-center justify-center"
-                           :class="selectedServers.includes(server) ? 'border-primary bg-primary/20' : 'border-base-content/50'">
-                        <i v-if="selectedServers.includes(server)" 
-                           class="fas fa-check text-sm text-primary"></i>
+                        :class="selectedServers.includes(server) ? 'border-primary bg-primary/20' : 'border-base-content/50'">
+                        <i v-if="selectedServers.includes(server)" class="fas fa-check text-sm text-primary"></i>
                       </div>
                       {{ server }}
                     </a>
@@ -449,12 +449,6 @@ const routeSummary = computed(() => {
   }
 })
 
-// 处理网络类型变化
-function handleNetworkTypeChange() {
-  selectedServers.value = []
-  query.value = ''
-}
-
 // 获取服务器列表
 async function fetchServers() {
   try {
@@ -554,16 +548,6 @@ function formatDate(date) {
     hour: '2-digit',
     minute: '2-digit'
   })
-}
-
-// 获取状态样式
-function getStatusClass(status) {
-  const classes = {
-    'ACTIVE': 'text-success',
-    'WITHDRAWN': 'text-error',
-    'PARTIAL': 'text-warning'
-  }
-  return classes[status] || ''
 }
 
 // 切换WHOIS类型

@@ -8,17 +8,14 @@
         <div class="flex items-center justify-between mb-4">
           <div>
             <h2 class="text-2xl font-bold">{{ metrics.nickname || 'AkaereTor' }}</h2>
-            <p class="text-gray-600 dark:text-gray-400">指纹: {{ metrics.fingerprint || '2F59BA21B8D07BE11FCD50C731CA5CAB638F624B' }}</p>
+            <p class="text-gray-600 dark:text-gray-400">指纹: {{ metrics.fingerprint ||
+              '2F59BA21B8D07BE11FCD50C731CA5CAB638F624B' }}</p>
           </div>
           <div class="flex gap-2">
-            <span v-for="flag in metrics.flags || defaultFlags" :key="flag" 
-                  class="bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-sm flex items-center">
-              <img 
-                :src="getFlagIconUrl(flag)" 
-                :alt="flag"
-                @error="handleFlagIconError($event, flag)"
-                class="w-4 h-4 mr-1.5"
-              >
+            <span v-for="flag in metrics.flags || defaultFlags" :key="flag"
+              class="bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-sm flex items-center">
+              <img :src="getFlagIconUrl(flag)" :alt="flag" @error="handleFlagIconError($event, flag)"
+                class="w-4 h-4 mr-1.5">
               <span class="text-green-800 dark:text-green-200">{{ flag }}</span>
             </span>
           </div>
@@ -114,8 +111,8 @@
           <div>
             <h4 class="font-medium mb-2">IPv4 拒绝端口</h4>
             <div class="space-y-1">
-              <div v-for="port in ipv4RejectPorts" :key="port" 
-                   class="bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded text-sm inline-block mr-2 mb-2">
+              <div v-for="port in ipv4RejectPorts" :key="port"
+                class="bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded text-sm inline-block mr-2 mb-2">
                 <span class="text-red-800 dark:text-red-200">{{ port }}</span>
               </div>
             </div>
@@ -124,7 +121,7 @@
             <h4 class="font-medium mb-2">IPv6 拒绝端口</h4>
             <div class="space-y-1">
               <div v-for="port in ipv6RejectPorts" :key="port"
-                   class="bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded text-sm inline-block mr-2 mb-2">
+                class="bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded text-sm inline-block mr-2 mb-2">
                 <span class="text-red-800 dark:text-red-200">{{ port }}</span>
               </div>
             </div>
@@ -140,7 +137,8 @@
             <i class="fas fa-sync-alt fa-spin mr-2"></i>
             正在获取最新数据...
           </div>
-          <div v-else-if="lastUpdateSuccess" class="text-green-500 transition-opacity duration-1000" :class="{ 'opacity-0': !showUpdateSuccess }">
+          <div v-else-if="lastUpdateSuccess" class="text-green-500 transition-opacity duration-1000"
+            :class="{ 'opacity-0': !showUpdateSuccess }">
             <i class="fas fa-check-circle mr-2"></i>
             数据已更新
           </div>
@@ -172,7 +170,7 @@
               <p class="font-medium text-lg">{{ formatBandwidth(metrics.advertised_bandwidth) }}</p>
             </div>
           </div>
-          
+
           <!-- 概率指标 -->
           <div class="grid grid-cols-3 gap-4">
             <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded">
@@ -223,11 +221,9 @@
     </article>
 
     <!-- 更新提示 -->
-    <div 
-      v-if="showUpdateNotification" 
+    <div v-if="showUpdateNotification"
       class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-500"
-      :class="{ 'translate-y-0 opacity-100': showUpdateNotification, 'translate-y-10 opacity-0': !showUpdateNotification }"
-    >
+      :class="{ 'translate-y-0 opacity-100': showUpdateNotification, 'translate-y-10 opacity-0': !showUpdateNotification }">
       <div class="flex items-center">
         <i class="fas fa-check-circle mr-2"></i>
         <span>数据已成功更新</span>
@@ -295,11 +291,11 @@ const calculateUptime = (lastRestarted: string) => {
   const start = new Date(lastRestarted)
   const now = new Date()
   const diff = now.getTime() - start.getTime()
-  
+
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-  
+
   return `${days}天 ${hours}小时 ${minutes}分钟`
 }
 
@@ -361,7 +357,7 @@ const handleFlagIconError = (event: Event, flag: string) => {
   const img = event.target as HTMLImageElement
   const flagName = flag.toLowerCase()
   const backupUrl = `https://cdn.akaere.online/https://metrics.torproject.org/images/flags/${flagName}.png`
-  
+
   // 如果当前不是备用地址，则切换到备用地址
   if (!img.src.includes('cdn.akaere.online')) {
     img.src = backupUrl
@@ -373,14 +369,14 @@ const fetchMetricsData = async () => {
   metricsLoading.value = true
   try {
     let response = await fetch('https://onionoo.torproject.org/details?lookup=2F59BA21B8D07BE11FCD50C731CA5CAB638F624B')
-    
+
     if (!response.ok) {
       console.log('主要 API 访问失败，正在尝试备用地址...')
       response = await fetch('https://cdn.akaere.online/https://onionoo.torproject.org/details?lookup=2F59BA21B8D07BE11FCD50C731CA5CAB638F624B')
     }
-    
+
     const data = await response.json()
-    
+
     if (data.relays && data.relays[0]) {
       const relay = data.relays[0]
       metrics.value = {
@@ -442,6 +438,7 @@ onMounted(() => {
     transform: translateY(100%);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -451,4 +448,4 @@ onMounted(() => {
 .slide-in {
   animation: slideIn 0.5s ease-out;
 }
-</style> 
+</style>

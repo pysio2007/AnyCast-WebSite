@@ -5,7 +5,7 @@
         <h2 class="card-title text-2xl mb-6 text-center justify-center">
           <i class="fas fa-route mr-2"></i>路由追踪
         </h2>
-        
+
         <div class="w-full max-w-4xl mx-auto">
           <!-- 输入区域 -->
           <div class="flex flex-col gap-4">
@@ -17,16 +17,16 @@
                   <span class="label-text">选择服务器</span>
                 </label>
                 <div class="dropdown w-full">
-                  <label tabindex="0" class="btn btn-ghost w-full justify-between bg-opacity-70 bg-base-100 hover:bg-opacity-70 hover:bg-base-200">
-                    <span class="normal-case">{{ selectedServer ? serverDisplayNames[selectedServer] : '请选择服务器' }}</span>
+                  <label tabindex="0"
+                    class="btn btn-ghost w-full justify-between bg-opacity-70 bg-base-100 hover:bg-opacity-70 hover:bg-base-200">
+                    <span class="normal-case">{{ selectedServer ? serverDisplayNames[selectedServer] : '请选择服务器'
+                      }}</span>
                     <i class="fas fa-chevron-down text-xs opacity-50"></i>
                   </label>
-                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-lg bg-opacity-95 bg-base-200 backdrop-blur-md rounded-box w-full max-h-60 overflow-auto">
+                  <ul tabindex="0"
+                    class="dropdown-content z-[1] menu p-2 shadow-lg bg-opacity-95 bg-base-200 backdrop-blur-md rounded-box w-full max-h-60 overflow-auto">
                     <li v-for="server in availableServers" :key="server">
-                      <a 
-                        @click="selectedServer = server"
-                        :class="{'active': selectedServer === server}"
-                      >
+                      <a @click="selectedServer = server" :class="{ 'active': selectedServer === server }">
                         <i class="fas fa-server text-xs opacity-50"></i>
                         {{ serverDisplayNames[server] }}
                       </a>
@@ -41,19 +41,10 @@
                   <span class="label-text">目标地址</span>
                 </label>
                 <div class="join w-full">
-                  <input 
-                    v-model="target"
-                    type="text"
-                    placeholder="8.8.8.8 或 google.com"
-                    class="input input-bordered join-item flex-1 bg-opacity-70 bg-base-100"
-                    :disabled="!selectedServer"
-                    @keyup.enter="performTraceroute"
-                  />
-                  <button 
-                    class="btn btn-primary join-item w-24"
-                    @click="performTraceroute"
-                    :disabled="!canQuery"
-                  >
+                  <input v-model="target" type="text" placeholder="8.8.8.8 或 google.com"
+                    class="input input-bordered join-item flex-1 bg-opacity-70 bg-base-100" :disabled="!selectedServer"
+                    @keyup.enter="performTraceroute" />
+                  <button class="btn btn-primary join-item w-24" @click="performTraceroute" :disabled="!canQuery">
                     <i class="fas fa-play mr-1"></i>
                     <span class="hidden sm:inline">追踪</span>
                   </button>
@@ -64,14 +55,11 @@
 
           <!-- 结果显示 -->
           <div class="mt-8">
-            <Transition
-              enter-active-class="transition-all duration-300 ease-out"
-              enter-from-class="opacity-0 transform -translate-y-4"
-              enter-to-class="opacity-100 transform translate-y-0"
+            <Transition enter-active-class="transition-all duration-300 ease-out"
+              enter-from-class="opacity-0 transform -translate-y-4" enter-to-class="opacity-100 transform translate-y-0"
               leave-active-class="transition-all duration-300 ease-in"
               leave-from-class="opacity-100 transform translate-y-0"
-              leave-to-class="opacity-0 transform -translate-y-4"
-            >
+              leave-to-class="opacity-0 transform -translate-y-4">
               <div v-if="loading" class="text-center p-8">
                 <span class="loading loading-spinner loading-lg"></span>
                 <p class="mt-4 text-base-content/70">
@@ -90,12 +78,12 @@
                   </template>
                 </p>
               </div>
-              
+
               <div v-else-if="parsedResult" class="card bg-opacity-70 bg-base-100 backdrop-blur shadow-lg">
                 <div class="card-body">
                   <!-- 标题信息 -->
                   <div class="text-sm font-mono mb-4">{{ parsedResult.header }}</div>
-                  
+
                   <!-- 跳转信息表格 -->
                   <div class="overflow-x-auto">
                     <table class="table table-sm w-full">
@@ -110,7 +98,7 @@
                       </thead>
                       <tbody>
                         <template v-for="hop in parsedResult.hops" :key="hop.hop">
-                          <tr :class="{'opacity-50': hop.isPrivate}">
+                          <tr :class="{ 'opacity-50': hop.isPrivate }">
                             <td>{{ hop.hop }}</td>
                             <td class="font-mono">{{ hop.address }}</td>
                             <td>{{ hop.delay }}</td>
@@ -145,8 +133,7 @@
                   </div>
 
                   <!-- 未响应跳数提示 -->
-                  <div v-if="parsedResult.noResponseHops" 
-                       class="mt-4 text-sm text-base-content/70">
+                  <div v-if="parsedResult.noResponseHops" class="mt-4 text-sm text-base-content/70">
                     {{ parsedResult.noResponseHops }} 跳未响应
                   </div>
                 </div>
@@ -181,14 +168,14 @@ const canQuery = computed(() => {
 
 const performTraceroute = async () => {
   if (!canQuery.value) return
-  
+
   loading.value = true
   result.value = ''
   parsedResult.value = null
   processingIpInfo.value = false
   processedCount.value = 0
   totalHops.value = 0
-  
+
   try {
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -199,7 +186,7 @@ const performTraceroute = async () => {
         args: target.value.trim()
       })
     })
-    
+
     const data = await response.json()
     if (data.error) {
       result.value = `错误: ${data.error}`;
@@ -275,7 +262,7 @@ const isPrivateIP = (ip: string): boolean => {
       (parts[0] === 169 && parts[1] === 254)
     );
   }
-  
+
   // IPv6 私有地址检查
   const ipv6Lower = ip.toLowerCase();
   return (
@@ -306,7 +293,7 @@ const extractIP = (text: string): string | null => {
       return word;
     }
   }
-  
+
   return null;
 };
 
@@ -382,7 +369,7 @@ const parseTracerouteResult = async (text: string) => {
         try {
           const ipInfo = await Promise.race([
             fetchIpInfo(ip),
-            new Promise<never>((_, reject) => 
+            new Promise<never>((_, reject) =>
               setTimeout(() => reject(new Error('Timeout')), 5000)
             )
           ]);
@@ -420,7 +407,7 @@ const parseTracerouteResult = async (text: string) => {
         hop.ipInfo = { loading: true } as IpInfo;
         const ipInfo = await Promise.race([
           fetchIpInfo(ip),
-          new Promise<never>((_, reject) => 
+          new Promise<never>((_, reject) =>
             setTimeout(() => reject(new Error('Timeout')), 5000)
           )
         ]);
@@ -432,7 +419,7 @@ const parseTracerouteResult = async (text: string) => {
     }
     processedCount.value++;
   }
-  
+
   processingIpInfo.value = false;
   parsedResult.value = {
     header,
@@ -453,7 +440,8 @@ const parseTracerouteResult = async (text: string) => {
   background-color: rgba(255, 255, 255, 0.05);
 }
 
-.input, .select {
+.input,
+.select {
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -469,12 +457,12 @@ const parseTracerouteResult = async (text: string) => {
   align-items: stretch;
 }
 
-.join > .join-item:not(:first-child) {
+.join>.join-item:not(:first-child) {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
 
-.join > .join-item:not(:last-child) {
+.join>.join-item:not(:last-child) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }

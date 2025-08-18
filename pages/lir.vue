@@ -1,15 +1,14 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <PageSeo 
-      title="LIR 服务 - RIPE NCC 和 APNIC 会员" 
-      description="作为 RIPE NCC 和 APNIC 的正式会员，我们提供全面的 LIR 服务，包括 ASN 分配和 IPv4/IPv6 地址空间管理"
-    />
+    <PageSeo title="LIR 服务 - RIPE NCC 和 APNIC 会员"
+      description="作为 RIPE NCC 和 APNIC 的正式会员，我们提供全面的 LIR 服务，包括 ASN 分配和 IPv4/IPv6 地址空间管理" />
+
     <Head>
       <Meta name="keywords" content="LIR服务, RIPE NCC, APNIC, ASN分配, IPv4地址, IPv6地址, 互联网号码分配, 互联网资源管理, 地址空间" />
     </Head>
     <article class="prose dark:prose-invert max-w-none">
       <h1 class="text-4xl font-bold mb-6">LIR 服务</h1>
-      
+
       <p class="mb-4">
         我们是 RIPE NCC 和 APNIC 的正式会员，提供全面的 LIR (Local Internet Registry) 服务，
         包括 ASN 分配和 IPv4/IPv6 地址空间管理。
@@ -18,18 +17,12 @@
       <div class="flex flex-wrap gap-8 my-8 items-center justify-center">
         <img
           src="https://anycast.ink/cdn-cgi/image/f=webp,onerror=redirect,slow-connection-quality=50/https://anycast.ink/RIR/RIPE-NCC-Member.png"
-          alt="RIPE NCC Member Logo"
-          style="max-width: 240px; height: auto; object-fit: contain;"
-          loading="lazy"
-        />
+          alt="RIPE NCC Member Logo" style="max-width: 240px; height: auto; object-fit: contain;" loading="lazy" />
         <img
           src="https://anycast.ink/cdn-cgi/image/f=webp,onerror=redirect,slow-connection-quality=50/https://anycast.ink/RIR/apnic-seeklogo.png"
-          alt="APNIC Logo"
-          style="max-width: 220px; height: auto; object-fit: contain;"
-          loading="lazy"
-        />
+          alt="APNIC Logo" style="max-width: 220px; height: auto; object-fit: contain;" loading="lazy" />
       </div>
-      
+
       <div class="mt-4 mb-2 text-sm flex flex-wrap gap-x-8 gap-y-2">
         <div class="flex items-center">
           <div class="w-4 h-4 bg-blue-50 dark:bg-blue-900/15 mr-2"></div>
@@ -47,7 +40,7 @@
 
       <section class="my-8">
         <h2 class="text-2xl font-bold mb-4">RIPE NCC LIR 服务</h2>
-        
+
         <div class="overflow-x-auto">
           <table class="table table-zebra w-full">
             <thead>
@@ -88,7 +81,7 @@
 
       <section class="my-8">
         <h2 class="text-2xl font-bold mb-4">APNIC LIR 服务</h2>
-        
+
         <div class="overflow-x-auto">
           <table class="table table-zebra w-full">
             <thead>
@@ -213,7 +206,7 @@
 
       <section class="my-8">
         <h2 class="text-2xl font-bold mb-4">ARIN 服务</h2>
-        
+
         <div class="overflow-x-auto">
           <table class="table table-zebra w-full">
             <thead>
@@ -240,18 +233,20 @@
 
       <section class="my-8">
         <h2 class="text-2xl font-bold mb-4">LIR 服务说明</h2>
-        
+
         <div class="grid md:grid-cols-2 gap-6">
           <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
             <h3 class="font-bold mb-2">什么是 LIR?</h3>
-            <p>LIR (Local Internet Registry) 是互联网号码资源的本地注册机构，负责向终端用户或较小的 ISP 分配 IP 地址和 AS 号码。我们作为 RIPE 和 APNIC 的会员，可以帮助您申请和管理这些资源。</p>
+            <p>LIR (Local Internet Registry) 是互联网号码资源的本地注册机构，负责向终端用户或较小的 ISP 分配 IP 地址和 AS 号码。我们作为 RIPE 和 APNIC
+              的会员，可以帮助您申请和管理这些资源。</p>
           </div>
-          
+
           <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
             <h3 class="font-bold mb-2">PA vs PI</h3>
-            <p>PA (Provider Aggregatable) 地址是通过 ISP 分配的地址，当您更换提供商时需要放弃。PI (Provider Independent) 地址是直接从 RIR 获得的，可以带到任何 ISP。PI 地址价格更高但提供更好的灵活性。</p>
+            <p>PA (Provider Aggregatable) 地址是通过 ISP 分配的地址，当您更换提供商时需要放弃。PI (Provider Independent) 地址是直接从 RIR 获得的，可以带到任何
+              ISP。PI 地址价格更高但提供更好的灵活性。</p>
           </div>
-          
+
           <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
             <h3 class="font-bold mb-2">服务内容</h3>
             <ul class="list-disc pl-5">
@@ -263,7 +258,7 @@
               <li>专业技术支持和咨询</li>
             </ul>
           </div>
-          
+
           <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
             <h3 class="font-bold mb-2">申请流程</h3>
             <ol class="list-decimal pl-5">
@@ -294,7 +289,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 
 definePageMeta({
   layout: 'no-navbar'
@@ -352,11 +347,11 @@ onMounted(() => {
   .table-zebra tbody tr.dark\:bg-red-900\/15 {
     background-color: rgba(127, 29, 29, 0.15) !important;
   }
-  
+
   .table-zebra tbody tr.dark\:bg-blue-900\/15 {
     background-color: rgba(30, 58, 138, 0.15) !important;
   }
-  
+
   .table-zebra tbody tr.dark\:bg-yellow-900\/15 {
     background-color: rgba(113, 63, 18, 0.15) !important;
   }
@@ -384,4 +379,4 @@ img {
   -webkit-user-drag: none;
   pointer-events: none;
 }
-</style> 
+</style>
