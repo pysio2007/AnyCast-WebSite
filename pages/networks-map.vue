@@ -171,9 +171,9 @@ let mapInstance: any = null
 
 // 网络统计数据
 const networkStats = ref({
-  totalNodes: 19,
-  ixPoints: 5,
-  regions: 9,
+  totalNodes: 20,
+  ixPoints: 6,
+  regions: 10,
   totalBandwidth: '70G+'
 })
 
@@ -239,6 +239,18 @@ const networkNodes = ref([
     lat: 25.0330,
     lng: 121.5654,
     provider: 'Moedove'
+  },
+  {
+    id: 21,
+    name: 'ONIX',
+    location: 'Ontario, Canada',
+    bandwidth: '1Gbps',
+    type: 'IX交换点',
+    status: '运行中',
+    flag: 'fi fi-ca',
+    lat: 43.6532,
+    lng: -79.3832,
+    provider: 'Ontario Internet Exchange'
   },
   // Anycast节点
   {
@@ -418,12 +430,17 @@ const nodeConnections = [
   { from: 0, to: 2, type: 'primary' }, // AKIX -> LOCIX
   { from: 0, to: 3, type: 'primary' }, // AKIX -> INTERIX
   { from: 0, to: 4, type: 'primary' }, // AKIX -> STUIX
+  { from: 0, to: 21, type: 'primary' }, // AKIX -> ONIX
   { from: 1, to: 2, type: 'primary' }, // FogIXP -> LOCIX
   { from: 1, to: 3, type: 'primary' }, // FogIXP -> INTERIX
   { from: 1, to: 4, type: 'primary' }, // FogIXP -> STUIX
+  { from: 1, to: 21, type: 'primary' }, // FogIXP -> ONIX
   { from: 2, to: 3, type: 'primary' }, // LOCIX -> INTERIX
   { from: 2, to: 4, type: 'primary' }, // LOCIX -> STUIX
+  { from: 2, to: 21, type: 'primary' }, // LOCIX -> ONIX
   { from: 3, to: 4, type: 'primary' }, // INTERIX -> STUIX
+  { from: 3, to: 21, type: 'primary' }, // INTERIX -> ONIX
+  { from: 4, to: 21, type: 'primary' }, // STUIX -> ONIX
 
   // IX到Anycast的次要连接
   { from: 0, to: 5, type: 'secondary' }, // AKIX -> HongKong Master
@@ -440,6 +457,8 @@ const nodeConnections = [
   { from: 4, to: 10, type: 'secondary' }, // STUIX -> Anycast-HongKong
   { from: 4, to: 13, type: 'secondary' }, // STUIX -> Moedove-HongKong
   { from: 4, to: 14, type: 'secondary' }, // STUIX -> Singapore
+  { from: 21, to: 6, type: 'secondary' }, // ONIX -> NewJersey
+  { from: 21, to: 16, type: 'secondary' }, // ONIX -> Moedove-USA
 
   // Anycast间连接
   { from: 5, to: 10, type: 'secondary' }, // HongKong Master -> Anycast-HongKong

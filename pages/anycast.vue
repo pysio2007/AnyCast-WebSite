@@ -81,6 +81,10 @@
                 class="bg-white/80 p-2 rounded text-sm font-medium text-green-900 dark:bg-gray-800 dark:text-green-300">
                 STUIX</div>
             </div>
+              <div
+                class="bg-white/80 p-2 rounded text-sm font-medium text-green-900 dark:bg-gray-800 dark:text-green-300">
+                ONIX</div>
+            </div>
           </div>
 
           <div
@@ -559,6 +563,29 @@
             <ul class="space-y-1 text-sm">
               <li><i class="fas fa-network-wired mr-2"></i>1Gbps</li>
               <li><i class="fas fa-server mr-2"></i>Moedove</li>
+              <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
+              <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
+              <li><i class="fas fa-cloud-download-alt mr-2"></i>支持下游</li>
+            </ul>
+          </div>
+
+          <!-- ONIX -->
+          <div class="bg-gray-50 p-4 rounded-lg dark:bg-gray-800">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold flex items-center">
+                <span class="fi fi-ca w-5 mr-2"></span>
+                ONIX-Ontario
+              </h3>
+              <div class="flex gap-2">
+                <span
+                  class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded dark:bg-green-900 dark:text-green-200">下游服务</span>
+                <span
+                  class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200">新增</span>
+              </div>
+            </div>
+            <ul class="space-y-1 text-sm">
+              <li><i class="fas fa-network-wired mr-2"></i>100Mbps</li>
+              <li><i class="fas fa-server mr-2"></i>Ontario Internet Exchange</li>
               <li><i class="fas fa-globe mr-2"></i>IPv4 + IPv6</li>
               <li><i class="fas fa-route mr-2"></i>AS213605 BGP Session</li>
               <li><i class="fas fa-cloud-download-alt mr-2"></i>支持下游</li>
