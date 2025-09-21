@@ -80,10 +80,9 @@
               <div
                 class="bg-white/80 p-2 rounded text-sm font-medium text-green-900 dark:bg-gray-800 dark:text-green-300">
                 STUIX</div>
-            </div>
               <div
                 class="bg-white/80 p-2 rounded text-sm font-medium text-green-900 dark:bg-gray-800 dark:text-green-300">
-                ONIX</div>
+                ONXI</div>
             </div>
           </div>
 
