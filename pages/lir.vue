@@ -53,14 +53,14 @@
               </tr>
             </thead>
             <tbody>
-              <tr class="bg-red-50 dark:bg-red-900/15 !odd:bg-red-50 !even:bg-red-50">
-                <td>RIPE ASN Registration + /44 IPv6 * 暂不受理</td>
+              <tr class="bg-blue-50 dark:bg-blue-900/15 !odd:bg-blue-50 !even:bg-blue-50">
+                <td>RIPE ASN Registration + /44 IPv6</td>
                 <td>不适用</td>
                 <td>不适用</td>
                 <td>¥621/年</td>
                 <td>$85/年</td>
               </tr>
-              <tr class="bg-yellow-50 dark:bg-yellow-900/15 !odd:bg-yellow-50 !even:bg-yellow-50">
+              <tr>
                 <td>IPv6 PA /44 ~ /48</td>
                 <td>¥0/月</td>
                 <td>$0/月</td>
@@ -281,6 +281,12 @@
         <div class="flex flex-wrap gap-4">
           <a href="https://t.me/Pysio07" class="btn btn-outline gap-2">
             <i class="fab fa-telegram"></i> Telegram
+          </a>
+          <a href="mailto:team@akae.re" class="btn btn-outline gap-2">
+            <i class="fas fa-envelope"></i> team@akae.re
+          </a>
+          <a href="tencent://message/?uin=593277393" class="btn btn-outline gap-2">
+            <i class="fab fa-qq"></i> QQ: 593277393
           </a>
         </div>
       </section>
