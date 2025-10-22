@@ -185,6 +185,11 @@ export default defineNuxtConfig({
           'data-website-id': 'e7693c69-0ebb-47bf-8f06-e49fa527ef7b'
         },
         {
+          async: true,
+          src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6547593871065949',
+          crossorigin: 'anonymous'
+        },
+        {
           innerHTML: `
             // 强制亮色模式
             if (typeof document !== 'undefined') {
