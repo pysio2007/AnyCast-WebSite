@@ -76,12 +76,6 @@ export default defineNuxtConfig({
             lastmod: new Date().toISOString()
           },
           {
-            url: '/networks-map',
-            changefreq: 'weekly',
-            priority: 0.8,
-            lastmod: new Date().toISOString()
-          },
-          {
             url: '/anycast',
             changefreq: 'weekly',
             priority: 0.8,
