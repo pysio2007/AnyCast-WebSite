@@ -2,7 +2,7 @@
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
-  modules: ['@nuxtjs/sitemap', '@nuxt/content', '@nuxt/image'],
+  modules: ['@nuxtjs/sitemap', '@nuxt/image'],
   vite: {
     plugins: [
       tailwindcss(),

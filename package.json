@@ -14,13 +14,11 @@
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/vue-fontawesome": "^3.0.8",
-    "@nuxt/content": "^3.1.1",
     "@nuxt/image": "^1.10.0",
     "@nuxtjs/sitemap": "^7.2.6",
     "@tailwindcss/vite": "^4.1.1",
     "@types/leaflet": "^1.9.20",
     "@vesp/nuxt-fontawesome": "^1.2.1",
-    "better-sqlite3": "^11.10.0",
     "echarts": "^5.6.0",
     "leaflet": "^1.9.4",
     "nuxt": "^3.17.5",
@@ -32,7 +30,7 @@
   "devDependencies": {
     "@types/node": "^24.0.1",
     "cross-env": "^7.0.3",
-    "daisyui": "^5.0.43",
+    "daisyui": "^5.3.8",
     "git-describe": "^4.1.1",
     "lightningcss": "^1.29.3"
   }
