@@ -104,6 +104,12 @@ export default defineNuxtConfig({
             changefreq: 'weekly',
             priority: 0.8,
             lastmod: new Date().toISOString()
+          },
+          {
+            url: '/root-dns',
+            changefreq: 'daily',
+            priority: 0.8,
+            lastmod: new Date().toISOString()
           }
         ]
       }

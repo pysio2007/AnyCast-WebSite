@@ -24,6 +24,10 @@
           <i class="apple-nav-icon fas fa-project-diagram"></i>
           <span>DN42</span>
         </NuxtLink></li>
+        <li><NuxtLink to="/root-dns" class="apple-nav-item">
+          <i class="apple-nav-icon fas fa-server"></i>
+          <span>根DNS</span>
+        </NuxtLink></li>
         <li><NuxtLink to="/tools" class="apple-nav-item">
           <i class="apple-nav-icon fas fa-tools"></i>
           <span>工具箱</span>
@@ -55,6 +59,10 @@
             <li><NuxtLink to="/dn42" class="apple-mobile-nav-item" @click="closeMobileMenu">
               <i class="fas fa-project-diagram"></i>
               <span>DN42</span>
+            </NuxtLink></li>
+            <li><NuxtLink to="/root-dns" class="apple-mobile-nav-item" @click="closeMobileMenu">
+              <i class="fas fa-server"></i>
+              <span>根DNS</span>
             </NuxtLink></li>
             <li><NuxtLink to="/tools" class="apple-mobile-nav-item" @click="closeMobileMenu">
               <i class="fas fa-tools"></i>
