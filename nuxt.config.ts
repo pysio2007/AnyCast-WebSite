@@ -1,5 +1,19 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from "@tailwindcss/vite";
+import { execSync } from 'child_process';
+
+// 获取 Git commit hash
+function getGitHash(): string {
+  try {
+    const hash = execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim();
+    return hash;
+  } catch (error) {
+    console.warn('Failed to get git hash:', error);
+    return 'development';
+  }
+}
+
+const gitHash = getGitHash();
 
 export default defineNuxtConfig({
   modules: ['@nuxtjs/sitemap', '@nuxt/image'],
@@ -26,7 +40,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   runtimeConfig: {
     public: {
-      gitHash: process.env.NUXT_PUBLIC_GIT_HASH || 'development',
+      gitHash: gitHash,
       sitemap: {
         siteUrl: 'https://anycast.ink',
         changefreq: 'daily',
