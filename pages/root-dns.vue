@@ -1,11 +1,10 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <article class="prose dark:prose-invert max-w-none">
-      <PageSeo title="RIPE DNS 服务 - Pysio Networks"
-        description="Pysio Networks 托管的 RIPE K-Root 根服务器和 AuthDNS 权威域名服务统计信息"
+      <PageSeo title="根DNS服务 - Pysio Networks" description="Pysio Networks 托管的 RIPE K-Root 根服务器和 AuthDNS 权威域名服务统计信息"
         :keywords="['RIPE', 'K-Root', 'AuthDNS', '根DNS', '权威DNS', 'DNS', 'AS25152']" />
 
-      <h1 class="text-4xl font-bold mb-6">RIPE DNS 服务</h1>
+      <h1 class="text-4xl font-bold mb-6">根DNS服务</h1>
 
       <div class="bg-blue-50 border-l-4 border-blue-400 p-4 my-4 dark:bg-blue-900/20">
         <p class="text-blue-700 dark:text-blue-200">
