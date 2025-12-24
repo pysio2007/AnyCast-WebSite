@@ -10,7 +10,7 @@
       </div>
 
       <p class="mb-4">
-        AS213605提供IPv6下游连接服务，支持多种连接方式，欢迎所有非商业用途的网络运营商申请。
+        AS213605提供IPv4和IPv6下游连接服务，支持多种连接方式，欢迎所有非商业用途的网络运营商申请。
       </p>
 
       <section class="my-8">
@@ -35,7 +35,7 @@
               <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
               <div>
                 <span class="font-semibold">前缀要求：</span>
-                <span>必须拥有有效的IPv6前缀，并通过RPKI验证。</span>
+                <span>必须拥有有效的IPv4和/或IPv6前缀，并通过RPKI验证。</span>
               </div>
             </li>
             <li class="flex items-start">
@@ -58,6 +58,7 @@
               <h3 class="font-bold text-lg">连接类型</h3>
             </div>
             <ul class="space-y-1">
+              <li>• IPv4 BGP会话</li>
               <li>• IPv6 BGP会话</li>
               <li>• VXLAN隧道</li>
               <li>• GRE隧道</li>
@@ -88,8 +89,7 @@
               <h3 class="font-bold text-lg">连接IP</h3>
             </div>
             <div class="space-y-1 text-sm">
-              <p><span class="font-semibold">FogIXP:</span> <span class="font-mono">2001:7f8:ca:1::21:3605:1</span></p>
-              <p><span class="font-semibold">其他地区:</span> 根据具体情况分配</p>
+              <p>根据具体情况分配</p>
             </div>
           </div>
         </div>
@@ -184,8 +184,58 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm">黑洞路由(BLACKHOLE)</td>
               </tr>
               <tr class="bg-gray-50 dark:bg-gray-700/30">
+                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">213605:66:nnn</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">区域黑洞路由(REGIONAL BLACKHOLE, nnn为ISO 3166-1国家代码)</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">213605:0:9000</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">导出到路由服务器(Route Server)</td>
+              </tr>
+              <tr class="bg-gray-50 dark:bg-gray-700/30">
                 <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">213605:0:34927</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">不向上游ifog导出</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">不向上游导出(Do Not Export to Upstream)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden mb-6">
+          <h3 class="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-lg font-semibold">RPKI和ASPA验证社区</h3>
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-100 dark:bg-gray-700">
+              <tr>
+                <th scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  社区标记</th>
+                <th scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  描述</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">213605:10:1</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">RPKI有效(RPKI Valid)</td>
+              </tr>
+              <tr class="bg-gray-50 dark:bg-gray-700/30">
+                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">213605:10:2</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">RPKI未知(RPKI Unknown)</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">213605:10:3</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">RPKI无效(RPKI Invalid)</td>
+              </tr>
+              <tr class="bg-gray-50 dark:bg-gray-700/30">
+                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">213605:10:4</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">ASPA有效(ASPA Valid)</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">213605:10:5</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">ASPA未知(ASPA Unknown)</td>
+              </tr>
+              <tr class="bg-gray-50 dark:bg-gray-700/30">
+                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm">213605:10:6</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">ASPA无效(ASPA Invalid)</td>
               </tr>
             </tbody>
           </table>
@@ -209,15 +259,17 @@
             <div class="bg-gray-50 dark:bg-gray-800 p-5 rounded-lg">
               <ul class="space-y-3">
                 <li><span class="font-mono font-medium">213605:0:666</span> - 标记应当被黑洞的路由，用于缓解DDoS攻击，带有此标记的路由会被丢弃</li>
-                <li><span class="font-mono font-medium">213605:0:34927</span> - 标记不应该向我们的上游ifog导出的路由</li>
+                <li><span class="font-mono font-medium">213605:66:nnn</span> - 区域黑洞路由，nnn为ISO 3166-1国家代码(如840代表美国)，仅在特定区域内黑洞</li>
+                <li><span class="font-mono font-medium">213605:0:9000</span> - 标记允许导出到路由服务器的路由</li>
+                <li><span class="font-mono font-medium">213605:0:34927</span> - 标记不应该向我们的上游导出的路由</li>
               </ul>
             </div>
           </div>
 
           <div>
-            <h3 class="text-xl font-bold mb-3">功能性社区</h3>
+            <h3 class="text-xl font-bold mb-3">上游控制社区</h3>
             <h4 class="text-lg font-semibold mb-2">基础控制社区</h4>
-            <p class="mb-4">我们支持以下功能性社区，用于控制路由如何通过ifog传递到各上游提供商：</p>
+            <p class="mb-4">我们支持以下功能性社区，用于控制路由如何传递到各上游提供商：</p>
 
             <div class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden mb-6">
               <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -331,22 +383,22 @@
             <div class="space-y-6">
               <div>
                 <h4 class="text-lg font-semibold mb-2">工作原理</h4>
-                <p>当您使用上述社区标记路由时，我们的路由器会识别这些社区并在向ifog导出路由时，添加相应的ifog社区，使ifog能够按照您的要求控制路由到其上游的传播。</p>
+                <p>当您使用上述社区标记路由时，我们的路由器会识别这些社区并按照您的要求控制路由向上游提供商的传播。</p>
               </div>
 
               <div>
                 <h4 class="text-lg font-semibold mb-2">不导出到特定上游</h4>
-                <p class="mb-2">如果您希望某个前缀不被导出到ifog的特定上游，请在宣告该前缀时附加对应的"不导出"社区。例如，如果您不希望某个前缀通过ifog被导出到Hurricane Electric：
+                <p class="mb-2">如果您希望某个前缀不被导出到特定上游，请在宣告该前缀时附加对应的"不导出"社区。例如，如果您不希望某个前缀被导出到Hurricane Electric：
                 </p>
                 <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded font-mono">(213605, 3, 9130)</div>
 
-                <p class="mt-3 mb-2">如果您不希望某个前缀被导出到ifog本身(不导出到任何上游)：</p>
+                <p class="mt-3 mb-2">如果您不希望某个前缀被导出到任何上游：</p>
                 <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded font-mono">(213605, 0, 34927)</div>
               </div>
 
               <div>
                 <h4 class="text-lg font-semibold mb-2">AS路径预置</h4>
-                <p class="mb-2">如果您希望增加某个前缀通过ifog到达特定上游的路径长度，可以使用预置社区：</p>
+                <p class="mb-2">如果您希望增加某个前缀到达特定上游的路径长度，可以使用预置社区：</p>
                 <ul class="space-y-2">
                   <li><span class="font-medium">单次AS路径预置</span> (例如向Cogent做1次预置): <span class="font-mono">(213605, 3,
                       9471)</span></li>
