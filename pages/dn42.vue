@@ -25,7 +25,7 @@
         <div class="flex-1">
           <h2 class="text-2xl font-bold mb-4">BGP AS213605 网络</h2>
           <ul>
-            <li>仅支持 IPv6</li>
+            <li>IPv4+IPv6</li>
           </ul>
         </div>
       </div>

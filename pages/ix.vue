@@ -232,6 +232,179 @@
             </div>
           </div>
 
+          <!-- TPIX-TW -->
+          <div
+            class="bg-white shadow-md rounded-lg overflow-hidden dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <div class="bg-orange-50 dark:bg-orange-900/30 p-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-xl">TPIX-TW</h3>
+                <div class="flex gap-2">
+                  <span
+                    class="text-sm bg-orange-100 text-orange-800 px-2 py-1 rounded dark:bg-orange-800 dark:text-orange-200">
+                    Taipei
+                  </span>
+                  <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-800 dark:text-blue-200">
+                    下游支持
+                  </span>
+                </div>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Taipei Internet Exchange
+              </p>
+            </div>
+            <div class="p-4">
+              <div class="mb-3">
+                <a href="https://www.peeringdb.com/ix/823" target="_blank"
+                  class="text-blue-500 hover:text-blue-700 text-sm flex items-center">
+                  <i class="fas fa-external-link-alt mr-1"></i> PeeringDB: IX #823
+                </a>
+              </div>
+              <div class="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p class="font-medium">对等节点:</p>
+                  <p>149</p>
+                </div>
+                <div>
+                  <p class="font-medium">开放政策:</p>
+                  <p>107</p>
+                </div>
+                <div>
+                  <p class="font-medium">总速率:</p>
+                  <p>3.2T</p>
+                </div>
+                <div>
+                  <p class="font-medium">IPv6 覆盖:</p>
+                  <p>78%</p>
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p class="font-medium mb-1">我们的对等信息:</p>
+                <div class="bg-gray-50 p-2 rounded dark:bg-gray-700 font-mono text-xs">
+                  <p>ASN: 213605</p>
+                  <p>IPv4: 203.163.223.49</p>
+                  <p>IPv6: 2406:d400:1:133:203:163:223:49</p>
+                  <p>速率: 1G</p>
+                  <p>策略: RS PEER Open</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ONIX -->
+          <div
+            class="bg-white shadow-md rounded-lg overflow-hidden dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-xl">ONIX</h3>
+                <div class="flex gap-2">
+                  <span
+                    class="text-sm bg-indigo-100 text-indigo-800 px-2 py-1 rounded dark:bg-indigo-800 dark:text-indigo-200">
+                    Toronto
+                  </span>
+                  <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-800 dark:text-blue-200">
+                    下游支持
+                  </span>
+                </div>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Ontario Internet Exchange
+              </p>
+            </div>
+            <div class="p-4">
+              <div class="mb-3">
+                <a href="https://www.peeringdb.com/ix/4059" target="_blank"
+                  class="text-blue-500 hover:text-blue-700 text-sm flex items-center">
+                  <i class="fas fa-external-link-alt mr-1"></i> PeeringDB: IX #4059
+                </a>
+              </div>
+              <div class="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p class="font-medium">对等节点:</p>
+                  <p>149</p>
+                </div>
+                <div>
+                  <p class="font-medium">开放政策:</p>
+                  <p>138</p>
+                </div>
+                <div>
+                  <p class="font-medium">总速率:</p>
+                  <p>863G</p>
+                </div>
+                <div>
+                  <p class="font-medium">IPv6 覆盖:</p>
+                  <p>98%</p>
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p class="font-medium mb-1">我们的对等信息:</p>
+                <div class="bg-gray-50 p-2 rounded dark:bg-gray-700 font-mono text-xs">
+                  <p>ASN: 213605</p>
+                  <p>IPv4: 149.112.50.137</p>
+                  <p>IPv6: 2001:504:125:e1::137</p>
+                  <p>速率: 1G</p>
+                  <p>策略: RS PEER BFD Support Open</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Poema IX -->
+          <div
+            class="bg-white shadow-md rounded-lg overflow-hidden dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <div class="bg-teal-50 dark:bg-teal-900/30 p-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-xl">Poema IX</h3>
+                <div class="flex gap-2">
+                  <span
+                    class="text-sm bg-teal-100 text-teal-800 px-2 py-1 rounded dark:bg-teal-800 dark:text-teal-200">
+                    Taipei City
+                  </span>
+                  <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-800 dark:text-blue-200">
+                    下游支持
+                  </span>
+                </div>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Poema eXchange LLC
+              </p>
+            </div>
+            <div class="p-4">
+              <div class="mb-3">
+                <a href="https://www.peeringdb.com/ix/3792" target="_blank"
+                  class="text-blue-500 hover:text-blue-700 text-sm flex items-center">
+                  <i class="fas fa-external-link-alt mr-1"></i> PeeringDB: IX #3792
+                </a>
+              </div>
+              <div class="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p class="font-medium">对等节点:</p>
+                  <p>61</p>
+                </div>
+                <div>
+                  <p class="font-medium">开放政策:</p>
+                  <p>55</p>
+                </div>
+                <div>
+                  <p class="font-medium">总速率:</p>
+                  <p>41G</p>
+                </div>
+                <div>
+                  <p class="font-medium">IPv6 覆盖:</p>
+                  <p>100%</p>
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p class="font-medium mb-1">我们的对等信息:</p>
+                <div class="bg-gray-50 p-2 rounded dark:bg-gray-700 font-mono text-xs">
+                  <p>ASN: 213605</p>
+                  <p>IPv6: 2404:f4c0:f70e:1980::213:605</p>
+                  <p>速率: 500M</p>
+                  <p>策略: RS PEER Open</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- STUIX -->
           <div
             class="bg-white shadow-md rounded-lg overflow-hidden dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
@@ -253,6 +426,12 @@
               </p>
             </div>
             <div class="p-4">
+              <div class="mb-3">
+                <a href="https://www.peeringdb.com/ix/3352" target="_blank"
+                  class="text-blue-500 hover:text-blue-700 text-sm flex items-center">
+                  <i class="fas fa-external-link-alt mr-1"></i> PeeringDB: IX #3352
+                </a>
+              </div>
               <div class="grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <p class="font-medium">对等节点:</p>

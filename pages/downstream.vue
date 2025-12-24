@@ -259,7 +259,8 @@
             <div class="bg-gray-50 dark:bg-gray-800 p-5 rounded-lg">
               <ul class="space-y-3">
                 <li><span class="font-mono font-medium">213605:0:666</span> - 标记应当被黑洞的路由，用于缓解DDoS攻击，带有此标记的路由会被丢弃</li>
-                <li><span class="font-mono font-medium">213605:66:nnn</span> - 区域黑洞路由，nnn为ISO 3166-1国家代码(如840代表美国)，仅在特定区域内黑洞</li>
+                <li><span class="font-mono font-medium">213605:66:nnn</span> - 区域黑洞路由，nnn为ISO
+                  3166-1国家代码(如840代表美国)，仅在特定区域内黑洞</li>
                 <li><span class="font-mono font-medium">213605:0:9000</span> - 标记允许导出到路由服务器的路由</li>
                 <li><span class="font-mono font-medium">213605:0:34927</span> - 标记不应该向我们的上游导出的路由</li>
               </ul>
