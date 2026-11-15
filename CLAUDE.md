@@ -70,7 +70,7 @@ There are no test commands — this project has no test suite.
 
 ### Runtime Config
 
-Server-only secret: `XMSL_KEY` (Netlify env var; locally in `.env`, see `.env.example`). Read via `xmslConfig()` in `server/utils/xmsl.ts`.
+Server-only secret: `XMSL_KEY` (Netlify env var; locally in `.env`, see `.env.example`). Read at request time via `xmslConfig()` in `server/utils/xmsl.ts`; never put its value into `runtimeConfig` defaults (it would be inlined into `.output` and Netlify's secret scan fails the build).
 
 
 `nuxt.config.ts` exposes `public.gitHash` (retrieved via `git rev-parse --short HEAD` at build time) and sitemap configuration. Access with `useRuntimeConfig().public.gitHash`.

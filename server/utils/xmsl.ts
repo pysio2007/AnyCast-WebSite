@@ -14,7 +14,7 @@ export function xmslConfig() {
   const { xmsl } = useRuntimeConfig()
   return {
     baseUrl: xmsl.baseUrl as string,
-    // Netlify injects XMSL_KEY at runtime as well; prefer it over the build-time value.
+    // Read at request time only (Netlify env var XMSL_KEY, or NUXT_XMSL_API_KEY via runtimeConfig).
     apiKey: (process.env.XMSL_KEY || xmsl.apiKey || '') as string,
   }
 }

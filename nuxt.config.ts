@@ -58,9 +58,10 @@ export default defineNuxtConfig({
     '/root-dns': { redirect: { to: '/', statusCode: 301 } },
   },
   runtimeConfig: {
-    // Server-only. Netlify provides XMSL_KEY; NUXT_XMSL_API_KEY also overrides at runtime.
+    // Server-only. The key is read from process.env.XMSL_KEY at request time (server/utils/xmsl.ts);
+    // never assign it here, or its value is inlined into .output and Netlify's secret scan fails the build.
     xmsl: {
-      apiKey: process.env.XMSL_KEY || '',
+      apiKey: '',
       baseUrl: 'https://stage-info-api.xmsl.dev',
     },
     public: {
