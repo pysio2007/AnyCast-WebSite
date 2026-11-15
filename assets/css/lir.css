@@ -17,6 +17,9 @@
 @plugin "daisyui" {
   themes: light;
   root: ".lir-root";
+  /* daisyUI 5's `.fab` (floating action button, position: fixed) collides with Font Awesome's
+     `fab` brand-icon class, pinning the Telegram/QQ icons to the bottom-right corner. */
+  exclude: fab;
   logs: false;
 }
 
