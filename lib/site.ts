@@ -9,6 +9,7 @@ import {
   Globe,
   History,
   Layers,
+  MapPin,
   Network,
   Radar,
   Route,
@@ -93,6 +94,7 @@ export const toolLinks: SiteLink[] = [
   { title: '全球 Ping', to: '/ping', description: '全球多点延迟与可达性测试', icon: Activity },
   { title: '路由追踪', to: '/traceroute', description: '从任意位置发起 MTR', icon: Route },
   { title: '全球路由追踪', to: '/global-traceroute', description: '多探针路由追踪与地图', icon: Waypoints },
+  { title: 'IP 定位', to: '/ip', description: '多家地理库定位结果对比', icon: MapPin },
   { title: 'WHOIS', to: '/whois', description: 'RDAP 域名 / IP / ASN 注册信息', icon: Database },
   { title: 'Tor 节点查询', to: '/tor-check', description: '查询 Tor 中继与出口节点', icon: VenetianMask },
 ]

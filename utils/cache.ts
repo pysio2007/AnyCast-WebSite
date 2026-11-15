@@ -11,7 +11,6 @@ export class Cache {
   
   // 针对不同类型数据的缓存时间配置
   private static CACHE_DURATIONS: {[key: string]: number} = {
-    'ip_geo_': 7 * 24 * 60 * 60 * 1000, // IP地理信息缓存7天
     'api_req_': 10 * 60 * 1000,         // API请求缓存10分钟
     'traceroute_': 60 * 60 * 1000       // 路由追踪结果缓存1小时
   };

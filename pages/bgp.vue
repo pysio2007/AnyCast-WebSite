@@ -616,6 +616,9 @@ const whoisQuery = computed(() => {
             <Button variant="outline" size="sm" as-child>
               <NuxtLink :to="{ path: '/whois', query: { q: whoisQuery } }">WHOIS</NuxtLink>
             </Button>
+            <Button v-if="target?.kind === 'ip'" variant="outline" size="sm" as-child>
+              <NuxtLink :to="{ path: '/ip', query: { q: target.resource } }">IP 定位</NuxtLink>
+            </Button>
           </div>
         </div>
 

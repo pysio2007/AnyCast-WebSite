@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { HopPlace } from '~/composables/useTraceAnalysis'
+import type { TraceMapOrigin } from '~/components/TraceMap.vue'
 import { AlertCircle, ArrowUpRight, ChevronDown, ChevronUp, Copy, Link2, Loader2, Play } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
@@ -17,6 +19,8 @@ interface HopRow {
   best: number | null
   worst: number | null
   stdev: number | null
+  /** Cross-database placement from xmsl.Dev GeoAPI, matched by TTL. */
+  place: HopPlace | null
 }
 
 const DEFAULT_PORT: Record<Exclude<Protocol, 'ICMP'>, string> = { TCP: '80', UDP: '53' }
@@ -98,24 +102,48 @@ const probe = computed(() => measurement.value?.results[0]?.probe ?? null)
 const result = computed(() => measurement.value?.results[0]?.result ?? null)
 const probeFailed = computed(() => result.value?.status === 'failed' || result.value?.status === 'offline')
 
-const hops = computed<HopRow[]>(() => (result.value?.hops ?? []).map((hop, i) => {
-  const rtts = hop.timings.map(t => t.rtt).filter((r): r is number => typeof r === 'number')
-  return {
-    index: i + 1,
-    address: hop.resolvedAddress,
-    hostname: hop.resolvedHostname && hop.resolvedHostname !== hop.resolvedAddress ? hop.resolvedHostname : null,
-    asns: hop.asn ?? [],
-    loss: hop.stats?.loss ?? 100,
-    sent: hop.stats?.total ?? hop.timings.length,
-    recv: hop.stats?.rcv ?? rtts.length,
-    last: rtts.at(-1) ?? null,
-    avg: hop.stats?.avg ?? null,
-    best: hop.stats?.min ?? null,
-    worst: hop.stats?.max ?? null,
-    stdev: hop.stats?.stDev ?? null,
-  }
-}))
+// Geolocate hops once the probe has finished (results cached per raw output).
+const analysisText = computed(() => {
+  const r = result.value
+  return state.value === 'finished' && r?.status === 'finished' && r.hops.some(hop => hop.resolvedAddress) ? r.rawOutput : null
+})
+const { data: analysis, pending: analysisPending, error: analysisError, retry: retryAnalysis } = useTraceAnalysis(analysisText)
+const selectedTtl = ref<number | null>(null)
+
+const mapOrigin = computed<TraceMapOrigin | null>(() => {
+  const p = probe.value
+  return p ? { lat: p.latitude, lon: p.longitude, label: `${placeLabel(p.country, p.city)} · AS${p.asn} ${p.network}` } : null
+})
+
+const hops = computed<HopRow[]>(() => {
+  const analysed = new Map((analysis.value?.route.hops ?? []).map(hop => [hop.ttl, hop]))
+  return (result.value?.hops ?? []).map((hop, i) => {
+    const rtts = hop.timings.map(t => t.rtt).filter((r): r is number => typeof r === 'number')
+    return {
+      index: i + 1,
+      address: hop.resolvedAddress,
+      hostname: hop.resolvedHostname && hop.resolvedHostname !== hop.resolvedAddress ? hop.resolvedHostname : null,
+      asns: hop.asn ?? [],
+      loss: hop.stats?.loss ?? 100,
+      sent: hop.stats?.total ?? hop.timings.length,
+      recv: hop.stats?.rcv ?? rtts.length,
+      last: rtts.at(-1) ?? null,
+      avg: hop.stats?.avg ?? null,
+      best: hop.stats?.min ?? null,
+      worst: hop.stats?.max ?? null,
+      stdev: hop.stats?.stDev ?? null,
+      place: hopPlace(analysed.get(i + 1)),
+    }
+  })
+})
 const timeoutCount = computed(() => hops.value.filter(h => !h.address).length)
+
+function selectHop(hop: HopRow) {
+  if (hop.place) selectedTtl.value = hop.index
+}
+watch(analysisText, () => {
+  selectedTtl.value = null
+})
 
 // AS names: one batched RIPEstat `as-names` call per finished measurement, for ASNs not seen yet.
 const asNames = ref<Record<number, string>>({})
@@ -146,16 +174,6 @@ async function resolveAsNames() {
 watch(state, (s) => {
   if (s === 'finished') resolveAsNames()
 })
-
-const regionNames = new Intl.DisplayNames(['zh-CN'], { type: 'region' })
-const countryName = (code: string) => {
-  try {
-    return regionNames.of(code) ?? code
-  }
-  catch {
-    return code
-  }
-}
 
 const ms = (v: number | null) => (v === null ? '—' : v.toFixed(1))
 const lossClass = (loss: number) => (loss === 0 ? 'text-success' : loss < 50 ? 'text-warning' : 'text-destructive')
@@ -334,6 +352,7 @@ const copyShareLink = () => copyText(window.location.href, '分享链接')
                   <TableHead class="w-12 pl-5">#</TableHead>
                   <TableHead>地址</TableHead>
                   <TableHead>ASN</TableHead>
+                  <TableHead>位置</TableHead>
                   <TableHead class="text-right">丢包</TableHead>
                   <TableHead class="text-right">发送/接收</TableHead>
                   <TableHead class="text-right">最近</TableHead>
@@ -349,11 +368,12 @@ const copyShareLink = () => copyText(window.location.href, '分享链接')
                     <TableCell class="pl-5"><Skeleton class="h-5 w-5" /></TableCell>
                     <TableCell><Skeleton class="h-5 w-40" /></TableCell>
                     <TableCell><Skeleton class="h-5 w-28" /></TableCell>
+                    <TableCell><Skeleton class="h-5 w-24" /></TableCell>
                     <TableCell v-for="j in 6" :key="j"><Skeleton class="ml-auto h-5 w-10" /></TableCell>
                     <TableCell class="pr-5"><Skeleton class="ml-auto h-5 w-10" /></TableCell>
                   </TableRow>
                 </template>
-                <TableEmpty v-else-if="!hops.length" :colspan="10">
+                <TableEmpty v-else-if="!hops.length" :colspan="11">
                   <span class="text-muted-foreground">探针未返回任何跳</span>
                 </TableEmpty>
                 <template v-for="hop in hops" :key="hop.index">
@@ -361,11 +381,16 @@ const copyShareLink = () => copyText(window.location.href, '分享链接')
                     <TableCell class="pl-5 font-mono tabular-nums">{{ hop.index }}</TableCell>
                     <TableCell class="font-mono">*</TableCell>
                     <TableCell>—</TableCell>
+                    <TableCell>—</TableCell>
                     <TableCell class="text-right font-mono tabular-nums">{{ hop.loss.toFixed(1) }}%</TableCell>
                     <TableCell class="text-right font-mono tabular-nums">{{ hop.sent }}/{{ hop.recv }}</TableCell>
                     <TableCell colspan="5" class="pr-5 text-right">无响应</TableCell>
                   </TableRow>
-                  <TableRow v-else>
+                  <TableRow
+                    v-else
+                    :class="[hop.place ? 'cursor-pointer' : '', selectedTtl === hop.index ? 'bg-muted' : '']"
+                    @click="selectHop(hop)"
+                  >
                     <TableCell class="pl-5 font-mono tabular-nums">{{ hop.index }}</TableCell>
                     <TableCell class="max-w-80">
                       <div class="font-mono tabular-nums">{{ hop.address }}</div>
@@ -385,6 +410,21 @@ const copyShareLink = () => copyText(window.location.href, '分享链接')
                         <Skeleton v-if="asNamesLoading && !(asn in asNames)" class="mt-1 h-3 w-28" />
                         <span v-else-if="asNames[asn]" class="truncate text-xs text-muted-foreground" :title="asNames[asn]">{{ asNames[asn] }}</span>
                       </div>
+                    </TableCell>
+                    <TableCell class="max-w-64">
+                      <Skeleton v-if="analysisPending" class="h-5 w-24" />
+                      <span v-else-if="hop.place" class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <span class="inline-flex items-center gap-2 whitespace-nowrap">
+                          <span v-if="hop.place.countryCode" :class="`fi fi-${hop.place.countryCode.toLowerCase()} shrink-0 rounded-[2px]`" />
+                          {{ placeLabel(hop.place.countryCode, hop.place.city) || '未知' }}
+                        </span>
+                        <Badge
+                          v-if="hop.place.confidence && CONFIDENCE[hop.place.confidence]"
+                          :class="CONFIDENCE[hop.place.confidence]!.badge"
+                          :title="hop.place.source ? `定位来源 ${hop.place.source}` : undefined"
+                        >{{ CONFIDENCE[hop.place.confidence]!.label }}</Badge>
+                      </span>
+                      <span v-else class="text-muted-foreground">—</span>
                     </TableCell>
                     <TableCell class="text-right font-mono tabular-nums" :class="lossClass(hop.loss)">{{ hop.loss.toFixed(1) }}%</TableCell>
                     <TableCell class="text-right font-mono text-muted-foreground tabular-nums">{{ hop.sent }}/{{ hop.recv }}</TableCell>
@@ -425,8 +465,45 @@ const copyShareLink = () => copyText(window.location.href, '分享链接')
           </div>
         </Card>
 
+        <Card v-if="analysisText" class="gap-0 py-0">
+          <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b px-5 py-3">
+            <span class="font-medium">路由地图</span>
+            <span v-if="analysis" class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              <span>总距离 <span class="font-mono text-foreground tabular-nums">{{ Math.round(analysis.route.summary.distanceKm).toLocaleString('zh-CN') }} km</span></span>
+              <span v-if="analysis.route.summary.countries.length" class="inline-flex items-center gap-1">
+                途经
+                <span
+                  v-for="code in new Set(analysis.route.summary.countries)"
+                  :key="code"
+                  :class="`fi fi-${code.toLowerCase()} rounded-[2px]`"
+                  :title="countryName(code)"
+                />
+              </span>
+            </span>
+          </div>
+          <Skeleton v-if="analysisPending" class="h-[360px] w-full rounded-none sm:h-[420px]" />
+          <div v-else-if="analysisError" class="p-5">
+            <Alert variant="destructive">
+              <AlertCircle />
+              <AlertTitle>跃点定位失败</AlertTitle>
+              <AlertDescription class="flex flex-col items-start gap-3">
+                <span class="break-all">{{ analysisError }}</span>
+                <Button size="sm" variant="outline" @click="retryAnalysis">重试</Button>
+              </AlertDescription>
+            </Alert>
+          </div>
+          <TraceMap
+            v-else-if="analysis"
+            class="h-[360px] sm:h-[420px]"
+            :route="analysis.route"
+            :origin="mapOrigin"
+            :selected-ttl="selectedTtl"
+            @select-ttl="selectedTtl = $event"
+          />
+        </Card>
+
         <p class="text-xs text-muted-foreground">
-          由 Globalping 探针执行 MTR；ASN 名称来自 RIPEstat。分享链接中的测量结果由 Globalping 保留约 7 天。
+          由 Globalping 探针执行 MTR；ASN 名称来自 RIPEstat；跨库定位由 <a href="https://xmsl.dev" target="_blank" rel="noopener" class="text-foreground underline-offset-4 hover:underline">xmsl.Dev GeoAPI</a> 提供。分享链接中的测量结果由 Globalping 保留约 7 天。
         </p>
       </template>
     </section>

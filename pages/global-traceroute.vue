@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type * as Leaflet from 'leaflet'
+import type { HopPlace } from '~/composables/useTraceAnalysis'
 import type { GlobalpingProbe, MtrHop, MtrResult, TracerouteHop, TracerouteResult } from '~/composables/useGlobalping'
-import type { IpGeoInfo } from '~/utils/geoip'
+import type { TraceMapMarker, TraceMapOrigin } from '~/components/TraceMap.vue'
 import {
   ChevronDown,
   ChevronUp,
@@ -17,42 +17,31 @@ import {
 } from '@lucide/vue'
 import { createReusableTemplate } from '@vueuse/core'
 import { toast } from 'vue-sonner'
-import countryCenters from '~/utils/country-centers'
-import { getIpGeoLocation, isPrivateIP } from '~/utils/geoip'
-import 'leaflet/dist/leaflet.css'
 
 type TraceResult = MtrResult | TracerouteResult
-type TraceHop = MtrHop | TracerouteHop
+type ProbeHop = MtrHop | TracerouteHop
 type ProbeTone = 'running' | 'reached' | 'unreached' | 'failed'
 
 interface ProbeRow {
   index: number
   probe: GlobalpingProbe
   result: TraceResult
-  hops: TraceHop[]
+  hops: ProbeHop[]
   /** 最后一个响应的跃点就是目标地址 */
   reached: boolean
   tone: ProbeTone
 }
 
-interface PathPoint {
-  kind: 'probe' | 'hop' | 'target'
-  /** 跃点序号；起点与未到达的目标为 null */
-  hop: number | null
+interface HopRow {
+  ttl: number
   address: string | null
   hostname: string | null
-  asn: string
-  org: string
-  country: string
-  city: string
-  private: boolean
-  /** 任播地址：地理库位置不可信，地图上取上一跳位置 */
-  anycast: boolean
-  locating: boolean
-  latitude?: number
-  longitude?: number
+  asns: number[]
   loss: number | null
   rtt: number | null
+  place: HopPlace | null
+  /** 已到达目标时，最后一个响应的跃点 */
+  target: boolean
 }
 
 const PROBE_COUNTS = ['3', '5', '10']
@@ -62,15 +51,14 @@ const IP_VERSIONS = [
   { value: '4', label: 'IPv4' },
   { value: '6', label: 'IPv6' },
 ]
-const TONES: Record<ProbeTone, { label: string, dot: string, badge: string, color: string, popup: string }> = {
-  running: { label: '进行中', dot: 'bg-muted-foreground', badge: 'bg-muted text-muted-foreground', color: 'var(--muted-foreground)', popup: '' },
-  reached: { label: '已到达', dot: 'bg-success', badge: 'bg-success/15 text-success', color: 'var(--success)', popup: 'gt-ok' },
-  unreached: { label: '未到达', dot: 'bg-warning', badge: 'bg-warning/15 text-warning', color: 'var(--warning)', popup: 'gt-warn' },
-  failed: { label: '失败', dot: 'bg-destructive', badge: 'bg-destructive/15 text-destructive', color: 'var(--destructive)', popup: 'gt-fail' },
+const TONES: Record<ProbeTone, { label: string, dot: string, badge: string, color: string }> = {
+  running: { label: '进行中', dot: 'bg-muted-foreground', badge: 'bg-muted text-muted-foreground', color: 'var(--muted-foreground)' },
+  reached: { label: '已到达', dot: 'bg-success', badge: 'bg-success/15 text-success', color: 'var(--success)' },
+  unreached: { label: '未到达', dot: 'bg-warning', badge: 'bg-warning/15 text-warning', color: 'var(--warning)' },
+  failed: { label: '失败', dot: 'bg-destructive', badge: 'bg-destructive/15 text-destructive', color: 'var(--destructive)' },
 }
 
 const [DefineHopTable, ReuseHopTable] = createReusableTemplate<{ compact?: boolean }>()
-const colorMode = useColorMode()
 const route = useRoute()
 const router = useRouter()
 const { measurement, state, error, run, load } = useGlobalping<TraceResult>()
@@ -82,6 +70,7 @@ const protocol = ref('ICMP')
 const port = ref<string | number>(80)
 const ipVersion = ref('auto')
 const selectedIndex = ref<number | null>(null)
+const selectedTtl = ref<number | null>(null)
 let retryAction: (() => unknown) | null = null
 
 const busy = computed(() => state.value === 'creating' || state.value === 'running')
@@ -96,7 +85,7 @@ const wrongType = computed(() => {
 const probes = computed<ProbeRow[]>(() => {
   if (!measurement.value || wrongType.value) return []
   return measurement.value.results.map(({ probe, result }, index) => {
-    const hops: TraceHop[] = result.hops ?? []
+    const hops: ProbeHop[] = result.hops ?? []
     const reached = !!result.resolvedAddress && hops.findLast(hop => hop.resolvedAddress)?.resolvedAddress === result.resolvedAddress
     let tone: ProbeTone = 'running'
     if (result.status === 'failed' || result.status === 'offline') tone = 'failed'
@@ -119,18 +108,13 @@ const averageHops = computed(() => {
 
 // ---------- 格式化 ----------
 
-const countryLabel = (code: string) => countryCenters[code]?.country_name || code
-
-const placeText = (country: string, city: string) => [country && countryLabel(country), city].filter(Boolean).join(', ') || '未知'
+const probePlace = (probe: GlobalpingProbe) => placeLabel(probe.country, probe.city) || '未知'
 
 const flagClass = (code?: string) => (code && /^[a-z]{2}$/i.test(code) ? `fi-${code.toLowerCase()}` : '')
 
 const rttText = (rtt: number | null) => (rtt === null ? '—' : `${Number(rtt.toFixed(2))} ms`)
 
 const lossText = (loss: number | null) => (loss === null ? '—' : `${Number(loss.toFixed(1))}%`)
-
-const escapeHtml = (value: unknown) =>
-  String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' })[c]!)
 
 // ---------- 测量 ----------
 
@@ -181,117 +165,79 @@ const copyShareLink = async () => {
   }
 }
 
-// ---------- 跃点地理位置 ----------
+// ---------- 跨库定位（xmsl.Dev GeoAPI） ----------
 
-const geoCache = shallowReactive(new Map<string, IpGeoInfo | null>())
-const geoPending = new Set<string>()
-
-const locate = async (ip: string) => {
-  if (geoCache.has(ip) || geoPending.has(ip)) return
-  geoPending.add(ip)
-  geoCache.set(ip, await getIpGeoLocation(ip))
-  geoPending.delete(ip)
-}
-
-const lookupPoint = (kind: PathPoint['kind'], hop: number | null, address: string | null, hostname: string | null, asns: number[]): PathPoint => {
-  const isPrivate = !!address && isPrivateIP(address)
-  const geo = address && !isPrivate ? geoCache.get(address) : undefined
-  const anycast = geo?.anycast === true
-  return {
-    kind,
-    hop,
-    address,
-    hostname: hostname && hostname !== address ? hostname : null,
-    asn: asns.length ? asns.map(asn => `AS${asn}`).join(' ') : geo?.asn ? `AS${geo.asn}` : '',
-    org: geo?.org.replace(/^AS\d+\s*/, '') ?? '',
-    country: geo?.country ?? '',
-    city: geo?.city ?? '',
-    private: isPrivate,
-    anycast,
-    locating: !!address && !isPrivate && !geoCache.has(address),
-    latitude: anycast ? undefined : geo?.latitude,
-    longitude: anycast ? undefined : geo?.longitude,
-    loss: null,
-    rtt: null,
-  }
-}
-
-// 选中探针的完整路径：起点（探针自身坐标）→ 各跃点 → 目标
-const currentPath = computed<PathPoint[]>(() => {
+// 只分析已完成且有响应跃点的探针输出；结果按文本缓存，切回已分析的探针不会重复请求
+const { data: analysis, pending: analysisPending, error: analysisError, retry: retryAnalysis } = useTraceAnalysis(() => {
   const row = selectedRow.value
-  if (!row) return []
-  const { probe, result } = row
-  const points: PathPoint[] = [{
-    kind: 'probe',
-    hop: null,
-    address: null,
-    hostname: null,
-    asn: `AS${probe.asn}`,
-    org: probe.network,
-    country: probe.country,
-    city: probe.city,
-    private: false,
-    anycast: false,
-    locating: false,
-    latitude: probe.latitude,
-    longitude: probe.longitude,
-    loss: null,
-    rtt: null,
-  }]
-
-  let anchor: [number, number] = [probe.latitude, probe.longitude]
-  const endIndex = row.reached ? row.hops.findLastIndex(hop => hop.resolvedAddress) : -1
-
-  row.hops.forEach((hop, i) => {
-    const point = lookupPoint(i === endIndex ? 'target' : 'hop', i + 1, hop.resolvedAddress, hop.resolvedHostname, 'asn' in hop ? hop.asn : [])
-    if ('stats' in hop) {
-      point.rtt = hop.stats.avg
-      point.loss = hop.stats.loss
-    }
-    else if (hop.timings.length) {
-      point.rtt = hop.timings.reduce((acc, t) => acc + t.rtt, 0) / hop.timings.length
-    }
-    if (point.anycast) [point.latitude, point.longitude] = anchor
-    else if (point.latitude !== undefined && point.longitude !== undefined) anchor = [point.latitude, point.longitude]
-    points.push(point)
-  })
-
-  // 未到达目标时追加目标本身（任播目标无法可靠定位，只列出不上图）
-  if (!row.reached && row.tone !== 'running' && result.resolvedAddress) {
-    points.push(lookupPoint('target', null, result.resolvedAddress, result.resolvedHostname, []))
-  }
-  return points
+  return row?.result.status === 'finished' && row.hops.some(hop => hop.resolvedAddress) ? row.result.rawOutput : null
 })
 
-const pathLocating = computed(() => currentPath.value.some(point => point.locating))
+const traceRoute = computed(() => analysis.value?.route ?? null)
+const summary = computed(() => traceRoute.value?.summary ?? null)
 
-watch(currentPath, (points) => {
-  for (const point of points) {
-    if (point.locating && point.address) locate(point.address)
-  }
+const asNames = computed(() => {
+  const names = new Map<number, string>()
+  for (const { asn, name } of summary.value?.asns ?? []) if (name) names.set(asn, name)
+  for (const [asn, name] of Object.entries(analysis.value?.asNames ?? {})) if (name) names.set(Number(asn), name)
+  return names
+})
+
+// 连续重复的国家只保留一个
+const countryPath = computed(() => (summary.value?.countries ?? []).filter((code, i, all) => code !== all[i - 1]))
+
+const hopRows = computed<HopRow[]>(() => {
+  const row = selectedRow.value
+  if (!row) return []
+  const analysed = new Map((traceRoute.value?.hops ?? []).map(hop => [hop.ttl, hop]))
+  const targetIndex = row.reached ? row.hops.findLastIndex(hop => hop.resolvedAddress) : -1
+  return row.hops.map((hop, i) => {
+    const ttl = i + 1
+    const info = analysed.get(ttl)
+    const host = info?.hosts[info.primary ?? 0]
+    const asns = 'asn' in hop && hop.asn.length ? hop.asn : host?.asn ? [host.asn] : []
+    let rtt: number | null = null
+    if ('stats' in hop) rtt = hop.stats.avg
+    else if (hop.timings.length) rtt = hop.timings.reduce((acc, t) => acc + t.rtt, 0) / hop.timings.length
+    return {
+      ttl,
+      address: hop.resolvedAddress,
+      hostname: hop.resolvedHostname && hop.resolvedHostname !== hop.resolvedAddress ? hop.resolvedHostname : null,
+      asns,
+      loss: 'stats' in hop ? hop.stats.loss : null,
+      rtt,
+      place: hopPlace(info),
+      target: i === targetIndex,
+    }
+  })
 })
 
 // ---------- 地图 ----------
 
-const mapEl = ref<HTMLElement | null>(null)
-const fullscreenEl = ref<HTMLElement | null>(null)
-const loadingMap = ref(false)
-const mapError = ref('')
-const hasPath = ref(false)
-let L: typeof Leaflet | null = null
-let map: Leaflet.Map | null = null
-let tiles: Leaflet.TileLayer | null = null
-let probeMarkers = new Map<number, Leaflet.Marker>()
-let pathLines: Leaflet.Polyline[] = []
-let pathMarkers: Leaflet.Marker[] = []
-let fittedMeasurement = ''
-let fittedProbe: number | null = null
+const mapOrigin = computed<TraceMapOrigin | null>(() => {
+  const probe = selectedRow.value?.probe
+  return probe ? { lat: probe.latitude, lon: probe.longitude, label: `${probePlace(probe)} · AS${probe.asn} ${probe.network}` } : null
+})
+
+const probeMarkers = computed<TraceMapMarker[]>(() => probes.value.map(row => ({
+  id: row.index,
+  lat: row.probe.latitude,
+  lon: row.probe.longitude,
+  color: TONES[row.tone].color,
+  title: probePlace(row.probe),
+  lines: [`AS${row.probe.asn} · ${row.probe.network}`, `${TONES[row.tone].label} · ${row.hops.length} 跳`],
+})))
+
+watch(selectedIndex, () => {
+  selectedTtl.value = null
+})
+
+const selectHop = (hop: HopRow) => {
+  if (hop.place) selectedTtl.value = hop.ttl
+}
 
 // 全屏地图与浮动跃点窗口
 const isFullscreenMap = ref(false)
-let fullscreenMap: Leaflet.Map | null = null
-let fullscreenTiles: Leaflet.TileLayer | null = null
-let fullscreenLayer: Leaflet.FeatureGroup | null = null
 const isTableMinimized = ref(false)
 const isTableCollapsed = ref(false)
 const routeTableWindow = ref<HTMLElement | null>(null)
@@ -300,269 +246,27 @@ let isDragging = false
 let dragOffsetX = 0
 let dragOffsetY = 0
 
-const loadLeaflet = async () => {
-  L ??= (await import('leaflet')).default
-  return L
+const onFullscreenKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && isFullscreenMap.value) toggleFullscreenMap()
 }
 
-// CARTO 底图现已要求 API KEY，改用无需密钥的 Esri Canvas 灰度底图
-const tileUrl = () =>
-  `https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/${colorMode.value === 'dark' ? 'World_Dark_Gray_Base' : 'World_Light_Gray_Base'}/MapServer/tile/{z}/{y}/{x}`
-
-const addTiles = (leaflet: typeof Leaflet, target: Leaflet.Map) =>
-  leaflet.tileLayer(tileUrl(), {
-    attribution: 'Tiles &copy; <a href="https://www.esri.com">Esri</a> &mdash; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 16,
-  }).addTo(target)
-
-watch(() => colorMode.value, () => {
-  tiles?.setUrl(tileUrl())
-  fullscreenTiles?.setUrl(tileUrl())
-})
-
-const dotIcon = (leaflet: typeof Leaflet, color: string, size: number) =>
-  leaflet.divIcon({
-    className: 'gt-dot-icon',
-    html: `<span class="gt-dot" style="width:${size}px;height:${size}px;background:${color}"></span>`,
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
-    popupAnchor: [0, -size / 2],
-  })
-
-const popupRow = (label: string, value: string, cls = '') =>
-  `<dt>${label}</dt><dd class="${cls}">${value}</dd>`
-
-const probePopup = (row: ProbeRow) => `
-  <div class="gt-popup-body">
-    <div class="gt-popup-title">${escapeHtml(placeText(row.probe.country, row.probe.city))}</div>
-    <div class="gt-popup-sub">${escapeHtml(row.probe.network)}</div>
-    <dl>
-      ${popupRow('ASN', `AS${row.probe.asn}`)}
-      ${popupRow('状态', TONES[row.tone].label, TONES[row.tone].popup)}
-      ${popupRow('跃点数', String(row.hops.length))}
-    </dl>
-  </div>`
-
-const pointPopup = (point: PathPoint, index: number, last: number) => {
-  const title = point.kind === 'probe'
-    ? `探针 · ${placeText(point.country, point.city)}`
-    : point.hop === null ? '目标（未到达）' : `跃点 ${point.hop}${point.kind === 'target' ? ' · 目标' : ''}`
-  const sub = point.kind === 'probe'
-    ? point.org
-    : point.anycast ? '任播地址，位置按上一跳估计' : placeText(point.country, point.city)
-  const asn = `${point.asn} ${point.kind === 'probe' ? '' : point.org}`.trim()
-  return `
-    <div class="gt-popup-body">
-      <div class="gt-popup-title">${escapeHtml(title)}</div>
-      ${point.address ? `<div class="gt-popup-addr">${escapeHtml(point.address)}</div>` : ''}
-      ${point.hostname ? `<div class="gt-popup-addr">${escapeHtml(point.hostname)}</div>` : ''}
-      <div class="gt-popup-sub">${escapeHtml(sub)}</div>
-      <dl>
-        ${point.rtt !== null ? popupRow('延迟', escapeHtml(rttText(point.rtt))) : ''}
-        ${point.loss !== null ? popupRow('丢包', escapeHtml(lossText(point.loss))) : ''}
-        ${asn ? popupRow('ASN', escapeHtml(asn)) : ''}
-        ${popupRow('序号', `${index}/${last}`)}
-      </dl>
-    </div>`
-}
-
-const clearPath = () => {
-  pathLines.forEach(line => line.remove())
-  pathMarkers.forEach(marker => marker.remove())
-  pathLines = []
-  pathMarkers = []
-}
-
-const destroyMap = () => {
-  map?.remove()
-  map = null
-  tiles = null
-  probeMarkers = new Map()
-  pathLines = []
-  pathMarkers = []
-  hasPath.value = false
-  fittedMeasurement = ''
-  fittedProbe = null
-}
-
-const fitLayers = (leaflet: typeof Leaflet, target: Leaflet.Map, layers: Leaflet.Layer[]) => {
-  const bounds = leaflet.featureGroup(layers).getBounds()
-  if (bounds.isValid()) target.fitBounds(bounds.pad(0.1), { maxZoom: 8 })
-}
-
-const syncFullscreen = (fit = false) => {
-  const leaflet = L
-  const full = fullscreenMap
-  if (!leaflet || !full) return
-  fullscreenLayer?.remove()
-  fullscreenLayer = leaflet.featureGroup([
-    ...pathLines.map(line => leaflet.polyline(line.getLatLngs() as Leaflet.LatLngExpression[], { ...line.options })),
-    ...pathMarkers.map((marker) => {
-      const copy = leaflet.marker(marker.getLatLng(), { icon: marker.options.icon })
-      const content = marker.getPopup()?.getContent()
-      if (typeof content === 'string') copy.bindPopup(content, { className: 'gt-popup' })
-      return copy
-    }),
-  ]).addTo(full)
-  if (fit) {
-    const bounds = fullscreenLayer.getBounds()
-    if (bounds.isValid()) full.fitBounds(bounds.pad(0.1), { maxZoom: 8 })
-  }
-}
-
-const renderPath = () => {
-  const leaflet = L
-  const current = map
-  if (!leaflet || !current) return
-  clearPath()
-
-  const row = selectedRow.value
-  const points = pathLocating.value
-    ? []
-    : currentPath.value.filter(point => point.latitude !== undefined && point.longitude !== undefined)
-  const last = points.length - 1
-
-  for (let i = 0; i < last; i++) {
-    const from = points[i]!
-    const to = points[i + 1]!
-    pathLines.push(
-      leaflet.polyline([[from.latitude!, from.longitude!], [to.latitude!, to.longitude!]], {
-        weight: 2,
-        opacity: 0.85,
-        className: 'gt-path',
-        // 未到达的目标用虚线连接
-        dashArray: to.kind === 'target' && to.hop === null ? '4 6' : undefined,
-      }).addTo(current),
-    )
-  }
-
-  if (pathLines.length) {
-    points.forEach((point, index) => {
-      const color = point.kind === 'probe' ? 'var(--success)' : point.kind === 'target' ? 'var(--destructive)' : 'var(--info)'
-      const size = point.kind === 'hop' ? 6 : 10
-      pathMarkers.push(
-        leaflet.marker([point.latitude!, point.longitude!], { icon: dotIcon(leaflet, color, size) })
-          .addTo(current)
-          .bindPopup(pointPopup(point, index, last), { className: 'gt-popup' }),
-      )
-    })
-  }
-
-  hasPath.value = pathLines.length > 0
-  probeMarkers.forEach(marker => (hasPath.value ? marker.remove() : marker.addTo(current)))
-
-  if (!hasPath.value) {
-    fittedProbe = null
-    if (row && !pathLocating.value) probeMarkers.get(row.index)?.openPopup()
-  }
-  else if (row && fittedProbe !== row.index) {
-    fittedProbe = row.index
-    fitLayers(leaflet, current, [...pathLines, ...pathMarkers])
-  }
-  syncFullscreen()
-}
-
-const renderProbes = async (el: HTMLElement) => {
-  loadingMap.value = true
-  mapError.value = ''
-  try {
-    const leaflet = await loadLeaflet()
-    if (mapEl.value !== el) return
-    if (!map || map.getContainer() !== el) {
-      destroyMap()
-      map = leaflet.map(el, { center: [20, 0], zoom: 2, minZoom: 1, maxZoom: 16 })
-      tiles = addTiles(leaflet, map)
-    }
-
-    probeMarkers.forEach(marker => marker.remove())
-    probeMarkers = new Map()
-    for (const row of probes.value) {
-      const marker = leaflet
-        .marker([row.probe.latitude, row.probe.longitude], { icon: dotIcon(leaflet, TONES[row.tone].color, 10) })
-        .bindPopup(probePopup(row), { className: 'gt-popup' })
-      probeMarkers.set(row.index, marker)
-    }
-
-    const id = measurement.value?.id ?? ''
-    if (fittedMeasurement !== id) {
-      fittedMeasurement = id
-      fitLayers(leaflet, map, [...probeMarkers.values()])
-    }
-    renderPath()
-    setTimeout(() => map?.invalidateSize(), 100)
-  }
-  catch (err) {
-    console.error('地图初始化失败:', err)
-    mapError.value = `地图加载失败: ${err instanceof Error ? err.message : String(err)}`
-  }
-  finally {
-    loadingMap.value = false
-  }
-}
-
-// 探针状态变化时重绘探针点（轮询中每 600ms 替换一次结果，签名不变则不重绘）
-const probeSignature = computed(() => `${measurement.value?.id}|${probes.value.map(row => row.tone).join()}`)
-
-watch([mapEl, probeSignature], ([el]) => {
-  if (!el) {
-    destroyMap()
+const toggleFullscreenMap = () => {
+  isFullscreenMap.value = !isFullscreenMap.value
+  if (!isFullscreenMap.value) {
+    window.removeEventListener('keydown', onFullscreenKeydown)
     return
   }
-  if (probes.value.length) renderProbes(el)
-}, { flush: 'post' })
-
-const pathSignature = computed(() =>
-  `${selectedIndex.value}|${pathLocating.value}|${currentPath.value.map(p => `${p.kind}${p.hop}${p.address}${p.latitude},${p.longitude}${p.rtt}${p.loss}`).join(';')}`,
-)
-
-watch(pathSignature, renderPath, { flush: 'post' })
+  isTableCollapsed.value = false
+  isTableMinimized.value = false
+  windowPos.value = null
+  window.addEventListener('keydown', onFullscreenKeydown)
+}
 
 const clearSelectedProbe = () => {
   if (isFullscreenMap.value) toggleFullscreenMap()
   isTableMinimized.value = false
   isTableCollapsed.value = false
   selectedIndex.value = null
-}
-
-// ---------- 全屏地图 ----------
-
-const onFullscreenKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Escape' && isFullscreenMap.value) toggleFullscreenMap()
-}
-
-const closeFullscreenMap = () => {
-  fullscreenMap?.remove()
-  fullscreenMap = null
-  fullscreenTiles = null
-  fullscreenLayer = null
-  window.removeEventListener('keydown', onFullscreenKeydown)
-}
-
-const toggleFullscreenMap = async () => {
-  isFullscreenMap.value = !isFullscreenMap.value
-  if (!isFullscreenMap.value) {
-    closeFullscreenMap()
-    return
-  }
-
-  isTableCollapsed.value = false
-  isTableMinimized.value = false
-  windowPos.value = null
-  window.addEventListener('keydown', onFullscreenKeydown)
-
-  await nextTick()
-  const el = fullscreenEl.value
-  const leaflet = L
-  if (!el || !leaflet || !isFullscreenMap.value) return
-
-  fullscreenMap = leaflet.map(el, {
-    center: map ? map.getCenter() : [20, 0],
-    zoom: map ? map.getZoom() : 2,
-    minZoom: 1,
-    maxZoom: 16,
-  })
-  fullscreenTiles = addTiles(leaflet, fullscreenMap)
-  syncFullscreen(true)
 }
 
 const windowStyle = computed(() =>
@@ -617,13 +321,11 @@ const stopDrag = () => {
 onMounted(() => {
   const id = route.query.id
   if (typeof id === 'string' && id) loadShared(id)
-  loadLeaflet().catch(err => console.error('预加载 Leaflet 失败:', err))
 })
 
 onUnmounted(() => {
   stopDrag()
-  closeFullscreenMap()
-  destroyMap()
+  window.removeEventListener('keydown', onFullscreenKeydown)
 })
 </script>
 
@@ -640,61 +342,95 @@ onUnmounted(() => {
             <TableHead>ASN / 组织</TableHead>
             <TableHead>位置</TableHead>
             <TableHead class="text-right">丢包</TableHead>
-            <TableHead class="text-right">延迟</TableHead>
+            <TableHead class="text-right">平均延迟</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
+          <TableRow v-if="selectedRow" class="bg-success/5">
+            <TableCell>
+              <Badge class="border-transparent bg-success/15 text-success">起点</Badge>
+            </TableCell>
+            <TableCell class="text-muted-foreground">探针</TableCell>
+            <TableCell>
+              <div class="flex flex-col">
+                <span class="font-mono tabular-nums">AS{{ selectedRow.probe.asn }}</span>
+                <span class="truncate text-muted-foreground" :class="compact ? 'max-w-40' : 'max-w-64'">{{ selectedRow.probe.network }}</span>
+              </div>
+            </TableCell>
+            <TableCell>
+              <span class="inline-flex items-center gap-2">
+                <span v-if="flagClass(selectedRow.probe.country)" class="fi shrink-0 rounded-[2px]" :class="flagClass(selectedRow.probe.country)" />
+                {{ probePlace(selectedRow.probe) }}
+              </span>
+            </TableCell>
+            <TableCell class="text-right font-mono text-muted-foreground tabular-nums">—</TableCell>
+            <TableCell class="text-right font-mono text-muted-foreground tabular-nums">—</TableCell>
+          </TableRow>
           <TableRow
-            v-for="(point, index) in currentPath"
-            :key="index"
-            :class="point.kind === 'probe' ? 'bg-success/5' : point.kind === 'target' ? 'bg-muted/50' : ''"
+            v-for="hop in hopRows"
+            :key="hop.ttl"
+            :class="[
+              hop.place ? 'cursor-pointer' : '',
+              selectedTtl === hop.ttl ? 'bg-muted' : hop.target ? 'bg-muted/50' : '',
+            ]"
+            @click="selectHop(hop)"
           >
             <TableCell>
-              <Badge v-if="point.kind === 'probe'" class="border-transparent bg-success/15 text-success">起点</Badge>
-              <Badge v-else-if="point.hop === null" variant="outline">目标</Badge>
-              <span v-else class="inline-flex items-center gap-2">
-                <span class="font-mono tabular-nums text-muted-foreground">{{ point.hop }}</span>
-                <Badge v-if="point.kind === 'target'" variant="outline">目标</Badge>
+              <span class="inline-flex items-center gap-2">
+                <span class="font-mono tabular-nums text-muted-foreground">{{ hop.ttl }}</span>
+                <Badge v-if="hop.target" variant="outline">目标</Badge>
               </span>
             </TableCell>
             <TableCell>
-              <span v-if="point.kind === 'probe'" class="text-muted-foreground">探针</span>
-              <div v-else-if="point.address" class="flex flex-col">
-                <span class="font-mono tabular-nums">{{ point.address }}</span>
+              <div v-if="hop.address" class="flex flex-col">
+                <span class="font-mono tabular-nums">{{ hop.address }}</span>
                 <span
-                  v-if="point.hostname"
+                  v-if="hop.hostname"
                   class="truncate font-mono text-xs text-muted-foreground"
                   :class="compact ? 'max-w-40' : 'max-w-64'"
-                >{{ point.hostname }}</span>
+                  :title="hop.hostname"
+                >{{ hop.hostname }}</span>
               </div>
               <span v-else class="font-mono text-muted-foreground">*</span>
             </TableCell>
             <TableCell>
-              <div v-if="point.asn || point.org" class="flex flex-col">
-                <span class="font-mono tabular-nums">{{ point.asn }}</span>
-                <span v-if="point.org" class="truncate text-muted-foreground" :class="compact ? 'max-w-40' : 'max-w-64'">{{ point.org }}</span>
+              <div v-if="hop.asns.length" class="flex flex-col gap-0.5">
+                <div v-for="asn in hop.asns" :key="asn" class="flex min-w-0 flex-col">
+                  <span class="font-mono tabular-nums">AS{{ asn }}</span>
+                  <span
+                    v-if="asNames.get(asn)"
+                    class="truncate text-muted-foreground"
+                    :class="compact ? 'max-w-40' : 'max-w-64'"
+                    :title="asNames.get(asn)"
+                  >{{ asNames.get(asn) }}</span>
+                </div>
               </div>
-              <Skeleton v-else-if="point.locating" class="h-4 w-20" />
               <span v-else class="text-muted-foreground">—</span>
             </TableCell>
             <TableCell>
-              <Skeleton v-if="point.locating" class="h-4 w-24" />
-              <span v-else-if="point.private" class="text-muted-foreground">私有地址</span>
-              <Badge v-else-if="point.anycast" variant="outline" title="任播地址，地理位置不代表实际节点，地图上按上一跳位置绘制">任播</Badge>
-              <span v-else-if="point.country" class="inline-flex items-center gap-2">
-                <span v-if="flagClass(point.country)" class="fi rounded-[2px]" :class="flagClass(point.country)" />
-                {{ placeText(point.country, point.city) }}
-              </span>
+              <Skeleton v-if="analysisPending && hop.address" class="h-4 w-24" />
+              <div v-else-if="hop.place" class="flex flex-col gap-0.5">
+                <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span class="inline-flex items-center gap-2 whitespace-nowrap">
+                    <span v-if="flagClass(hop.place.countryCode)" class="fi shrink-0 rounded-[2px]" :class="flagClass(hop.place.countryCode)" />
+                    {{ placeLabel(hop.place.countryCode, hop.place.city) || '未知' }}
+                  </span>
+                  <Badge v-if="hop.place.confidence && CONFIDENCE[hop.place.confidence]" :class="CONFIDENCE[hop.place.confidence]!.badge">
+                    {{ CONFIDENCE[hop.place.confidence]!.label }}
+                  </Badge>
+                </span>
+                <span v-if="hop.place.source" class="text-xs text-muted-foreground">定位来源 {{ hop.place.source }}</span>
+              </div>
               <span v-else class="text-muted-foreground">—</span>
             </TableCell>
             <TableCell
               class="text-right font-mono tabular-nums"
-              :class="point.loss === null || point.loss === 0 ? 'text-muted-foreground' : 'text-warning'"
+              :class="hop.loss === null || hop.loss === 0 ? 'text-muted-foreground' : 'text-warning'"
             >
-              {{ lossText(point.loss) }}
+              {{ lossText(hop.loss) }}
             </TableCell>
             <TableCell class="text-right font-mono tabular-nums">
-              {{ rttText(point.rtt) }}
+              {{ rttText(hop.rtt) }}
             </TableCell>
           </TableRow>
         </TableBody>
@@ -774,7 +510,7 @@ onUnmounted(() => {
         </form>
         <div class="flex flex-wrap items-center justify-between gap-2 border-t px-6 py-3 text-xs text-muted-foreground">
           <GlobalpingQuota />
-          <span>跃点位置来自 ipinfo.io / ipwho.is</span>
+          <span>跨库定位由 <a href="https://xmsl.dev" target="_blank" rel="noopener" class="text-foreground underline-offset-4 hover:underline">xmsl.Dev GeoAPI</a> 提供</span>
         </div>
       </Card>
 
@@ -865,7 +601,7 @@ onUnmounted(() => {
                     <span class="flex items-center justify-between gap-2">
                       <span class="flex min-w-0 items-center gap-2 text-sm">
                         <span v-if="flagClass(row.probe.country)" class="fi shrink-0 rounded-[2px]" :class="flagClass(row.probe.country)" />
-                        <span class="truncate">{{ placeText(row.probe.country, row.probe.city) }}</span>
+                        <span class="truncate">{{ probePlace(row.probe) }}</span>
                       </span>
                       <Loader2 v-if="row.tone === 'running'" class="size-3 shrink-0 animate-spin text-muted-foreground" />
                       <span v-else class="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">{{ row.hops.length }} 跳</span>
@@ -884,24 +620,17 @@ onUnmounted(() => {
             <Card class="gap-0 py-0">
               <div class="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3">
                 <span class="font-medium">
-                  <template v-if="selectedRow && hasPath">{{ placeText(selectedRow.probe.country, selectedRow.probe.city) }} 路由路径</template>
+                  <template v-if="selectedRow && traceRoute">{{ probePlace(selectedRow.probe) }} 路由路径</template>
                   <template v-else>探针分布地图</template>
                 </span>
                 <div class="flex flex-wrap items-center gap-4">
-                  <div class="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                    <template v-if="hasPath">
-                      <span class="flex items-center gap-1.5"><span class="size-2 rounded-full bg-success" />起点</span>
-                      <span class="flex items-center gap-1.5"><span class="size-2 rounded-full bg-info" />跃点</span>
-                      <span class="flex items-center gap-1.5"><span class="size-2 rounded-full bg-destructive" />目标</span>
-                    </template>
-                    <template v-else>
-                      <span v-for="(tone, key) in TONES" :key="key" class="flex items-center gap-1.5">
-                        <span class="size-2 rounded-full" :class="tone.dot" />{{ tone.label }}
-                      </span>
-                    </template>
+                  <div v-if="!traceRoute" class="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                    <span v-for="(tone, key) in TONES" :key="key" class="flex items-center gap-1.5">
+                      <span class="size-2 rounded-full" :class="tone.dot" />{{ tone.label }}
+                    </span>
                   </div>
-                  <div v-if="selectedRow && hasPath" class="flex gap-1">
-                    <Button variant="ghost" size="xs" @click="toggleFullscreenMap">
+                  <div v-if="selectedRow" class="flex gap-1">
+                    <Button v-if="traceRoute" variant="ghost" size="xs" @click="toggleFullscreenMap">
                       <Maximize2 data-icon="inline-start" />
                       全屏
                     </Button>
@@ -913,28 +642,30 @@ onUnmounted(() => {
                 </div>
               </div>
               <div class="relative h-[420px]">
-                <div ref="mapEl" class="gt-map isolate size-full bg-muted" />
+                <TraceMap
+                  class="size-full"
+                  :route="traceRoute"
+                  :origin="mapOrigin"
+                  :markers="probeMarkers"
+                  :selected-ttl="selectedTtl"
+                  @select-ttl="selectedTtl = $event"
+                  @select-marker="selectedIndex = $event"
+                />
                 <div
-                  v-if="loadingMap || pathLocating"
-                  class="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-background/60 text-sm text-muted-foreground"
+                  v-if="analysisPending"
+                  class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center gap-2 bg-background/60 text-sm text-muted-foreground"
                 >
                   <Loader2 class="size-4 animate-spin" />
-                  {{ pathLocating ? '正在获取跃点地理位置…' : '加载地图中…' }}
+                  正在跨库定位跃点…
                 </div>
               </div>
-              <p
-                v-if="!loadingMap && mapError"
-                class="flex items-center gap-2 border-t px-4 py-3 text-sm text-destructive"
-              >
-                <TriangleAlert class="size-4" />{{ mapError }}
-              </p>
             </Card>
 
             <!-- 选中探针的路由路径 -->
             <Card v-if="selectedRow" class="gap-0 py-0">
               <div class="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
                 <div class="flex min-w-0 flex-col">
-                  <span class="font-medium">{{ placeText(selectedRow.probe.country, selectedRow.probe.city) }} 的路由路径</span>
+                  <span class="font-medium">{{ probePlace(selectedRow.probe) }} 的路由路径</span>
                   <span class="truncate text-xs text-muted-foreground">
                     <span class="font-mono tabular-nums">AS{{ selectedRow.probe.asn }}</span> · {{ selectedRow.probe.network }}
                   </span>
@@ -943,6 +674,49 @@ onUnmounted(() => {
                   {{ TONES[selectedRow.tone].label }}
                 </Badge>
               </div>
+
+              <div v-if="analysisPending" class="flex flex-wrap gap-2 border-b px-4 py-3">
+                <Skeleton v-for="i in 4" :key="i" class="h-7 w-28 rounded-md" />
+              </div>
+              <div v-else-if="summary" class="flex flex-wrap items-center gap-2 border-b px-4 py-3 text-xs">
+                <span v-if="summary.asPath.length" class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1 rounded-md border px-2 py-1">
+                  <span class="text-muted-foreground">AS 路径</span>
+                  <template v-for="(asn, i) in summary.asPath" :key="`${i}-${asn}`">
+                    <span v-if="i" class="text-muted-foreground">→</span>
+                    <span class="font-mono tabular-nums" :title="asNames.get(asn)">AS{{ asn }}</span>
+                  </template>
+                </span>
+                <span v-if="countryPath.length" class="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1 rounded-md border px-2 py-1">
+                  <span class="text-muted-foreground">途经</span>
+                  <template v-for="(code, i) in countryPath" :key="`${i}-${code}`">
+                    <span v-if="i" class="text-muted-foreground">→</span>
+                    <span class="inline-flex items-center gap-1">
+                      <span v-if="flagClass(code)" class="fi rounded-[2px]" :class="flagClass(code)" />{{ countryName(code) }}
+                    </span>
+                  </template>
+                </span>
+                <span class="inline-flex items-center gap-1.5 rounded-md border px-2 py-1">
+                  <span class="text-muted-foreground">总距离</span>
+                  <span class="font-mono tabular-nums">{{ Math.round(summary.distanceKm).toLocaleString('zh-CN') }} km</span>
+                </span>
+                <Badge class="border-transparent" :class="summary.reached ? 'bg-success/15 text-success' : 'bg-warning/15 text-warning'">
+                  {{ summary.reached ? '已到达目标' : '未到达目标' }}
+                </Badge>
+              </div>
+              <div v-else-if="analysisError" class="border-b p-4">
+                <Alert variant="destructive">
+                  <TriangleAlert />
+                  <AlertTitle>跃点定位失败</AlertTitle>
+                  <AlertDescription>{{ analysisError }}</AlertDescription>
+                  <AlertAction>
+                    <Button variant="outline" size="xs" @click="retryAnalysis">
+                      <RefreshCw data-icon="inline-start" />
+                      重试
+                    </Button>
+                  </AlertAction>
+                </Alert>
+              </div>
+
               <div class="overflow-x-auto px-2 pb-2">
                 <p v-if="selectedRow.tone === 'running' && !selectedRow.hops.length" class="px-2 py-8 text-center text-sm text-muted-foreground">
                   该探针仍在追踪中…
@@ -971,8 +745,14 @@ onUnmounted(() => {
     </section>
 
     <!-- 全屏地图 -->
-    <div v-if="isFullscreenMap" class="fixed inset-0 z-[60] overflow-hidden bg-background">
-      <div ref="fullscreenEl" class="gt-map isolate size-full bg-muted" />
+    <div v-if="isFullscreenMap && traceRoute" class="fixed inset-0 z-[60] overflow-hidden bg-background">
+      <TraceMap
+        class="size-full"
+        :route="traceRoute"
+        :origin="mapOrigin"
+        :selected-ttl="selectedTtl"
+        @select-ttl="selectedTtl = $event"
+      />
       <Button
         variant="outline"
         size="icon"
@@ -1032,127 +812,3 @@ onUnmounted(() => {
     </div>
   </div>
 </template>
-
-<style>
-.gt-map.leaflet-container {
-  font-family: inherit;
-  background: var(--muted);
-}
-
-.gt-map .leaflet-bar {
-  border: 1px solid var(--border);
-  box-shadow: none;
-}
-
-.gt-map .leaflet-bar a {
-  background: var(--background);
-  color: var(--foreground);
-  border-bottom-color: var(--border);
-}
-
-.gt-map .leaflet-bar a:hover {
-  background: var(--muted);
-}
-
-.gt-map .leaflet-control-attribution {
-  background: color-mix(in oklab, var(--background) 80%, transparent);
-  color: var(--muted-foreground);
-}
-
-.gt-map .leaflet-control-attribution a {
-  color: var(--foreground);
-}
-
-.gt-dot-icon {
-  background: transparent;
-  border: none;
-}
-
-.gt-dot {
-  display: block;
-  border-radius: 9999px;
-  box-shadow: 0 0 0 2px var(--background);
-}
-
-.gt-path {
-  stroke: var(--info);
-}
-
-.gt-popup .leaflet-popup-content-wrapper {
-  background: var(--popover);
-  color: var(--popover-foreground);
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) + 2px);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
-  padding: 0;
-}
-
-.gt-popup .leaflet-popup-content {
-  margin: 0;
-  width: auto !important;
-  font-size: 0.75rem;
-  line-height: 1.4;
-}
-
-.gt-popup .leaflet-popup-tip {
-  background: var(--popover);
-  border: 1px solid var(--border);
-}
-
-.gt-popup a.leaflet-popup-close-button {
-  color: var(--muted-foreground);
-}
-
-.gt-popup-body {
-  min-width: 180px;
-  padding: 0.75rem;
-}
-
-.gt-popup-title {
-  font-weight: 600;
-  font-size: 0.875rem;
-}
-
-.gt-popup-addr {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  color: var(--muted-foreground);
-  margin-top: 0.125rem;
-}
-
-.gt-popup-sub {
-  color: var(--muted-foreground);
-  margin-top: 0.125rem;
-}
-
-.gt-popup-body dl {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.25rem 0.75rem;
-  margin: 0.5rem 0 0;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--border);
-}
-
-.gt-popup-body dt {
-  color: var(--muted-foreground);
-}
-
-.gt-popup-body dd {
-  margin: 0;
-  text-align: right;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-variant-numeric: tabular-nums;
-}
-
-.gt-popup-body .gt-ok {
-  color: var(--success);
-}
-
-.gt-popup-body .gt-warn {
-  color: var(--warning);
-}
-
-.gt-popup-body .gt-fail {
-  color: var(--destructive);
-}
-</style>

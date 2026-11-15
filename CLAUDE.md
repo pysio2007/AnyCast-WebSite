@@ -31,6 +31,7 @@ There are no test commands — this project has no test suite.
 | `/bgp` | BGP route lookup — public Looking Glass on RIPE RIS (RIPEstat `looking-glass`, visibility, RPKI, ASN overview) |
 | `/ping`, `/traceroute`, `/global-traceroute` | Globalping-based ping / MTR / multi-probe traceroute |
 | `/whois` | RDAP lookups via rdap.org (IP, ASN, domain) |
+| `/ip` | IP geolocation compared across ~11 databases (xmsl.Dev GeoAPI via `/api/geo`) |
 | `/tor-check` | Tor exit node lookup |
 | `/asn` | All operated ASNs (Pysio / Akaere / Skimit) with live RIPEstat data |
 | `/anycast` | Anycast service info |
@@ -55,11 +56,9 @@ There are no test commands — this project has no test suite.
 ### Utilities
 
 - `utils/cache.ts` — `localStorage`-backed `Cache` class with key-prefix-based TTLs:
-  - `ip_geo_*` → 7 days
   - `api_req_*` → 10 minutes
   - `traceroute_*` → 1 hour
-- `utils/geoip.ts` — IP geolocation via ipinfo.io (primary) falling back to ip-api.com; uses `Cache`; API key stored in `localStorage`
-- `utils/country-centers.ts` — country centroid coordinates for map rendering
+- `composables/useTraceAnalysis.ts` — cached client for `/api/trace` (hop placement helpers); `components/TraceMap.vue` renders the analysed route (locations, segments, confidence) on Leaflet
 
 ### Styling
 
@@ -71,6 +70,9 @@ There are no test commands — this project has no test suite.
 
 ### Runtime Config
 
+Server-only secret: `XMSL_KEY` (Netlify env var; locally in `.env`, see `.env.example`). Read via `xmslConfig()` in `server/utils/xmsl.ts`.
+
+
 `nuxt.config.ts` exposes `public.gitHash` (retrieved via `git rev-parse --short HEAD` at build time) and sitemap configuration. Access with `useRuntimeConfig().public.gitHash`.
 
 ### External APIs
@@ -80,6 +82,7 @@ There are no test commands — this project has no test suite.
 - **Globalping** — ping / traceroute / MTR probes (`api.globalping.io`)
 - **RDAP** — `rdap.org` redirector to RIR/registry RDAP servers
 - **ip.akaere.online** — visitor IP info on the home page
+- **xmsl.Dev GeoAPI** — server-only (CORS is locked to xmsl.dev): `server/api/geo.get.ts` (multi-provider IP lookup, needs `XMSL_KEY`, 20 req/h/visitor, cached 24h) and `server/api/trace.post.ts` (uploads an MTR text, reads the cross-checked hop geolocation, deletes the stored trace; 60 req/h/visitor, cached 24h by text hash). Shared types in `shared/types/xmsl.ts`. Base URL in `runtimeConfig.xmsl.baseUrl`
 - Retired, do not use: `lg.pysio.online`, `ping.akaere.online`, `whois.akaere.online`
 - **Tor Onionoo** — relay data
 - **ipinfo.io / ip-api.com** — IP geolocation (client-side, cached in localStorage)

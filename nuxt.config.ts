@@ -58,6 +58,11 @@ export default defineNuxtConfig({
     '/root-dns': { redirect: { to: '/', statusCode: 301 } },
   },
   runtimeConfig: {
+    // Server-only. Netlify provides XMSL_KEY; NUXT_XMSL_API_KEY also overrides at runtime.
+    xmsl: {
+      apiKey: process.env.XMSL_KEY || '',
+      baseUrl: 'https://stage-info-api.xmsl.dev',
+    },
     public: {
       gitHash: gitHash,
       sitemap: {
@@ -93,6 +98,12 @@ export default defineNuxtConfig({
           {
             url: '/bgp',
             changefreq: 'daily',
+            priority: 0.8,
+            lastmod: new Date().toISOString()
+          },
+          {
+            url: '/ip',
+            changefreq: 'weekly',
             priority: 0.8,
             lastmod: new Date().toISOString()
           },

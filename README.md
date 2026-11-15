@@ -11,6 +11,7 @@
 - **BGP 路由查询**: 基于 RIPE RIS 全球路由采集点的公共 Looking Glass（前缀 / IP / ASN）
 - **全球 Ping / 路由追踪 / 全球路由追踪**: 基于 Globalping 开放探针网络
 - **WHOIS查询**: 基于 RDAP 查询域名、IP 与 ASN 注册信息
+- **IP 定位对比**: 基于 xmsl.Dev GeoAPI 同时查询约 11 家地理库；路由追踪的跳点定位也由其跨库校验
 - **Tor节点查询**: 检查IP是否为Tor网络节点并显示详细信息
 
 ### 🌐 网络服务
@@ -42,6 +43,7 @@
   - PeeringDB API（IX 互联）
   - Globalping API（Ping、Traceroute、MTR）
   - RDAP（rdap.org）
+  - xmsl.Dev GeoAPI（IP 定位、路由追踪跳点定位；需在 Netlify 设置 `XMSL_KEY`）
   - Tor Onionoo API
 
 ## 💻 开发

@@ -109,6 +109,11 @@ const sourceUrl = ref('')
 const loading = ref(false)
 const error = ref<LookupError | null>(null)
 const copied = ref(false)
+/** Queried single IP (RDAP ip lookups land on `/ip/<addr>` URLs; CIDR queries keep a slash), for the geolocation cross-link. */
+const singleIp = computed(() => {
+  const m = sourceUrl.value.match(/\/ip\/([\da-f:.]+)$/i)
+  return m?.[1] ?? ''
+})
 
 const detected = computed(() => detect(query.value))
 const meta = computed(() => kindMeta[query.value.trim() ? (detected.value?.kind ?? 'unknown') : 'none'])
@@ -556,6 +561,11 @@ async function copyRaw() {
                 </a>
               </template>
             </CardDescription>
+            <CardAction v-if="singleIp">
+              <Button variant="outline" size="sm" as-child>
+                <NuxtLink :to="{ path: '/ip', query: { q: singleIp } }">IP 定位</NuxtLink>
+              </Button>
+            </CardAction>
           </CardHeader>
           <CardContent class="flex flex-col gap-6">
             <div v-if="keyEvents.length" class="grid gap-px overflow-hidden rounded-xl border bg-border sm:grid-cols-3">
