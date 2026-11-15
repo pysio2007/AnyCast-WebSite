@@ -1,361 +1,308 @@
-<template>
-  <div class="container mx-auto px-4 py-8">
-    <article class="prose dark:prose-invert max-w-none">
-      <h1 class="text-4xl font-bold mb-6">
-        <i class="fas fa-broadcast-tower mr-2"></i>
-        网络前缀公告
-      </h1>
-
-      <p class="mb-6 text-gray-600 dark:text-gray-400">
-        查看 AS213605 (Pysio Networks) 公告的网络前缀信息，包括 IPv4 和 IPv6 地址块的详细信息。
-      </p>
-
-      <!-- 加载状态 -->
-      <div v-if="loading" class="flex justify-center items-center py-12">
-        <div class="text-center">
-          <span class="loading loading-spinner loading-lg text-primary"></span>
-          <p class="mt-4 text-gray-600 dark:text-gray-400">正在获取前缀数据...</p>
-        </div>
-      </div>
-
-      <!-- 错误提示 -->
-      <div v-if="error" class="alert alert-error mb-6">
-        <i class="fas fa-exclamation-circle"></i>
-        <span>{{ error }}</span>
-      </div>
-
-      <!-- 前缀数据展示 -->
-      <div v-if="prefixData && !loading" class="space-y-6">
-        <!-- 统计信息 -->
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div
-            class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200 shadow-sm hover:shadow-md transition duration-300 dark:from-blue-900/20 dark:to-blue-800/20 dark:border-blue-700">
-            <div class="flex items-center mb-3">
-              <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mr-3">
-                <i class="fas fa-globe text-blue-500 text-lg"></i>
-              </div>
-              <h3 class="font-bold text-blue-800 dark:text-blue-200">IPv4 前缀</h3>
-            </div>
-            <div class="text-2xl font-bold text-blue-900 dark:text-blue-300">
-              {{ prefixData.ipv4_prefixes.length }}
-            </div>
-          </div>
-
-          <div
-            class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200 shadow-sm hover:shadow-md transition duration-300 dark:from-green-900/20 dark:to-green-800/20 dark:border-green-700">
-            <div class="flex items-center mb-3">
-              <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center mr-3">
-                <i class="fas fa-network-wired text-green-500 text-lg"></i>
-              </div>
-              <h3 class="font-bold text-green-800 dark:text-green-200">IPv6 前缀</h3>
-            </div>
-            <div class="text-2xl font-bold text-green-900 dark:text-green-300">
-              {{ prefixData.ipv6_prefixes.length }}
-            </div>
-          </div>
-
-          <div
-            class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200 shadow-sm hover:shadow-md transition duration-300 dark:from-purple-900/20 dark:to-purple-800/20 dark:border-purple-700">
-            <div class="flex items-center mb-3">
-              <div class="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center mr-3">
-                <i class="fas fa-shield-alt text-purple-500 text-lg"></i>
-              </div>
-              <h3 class="font-bold text-purple-800 dark:text-purple-200">ROA 验证</h3>
-            </div>
-            <div class="text-2xl font-bold text-purple-900 dark:text-purple-300">
-              {{ validRoaCount }}
-            </div>
-          </div>
-
-          <div
-            class="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl border border-orange-200 shadow-sm hover:shadow-md transition duration-300 dark:from-orange-900/20 dark:to-orange-800/20 dark:border-orange-700">
-            <div class="flex items-center mb-3">
-              <div class="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center mr-3">
-                <i class="fas fa-flag text-orange-500 text-lg"></i>
-              </div>
-              <h3 class="font-bold text-orange-800 dark:text-orange-200">国家/地区</h3>
-            </div>
-            <div class="text-2xl font-bold text-orange-900 dark:text-orange-300">
-              {{ uniqueCountries.length }}
-            </div>
-          </div>
-        </div>
-
-        <!-- IPv4 前缀列表 -->
-        <div v-if="prefixData.ipv4_prefixes.length > 0"
-          class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-          <h2 class="text-2xl font-bold mb-4 flex items-center">
-            <i class="fas fa-globe mr-2 text-blue-500"></i>
-            IPv4 前缀
-          </h2>
-          <div class="overflow-x-auto">
-            <table class="table table-zebra w-full">
-              <thead>
-                <tr class="border-b border-gray-200 dark:border-gray-700">
-                  <th class="text-left py-3 px-4">前缀</th>
-                  <th class="text-left py-3 px-4">名称</th>
-                  <th class="text-left py-3 px-4">描述</th>
-                  <th class="text-left py-3 px-4">国家</th>
-                  <th class="text-left py-3 px-4">ROA 状态</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="prefix in prefixData.ipv4_prefixes" :key="prefix.prefix"
-                  class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td class="py-3 px-4">
-                    <code class="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm font-mono">
-                      {{ prefix.prefix }}
-                    </code>
-                  </td>
-                  <td class="py-3 px-4">{{ prefix.name || '-' }}</td>
-                  <td class="py-3 px-4">{{ prefix.description || '-' }}</td>
-                  <td class="py-3 px-4">
-                    <span v-if="prefix.country_code" class="flex items-center gap-2">
-                      <span :class="`fi fi-${prefix.country_code.toLowerCase()}`"></span>
-                      {{ prefix.country_code }}
-                    </span>
-                    <span v-else>-</span>
-                  </td>
-                  <td class="py-3 px-4">
-                    <span class="px-2 py-1 rounded text-xs font-medium" :class="getRoaStatusClass(prefix.roa_status)">
-                      {{ prefix.roa_status || 'Unknown' }}
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- IPv6 前缀列表 -->
-        <div v-if="prefixData.ipv6_prefixes.length > 0"
-          class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-          <h2 class="text-2xl font-bold mb-4 flex items-center">
-            <i class="fas fa-network-wired mr-2 text-green-500"></i>
-            IPv6 前缀
-          </h2>
-          <div class="overflow-x-auto">
-            <table class="table table-zebra w-full">
-              <thead>
-                <tr class="border-b border-gray-200 dark:border-gray-700">
-                  <th class="text-left py-3 px-4">前缀</th>
-                  <th class="text-left py-3 px-4">名称</th>
-                  <th class="text-left py-3 px-4">描述</th>
-                  <th class="text-left py-3 px-4">国家</th>
-                  <th class="text-left py-3 px-4">ROA 状态</th>
-                  <th class="text-left py-3 px-4">父前缀</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="prefix in prefixData.ipv6_prefixes" :key="prefix.prefix"
-                  class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td class="py-3 px-4">
-                    <code class="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm font-mono">
-                      {{ prefix.prefix }}
-                    </code>
-                  </td>
-                  <td class="py-3 px-4">{{ prefix.name || '-' }}</td>
-                  <td class="py-3 px-4">{{ prefix.description || '-' }}</td>
-                  <td class="py-3 px-4">
-                    <span v-if="prefix.country_code" class="flex items-center gap-2">
-                      <span :class="`fi fi-${prefix.country_code.toLowerCase()}`"></span>
-                      {{ prefix.country_code }}
-                    </span>
-                    <span v-else>-</span>
-                  </td>
-                  <td class="py-3 px-4">
-                    <span class="px-2 py-1 rounded text-xs font-medium" :class="getRoaStatusClass(prefix.roa_status)">
-                      {{ prefix.roa_status || 'Unknown' }}
-                    </span>
-                  </td>
-                  <td class="py-3 px-4">
-                    <span v-if="prefix.parent" class="text-sm text-gray-600 dark:text-gray-400">
-                      <code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-xs">
-                        {{ prefix.parent.prefix }}
-                      </code>
-                      <br>
-                      <span class="text-xs">{{ prefix.parent.rir_name }}</span>
-                    </span>
-                    <span v-else>-</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- 数据源信息 -->
-        <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 text-sm text-gray-600 dark:text-gray-400">
-          <div class="flex items-center gap-2 mb-2">
-            <i class="fas fa-info-circle"></i>
-            <span class="font-medium">数据源信息</span>
-          </div>
-          <div class="grid md:grid-cols-2 gap-4">
-            <div>
-              <strong>API 版本:</strong> {{ apiMeta.api_version }}
-            </div>
-            <div>
-              <strong>执行时间:</strong> {{ apiMeta.execution_time }}
-            </div>
-            <div>
-              <strong>时区:</strong> {{ apiMeta.time_zone }}
-            </div>
-            <div>
-              <strong>数据提供:</strong> <a href="https://bgpview.io" target="_blank"
-                class="text-blue-500 hover:text-blue-600">BGPView.io</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </article>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ArrowUpRight, RefreshCw, Search } from '@lucide/vue'
+import { SITE_ASNS } from '@/lib/site'
 import { Cache } from '~/utils/cache'
 
-definePageMeta({
-  layout: 'default'
-})
+interface AnnouncedPrefixes {
+  prefixes: { prefix: string, timelines: { starttime: string, endtime: string }[] }[]
+  query_starttime: string
+  query_endtime: string
+}
+type RpkiState = 'valid' | 'invalid' | 'unknown' | 'pending' | 'error'
+type Family = 'all' | 'v4' | 'v6'
 
-// 接口定义
-interface PrefixData {
+interface PrefixRow {
   prefix: string
-  ip: string
-  cidr: number
-  roa_status: string
-  name: string
-  description: string
-  country_code: string
-  parent?: {
-    prefix: string
-    ip: string
-    cidr: number
-    rir_name: string
-    allocation_status: string
-  }
+  family: 4 | 6
+  origins: number[]
+  firstSeen: string | null
+  sortKey: string
 }
 
-interface ApiResponse {
-  status: string
-  status_message: string
-  data: {
-    ipv4_prefixes: PrefixData[]
-    ipv6_prefixes: PrefixData[]
-  }
-  '@meta': {
-    time_zone: string
-    api_version: number
-    execution_time: string
-  }
+/** Above this many (origin, prefix) pairs RPKI checks are skipped to stay polite to RIPEstat. */
+const RPKI_LIMIT = 200
+const RPKI_CONCURRENCY = 6
+
+const sources = SITE_ASNS.map(asn => ({
+  asn,
+  req: useRipeStat<AnnouncedPrefixes>('announced-prefixes', { resource: `AS${asn}` }),
+}))
+
+const isPending = (s: string) => s === 'pending' || s === 'idle'
+const loading = computed(() => sources.some(s => isPending(s.req.status.value)))
+const failedAsns = computed(() => sources.filter(s => s.req.status.value === 'error').map(s => s.asn))
+const windowStart = computed(() => sources.map(s => s.req.data.value?.query_starttime).find(Boolean) ?? null)
+
+function sortKey(prefix: string): string {
+  const [addr = '', len = '0'] = prefix.split('/')
+  if (!addr.includes(':'))
+    return `4${addr.split('.').map(o => o.padStart(3, '0')).join('')}/${len.padStart(3, '0')}`
+  const [head = '', tail = ''] = addr.split('::')
+  const h = head ? head.split(':') : []
+  const t = tail ? tail.split(':') : []
+  const groups = [...h, ...Array(Math.max(0, 8 - h.length - t.length)).fill('0'), ...t]
+  return `6${groups.map(g => g.padStart(4, '0')).join('')}/${len.padStart(3, '0')}`
 }
 
-// 响应式数据
-const loading = ref(false)
-const error = ref('')
-const prefixData = ref<ApiResponse['data'] | null>(null)
-const apiMeta = ref<ApiResponse['@meta']>({
-  time_zone: 'UTC',
-  api_version: 1,
-  execution_time: '0 ms'
-})
-
-// 计算属性
-const validRoaCount = computed(() => {
-  if (!prefixData.value) return 0
-  const ipv4Valid = prefixData.value.ipv4_prefixes.filter(p => p.roa_status === 'Valid').length
-  const ipv6Valid = prefixData.value.ipv6_prefixes.filter(p => p.roa_status === 'Valid').length
-  return ipv4Valid + ipv6Valid
-})
-
-const uniqueCountries = computed(() => {
-  if (!prefixData.value) return []
-  const countries = new Set<string>()
-  prefixData.value.ipv4_prefixes.forEach(p => p.country_code && countries.add(p.country_code))
-  prefixData.value.ipv6_prefixes.forEach(p => p.country_code && countries.add(p.country_code))
-  return Array.from(countries)
-})
-
-// 获取 ROA 状态样式
-const getRoaStatusClass = (status: string) => {
-  const classes = {
-    'Valid': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
-    'Invalid': 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
-    'NotFound': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
-    'Unknown': 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300'
+const rows = computed<PrefixRow[]>(() => {
+  const map = new Map<string, PrefixRow>()
+  for (const { asn, req } of sources) {
+    for (const p of req.data.value?.prefixes ?? []) {
+      const start = p.timelines.reduce<string | null>((min, t) => (!min || t.starttime < min ? t.starttime : min), null)
+      const row = map.get(p.prefix)
+      if (row) {
+        if (!row.origins.includes(asn))
+          row.origins.push(asn)
+        if (start && (!row.firstSeen || start < row.firstSeen))
+          row.firstSeen = start
+      }
+      else {
+        map.set(p.prefix, {
+          prefix: p.prefix,
+          family: p.prefix.includes(':') ? 6 : 4,
+          origins: [asn],
+          firstSeen: start,
+          sortKey: sortKey(p.prefix),
+        })
+      }
+    }
   }
-  return classes[status as keyof typeof classes] || classes.Unknown
-}
+  return [...map.values()].sort((a, b) => (a.sortKey < b.sortKey ? -1 : a.sortKey > b.sortKey ? 1 : 0))
+})
 
-// 获取前缀数据
-const fetchPrefixData = async () => {
-  const cacheKey = 'prefix_data_213605'
+const v4Count = computed(() => rows.value.filter(r => r.family === 4).length)
+const v6Count = computed(() => rows.value.length - v4Count.value)
 
-  // 检查缓存
-  const cachedData = Cache.get<ApiResponse>(cacheKey)
-  if (cachedData) {
-    prefixData.value = cachedData.data
-    apiMeta.value = cachedData['@meta']
-    return
-  }
+// RPKI origin validation, one RIPEstat call per (origin, prefix), cached 10 min in localStorage.
+const rpki = ref<Record<string, RpkiState>>({})
+const rpkiKey = (asn: number, prefix: string) => `${asn}|${prefix}`
+const rpkiPairs = computed(() => rows.value.flatMap(r => r.origins.map(asn => ({ asn, prefix: r.prefix }))))
+const rpkiEnabled = computed(() => rpkiPairs.value.length <= RPKI_LIMIT)
+const settled = (s?: RpkiState) => s === 'valid' || s === 'invalid' || s === 'unknown'
 
-  loading.value = true
-  error.value = ''
-
+async function validate(asn: number, prefix: string): Promise<RpkiState> {
+  const cacheKey = `api_req_rpki_${asn}_${prefix}`
+  const cached = Cache.get<RpkiState>(cacheKey)
+  if (cached)
+    return cached
   try {
-    const response = await fetch('https://cdn.akaere.online/https://api.bgpview.io/asn/213605/prefixes')
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-    }
-
-    const data: ApiResponse = await response.json()
-
-    if (data.status !== 'ok') {
-      throw new Error(data.status_message || '获取数据失败')
-    }
-
-    prefixData.value = data.data
-    apiMeta.value = data['@meta']
-
-    // 缓存数据 1 小时
-    Cache.set(cacheKey, data, 60 * 60 * 1000)
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : '获取前缀数据失败'
-    console.error('获取前缀数据失败:', err)
-  } finally {
-    loading.value = false
+    const res = await $fetch<{ data: { status: string } }>('https://stat.ripe.net/data/rpki-validation/data.json', {
+      query: { resource: `AS${asn}`, prefix, sourceapp: 'anycast-ink' },
+    })
+    const status = res.data.status
+    const state: RpkiState = status === 'valid' ? 'valid' : status.startsWith('invalid') ? 'invalid' : 'unknown'
+    Cache.set(cacheKey, state)
+    return state
+  }
+  catch {
+    return 'error'
   }
 }
 
-// 页面加载时获取数据
-onMounted(() => {
-  fetchPrefixData()
+let rpkiRun = 0
+async function runRpki() {
+  if (import.meta.server || !rpkiEnabled.value)
+    return
+  const run = ++rpkiRun
+  const queue = rpkiPairs.value.filter(p => !settled(rpki.value[rpkiKey(p.asn, p.prefix)]))
+  for (const p of queue)
+    rpki.value[rpkiKey(p.asn, p.prefix)] = 'pending'
+  const worker = async () => {
+    while (queue.length && run === rpkiRun) {
+      const p = queue.shift()!
+      const state = await validate(p.asn, p.prefix)
+      if (run === rpkiRun)
+        rpki.value[rpkiKey(p.asn, p.prefix)] = state
+    }
+  }
+  await Promise.all(Array.from({ length: RPKI_CONCURRENCY }, worker))
+}
+
+watch(loading, (l) => {
+  if (!l)
+    runRpki()
+}, { immediate: true })
+
+const rpkiStates = computed(() => rpkiPairs.value.map(p => rpki.value[rpkiKey(p.asn, p.prefix)]))
+const rpkiPending = computed(() => loading.value || (rpkiEnabled.value && rpkiStates.value.some(s => !s || s === 'pending')))
+const rpkiValidCount = computed(() => rows.value.filter(r => r.origins.every(asn => rpki.value[rpkiKey(asn, r.prefix)] === 'valid')).length)
+const rpkiErrors = computed(() => rpkiStates.value.filter(s => s === 'error').length)
+
+function refreshAll() {
+  // The loading watcher re-runs RPKI checks (including failed ones) once the refresh settles.
+  for (const s of sources)
+    s.req.refresh()
+}
+
+const rpkiOf = (asn: number, prefix: string) => rpki.value[rpkiKey(asn, prefix)]
+
+const query = ref('')
+const family = ref<Family>('all')
+
+const filtered = computed(() => {
+  const q = query.value.trim().toLowerCase().replace(/^as/, '')
+  return rows.value.filter((r) => {
+    if (family.value === 'v4' && r.family !== 4)
+      return false
+    if (family.value === 'v6' && r.family !== 6)
+      return false
+    return !q || r.prefix.toLowerCase().includes(q) || r.origins.some(asn => String(asn).includes(q))
+  })
 })
+
+function setFamily(v: unknown) {
+  if (v === 'all' || v === 'v4' || v === 'v6')
+    family.value = v
+}
+
+const formatTime = (t: string | null) => (t ? `${t.replace('T', ' ').slice(0, 16)}` : '—')
+
+const rpkiBadge: Record<Exclude<RpkiState, 'pending'>, { label: string, class: string }> = {
+  valid: { label: '有效', class: 'bg-success/15 text-success border-transparent' },
+  invalid: { label: '无效', class: 'bg-destructive/15 text-destructive border-transparent' },
+  unknown: { label: '未知', class: 'bg-muted text-muted-foreground border-transparent' },
+  error: { label: '查询失败', class: 'bg-warning/15 text-warning border-transparent' },
+}
 </script>
 
-<style scoped>
-@reference "tailwindcss";
+<template>
+  <div>
+    <PageSeo title="网络前缀" description="Pysio Networks、Akaere Networks 与 Skimit 各 ASN 当前公告的 IPv4 / IPv6 前缀与 RPKI 验证状态，数据实时来自 RIPEstat。" />
 
-.prose code {
-  @apply text-sm;
-}
+    <PageHeader
+      eyebrow="网络"
+      title="网络前缀"
+      description="我们运营的全部 ASN（Pysio / Akaere / Skimit）当前在全球路由表中公告的 IPv4 / IPv6 前缀，以及每条前缀的 RPKI 起源验证状态。"
+    >
+      <template #actions>
+        <Button variant="outline" :disabled="loading" @click="refreshAll">
+          <RefreshCw data-icon="inline-start" :class="loading && 'animate-spin'" />
+          刷新
+        </Button>
+        <Button v-for="asn in SITE_ASNS" :key="asn" variant="ghost" as-child>
+          <a :href="`https://bgp.tools/as/${asn}#prefixes`" target="_blank" rel="noopener" class="font-mono">
+            AS{{ asn }} <ArrowUpRight data-icon="inline-end" />
+          </a>
+        </Button>
+      </template>
+    </PageHeader>
 
-.table {
-  @apply border-collapse;
-}
+    <section class="page-container flex flex-col gap-3 py-12">
+      <div class="grid grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border lg:grid-cols-4">
+        <StatCard label="前缀总数" :value="rows.length" :loading="loading" :hint="`${SITE_ASNS.length} 个 ASN 去重`" />
+        <StatCard label="IPv4 前缀" :value="v4Count" :loading="loading" />
+        <StatCard label="IPv6 前缀" :value="v6Count" :loading="loading" />
+        <StatCard
+          label="RPKI 有效"
+          :value="rpkiEnabled ? rpkiValidCount : null"
+          :loading="rpkiPending"
+          :hint="rpkiEnabled ? (rpkiErrors ? `${rpkiErrors} 条查询失败` : `共 ${rows.length} 条前缀`) : '前缀过多，已跳过验证'"
+        />
+      </div>
+      <p class="text-xs text-muted-foreground">
+        数据实时来自
+        <a href="https://stat.ripe.net" target="_blank" rel="noopener" class="underline-offset-4 hover:text-foreground hover:underline">RIPEstat</a>
+        （RIS 路由收集器 announced-prefixes 与 rpki-validation）
+      </p>
+    </section>
 
-.table th,
-.table td {
-  @apply border-b border-gray-200 dark:border-gray-700;
-}
+    <section class="page-container flex flex-col gap-6 pb-24">
+      <div class="flex flex-col gap-2">
+        <h2 class="text-2xl font-semibold tracking-tight">前缀列表</h2>
+        <p class="text-muted-foreground">按地址排序，点击右侧链接在 bgp.tools 查看路由详情。</p>
+      </div>
 
-.table-zebra tbody tr:nth-child(even) {
-  @apply bg-gray-50 dark:bg-gray-700/50;
-}
+      <Alert v-if="failedAsns.length" variant="destructive">
+        <AlertTitle>部分数据获取失败</AlertTitle>
+        <AlertDescription>
+          无法从 RIPEstat 获取 <span class="font-mono">{{ failedAsns.map(a => `AS${a}`).join('、') }}</span> 的公告前缀。
+        </AlertDescription>
+        <AlertAction>
+          <Button size="sm" variant="outline" @click="refreshAll">重试</Button>
+        </AlertAction>
+      </Alert>
 
-.fi {
-  @apply w-4 h-4 inline-block;
-}
-</style>
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="relative w-full sm:max-w-xs">
+          <Label for="prefix-filter" class="sr-only">筛选前缀</Label>
+          <Search class="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input id="prefix-filter" v-model="query" placeholder="筛选前缀或 ASN" class="pl-8 font-mono" />
+        </div>
+        <ToggleGroup type="single" variant="outline" :model-value="family" @update:model-value="setFamily">
+          <ToggleGroupItem value="all" class="px-3">全部</ToggleGroupItem>
+          <ToggleGroupItem value="v4" class="px-3">IPv4</ToggleGroupItem>
+          <ToggleGroupItem value="v6" class="px-3">IPv6</ToggleGroupItem>
+        </ToggleGroup>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead class="pl-4">前缀</TableHead>
+              <TableHead>起源 ASN</TableHead>
+              <TableHead>RPKI</TableHead>
+              <TableHead>首次可见 (UTC)</TableHead>
+              <TableHead class="pr-4 text-right">详情</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <template v-if="loading && !rows.length">
+              <TableRow v-for="i in 6" :key="i">
+                <TableCell class="pl-4"><Skeleton class="h-5 w-40" /></TableCell>
+                <TableCell><Skeleton class="h-5 w-20" /></TableCell>
+                <TableCell><Skeleton class="h-5 w-12" /></TableCell>
+                <TableCell><Skeleton class="h-5 w-32" /></TableCell>
+                <TableCell class="pr-4"><Skeleton class="ml-auto h-5 w-16" /></TableCell>
+              </TableRow>
+            </template>
+            <TableEmpty v-else-if="!filtered.length" :colspan="5">
+              <span class="text-muted-foreground">{{ rows.length ? '没有匹配的前缀' : '暂无前缀数据' }}</span>
+            </TableEmpty>
+            <template v-else>
+            <TableRow v-for="row in filtered" :key="row.prefix">
+              <TableCell class="pl-4 font-mono tabular-nums">{{ row.prefix }}</TableCell>
+              <TableCell>
+                <div class="flex flex-wrap gap-x-2 font-mono tabular-nums">
+                  <a
+                    v-for="asn in row.origins"
+                    :key="asn"
+                    :href="`https://bgp.tools/as/${asn}`"
+                    target="_blank"
+                    rel="noopener"
+                    class="underline-offset-4 hover:underline"
+                  >AS{{ asn }}</a>
+                </div>
+              </TableCell>
+              <TableCell>
+                <div class="flex flex-wrap gap-1">
+                  <template v-for="asn in row.origins" :key="asn">
+                    <span v-if="!rpkiEnabled" class="text-muted-foreground">—</span>
+                    <Skeleton v-else-if="!settled(rpkiOf(asn, row.prefix)) && rpkiOf(asn, row.prefix) !== 'error'" class="h-5 w-12" />
+                    <Badge v-else :class="rpkiBadge[rpkiOf(asn, row.prefix) as keyof typeof rpkiBadge].class">
+                      {{ rpkiBadge[rpkiOf(asn, row.prefix) as keyof typeof rpkiBadge].label }}<template v-if="row.origins.length > 1"> · AS{{ asn }}</template>
+                    </Badge>
+                  </template>
+                </div>
+              </TableCell>
+              <TableCell class="font-mono text-muted-foreground tabular-nums">{{ formatTime(row.firstSeen) }}</TableCell>
+              <TableCell class="pr-4 text-right">
+                <Button variant="ghost" size="xs" as-child>
+                  <a :href="`https://bgp.tools/prefix/${row.prefix}`" target="_blank" rel="noopener">
+                    bgp.tools <ArrowUpRight data-icon="inline-end" />
+                  </a>
+                </Button>
+              </TableCell>
+            </TableRow>
+            </template>
+          </TableBody>
+        </Table>
+      </div>
+
+      <p class="text-xs text-muted-foreground">
+        “首次可见”为 RIPEstat 查询窗口<template v-if="windowStart">（<span class="font-mono tabular-nums">{{ formatTime(windowStart) }}</span> UTC 起）</template>内该前缀最早被 RIS 观测到的时间。
+        RPKI 状态由 RIPEstat（Routinator）按起源 ASN 验证，结果在本地缓存 10 分钟。
+      </p>
+    </section>
+  </div>
+</template>

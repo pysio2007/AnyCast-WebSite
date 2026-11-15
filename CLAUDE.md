@@ -16,35 +16,41 @@ There are no test commands — this project has no test suite.
 
 ## Architecture
 
-**Nuxt 3 + Vue 3** SPA/SSR site for Pysio Networks, a personal BGP/Anycast network operator's website. Deployed to Netlify on push to `main`.
+**Nuxt 4 + Vue 3** SSR site for Pysio Networks, a personal BGP/Anycast network operator's website. Deployed to Netlify on push to `main`.
 
 ### Layouts & Routing
 
-- `layouts/default.vue` — standard layout with `<NavBar>` + `<Footer>` + `<slot>`
-- `layouts/no-navbar.vue` — layout without nav (used by pages that opt in via `definePageMeta`)
-- `pages/` — file-based routing; `pages/detail/[server]/[protocol].vue` is the dynamic detail route for LG peer details
+- `layouts/default.vue` — standard layout: `<SiteHeader>` + `<slot>` + `<SiteFooter>`
+- `layouts/no-navbar.vue` — used **only** by the LIR pages; loads the legacy DaisyUI stylesheet (`assets/css/lir.css`) and Font Awesome so those pages keep their original design
+- `pages/` — file-based routing. `/lg` and `/detail/**` (the retired own Looking Glass) 301-redirect to `/bgp` via `routeRules` in `nuxt.config.ts`
 
 ### Key Pages
 
 | Route | Purpose |
 |---|---|
-| `/lg` | Looking Glass — queries Bird BGP daemon status across multiple nodes |
-| `/detail/[server]/[protocol]` | Per-peer detail view with raw output and analysis toggle |
-| `/traceroute`, `/ping`, `/global-traceroute` | Network path/latency tools |
-| `/bgp` | BGP route visibility via BGP.Tools API |
-| `/whois` | WHOIS queries |
+| `/bgp` | BGP route lookup — public Looking Glass on RIPE RIS (RIPEstat `looking-glass`, visibility, RPKI, ASN overview) |
+| `/ping`, `/traceroute`, `/global-traceroute` | Globalping-based ping / MTR / multi-probe traceroute |
+| `/whois` | RDAP lookups via rdap.org (IP, ASN, domain) |
 | `/tor-check` | Tor exit node lookup |
+| `/asn` | All operated ASNs (Pysio / Akaere / Skimit) with live RIPEstat data |
 | `/anycast` | Anycast service info |
-| `/dn42` | DN42 network peering info |
-| `/root-dns` | Root DNS service stats |
+| `/dn42` | DN42 AutoPeer — live nodes/stats from autopeer.su via the cached `server/api/autopeer.get.ts` proxy (autopeer.su has no CORS for us) |
 | `/prefixes`, `/ix`, `/downstream` | Network topology/peering info |
 | `/lir`, `/en/lir` | LIR (RIPE) service info (zh + en) |
 
 ### Components
 
+- `components/ui/*` — shadcn-vue components (Reka UI), auto-imported without prefix by `shadcn-nuxt`. Add more with `npx shadcn-vue@latest add <name>`; the CLI may emit `import { cn } from 'cn'` — rewrite to `@/lib/utils`
 - `components/PageSeo.vue` — drop into any page to set `<title>` and meta tags; accepts `title` and `description` props
-- `components/NavBar.vue` — sticky frosted-glass nav with mobile hamburger menu
-- `components/Footer.vue` — site footer
+- `components/SiteHeader.vue` / `SiteFooter.vue` — global nav (NavigationMenu + mobile Sheet) and footer (links, color-mode toggle, commit hash); both driven by `lib/site.ts`
+- `components/PageHeader.vue` — standard page hero (`eyebrow`, `title`, `description`, `#actions` slot)
+- `components/StatCard.vue`, `components/LinkCard.vue` — stat tile and navigation card
+
+### Shared data
+
+- `lib/site.ts` — `ORGANIZATIONS` + `OPERATED_ASNS` (every ASN we run, with org/registry/PeeringDB id; `SITE_ASNS` derives from it), `ANYCAST_ASNS`, `PRIMARY_ASN`, nav link groups (`networkLinks`, `toolLinks`, `resourceLinks`)
+- `composables/usePublicApi.ts` — `useRipeStat(call, query)` and `usePeeringDb(resource, query)`: client-side, lazy `useFetch` wrappers so pages always show live public data
+- `composables/useGlobalping.ts` — create + poll Globalping measurements (`run`, `load`, `stop`), shared rate-limit state; `components/GlobalpingLocation.vue` (probe location picker) and `components/GlobalpingQuota.vue` (credit + remaining quota). Anonymous quota: 250 probe tests/hour/IP; never send both top-level `limit` and `locations[].limit`
 
 ### Utilities
 
@@ -57,10 +63,11 @@ There are no test commands — this project has no test suite.
 
 ### Styling
 
-- **Tailwind CSS v4** via `@tailwindcss/vite` plugin (imported in `assets/css/main.css`)
-- **DaisyUI v5** as a Tailwind plugin, `light` theme only — dark mode is intentionally blocked via a `MutationObserver` in `nuxt.config.ts`
-- Apple-inspired design system with CSS custom properties (`--apple-blue`, `--apple-shadow-*`, etc.) defined in `assets/css/main.css`
-- Scoped styles in components use `@reference "tailwindcss"` to access Tailwind utilities inside `<style scoped>`
+- **Tailwind CSS v4** via `@tailwindcss/vite`; theme tokens (shadcn neutral + `success`/`warning`/`info`) in `assets/css/main.css`, which also imports `shadcn-vue/tailwind.css` (the `data-open:`-style variants the components rely on)
+- **shadcn-vue** components + **Lucide** icons (`@lucide/vue`); Vercel-style monochrome design, Geist / Geist Mono fonts
+- Light/dark via `@nuxtjs/color-mode` (`.dark` class). Use theme tokens (`bg-background`, `text-muted-foreground`, `border`…), never hardcoded light colors
+- Utilities: `page-container` (page width), `bg-grid` (hero backdrop)
+- LIR pages are the exception: DaisyUI scoped to `.lir-root` via `assets/css/lir.css`, forced light mode via `definePageMeta({ colorMode: 'light' })`
 
 ### Runtime Config
 
@@ -68,10 +75,13 @@ There are no test commands — this project has no test suite.
 
 ### External APIs
 
-- **BGP.Tools** — BGP route/AS visibility
-- **RIPE RIS** — routing information
-- **Tor Metrics** — exit node data
-- **DN42 Registry** — DN42 peering data
+- **RIPEstat Data API** — announced prefixes, ASN neighbours, visibility
+- **PeeringDB API** — IX connections
+- **Globalping** — ping / traceroute / MTR probes (`api.globalping.io`)
+- **RDAP** — `rdap.org` redirector to RIR/registry RDAP servers
+- **ip.akaere.online** — visitor IP info on the home page
+- Retired, do not use: `lg.pysio.online`, `ping.akaere.online`, `whois.akaere.online`
+- **Tor Onionoo** — relay data
 - **ipinfo.io / ip-api.com** — IP geolocation (client-side, cached in localStorage)
 
 ### Sitemap

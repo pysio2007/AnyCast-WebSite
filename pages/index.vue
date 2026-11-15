@@ -1,238 +1,155 @@
+<script setup lang="ts">
+import { ArrowRight, ArrowUpRight } from '@lucide/vue'
+import { networkLinks, OPERATED_ASNS, ORGANIZATIONS, PEERINGDB_NET_ID, PRIMARY_ASN, SITE_ASNS, toolLinks } from '@/lib/site'
+
+interface AnnouncedPrefixes { prefixes: { prefix: string }[] }
+interface AsnNeighbours { neighbour_counts: { left: number, right: number, unique: number, uncertain: number } }
+interface NetIxLan { ix_id: number }
+interface VisitorInfo { ip: string, city: string, region: string, country: string, org: string }
+
+const prefixes = SITE_ASNS.map(asn => useRipeStat<AnnouncedPrefixes>('announced-prefixes', { resource: `AS${asn}` }))
+const neighbours = useRipeStat<AsnNeighbours>('asn-neighbours', { resource: `AS${PRIMARY_ASN}` })
+const ixlans = usePeeringDb<NetIxLan>('netixlan', { net_id: PEERINGDB_NET_ID })
+
+const visitor = useFetch<VisitorInfo>('https://ip.akaere.online/', {
+  headers: { Accept: 'application/json' },
+  server: false,
+  lazy: true,
+  key: 'visitor-ip',
+})
+
+const prefixLoading = computed(() => prefixes.some(p => p.status.value === 'pending' || p.status.value === 'idle'))
+const prefixCount = computed(() => {
+  const all = new Set(prefixes.flatMap(p => p.data.value?.prefixes.map(x => x.prefix) ?? []))
+  const v6 = [...all].filter(p => p.includes(':')).length
+  return { v4: all.size - v6, v6 }
+})
+const ixCount = computed(() => ixlans.data.value ? new Set(ixlans.data.value.map(x => x.ix_id)).size : null)
+const viaOurNetwork = computed(() => SITE_ASNS.some(asn => visitor.data.value?.org?.includes(`AS${asn}`)))
+
+const isPending = (s: { status: Ref<string> }) => s.status.value === 'pending' || s.status.value === 'idle'
+
+const orgGroups = Object.values(ORGANIZATIONS).map(org => ({ org, asns: OPERATED_ASNS.filter(a => a.org === org.id) }))
+</script>
+
 <template>
-  <div class="apple-page">
-    <!-- Main Content -->
-    <div class="apple-main-content">
-      <!-- Welcome Hero -->
-      <div class="apple-hero-section">
-        <h1 class="apple-hero-title">
-          <span class="apple-hero-from-container">
-            来自
-            <span class="apple-hero-org-wrapper">
-              <span class="">{{ organization || '加载中...' }}</span>
+  <div>
+    <PageSeo />
+
+    <section class="relative overflow-hidden border-b">
+      <div class="bg-grid pointer-events-none absolute inset-0" aria-hidden="true" />
+      <div class="page-container relative grid gap-12 py-20 md:py-28 lg:grid-cols-[1.4fr_1fr] lg:items-center">
+        <div class="flex flex-col items-start gap-6">
+          <Badge variant="outline" class="gap-2 rounded-full px-3 py-1 font-mono text-xs font-normal">
+            <span class="relative flex size-2">
+              <span class="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-75" />
+              <span class="relative inline-flex size-2 rounded-full bg-success" />
             </span>
-          </span>
-        </h1>
-        <h2 class="apple-hero-subtitle">
-          欢迎来到 Pysio's Networks
-        </h2>
-        <p class="apple-hero-description">
-          这里是 Pysio Networks 的网络监控/工具平台。你可以在此查询节点/BGP路由状态
-        </p>
-      </div>
-
-      <!-- Services Update Section -->
-      <div class="apple-services-section">
-
-        <div class="apple-services-grid">
-          <!-- IXP Peering Card -->
-          <div class="apple-service-card apple-service-card-blue">
-            <div class="apple-service-header">
-              <div class="apple-service-icon">
-                <i class="fas fa-handshake"></i>
-              </div>
-              <h3 class="apple-service-title">IXP内对等互联</h3>
-            </div>
-            <p class="apple-service-description">
-              支持所有地区和所有人的Peer连接，无门槛，仅限非商业用途。
-            </p>
-            <NuxtLink to="/anycast" class="apple-service-link">
-              <span>了解详情</span>
-              <i class="fas fa-arrow-right apple-service-arrow"></i>
-            </NuxtLink>
+            AS{{ PRIMARY_ASN }} · {{ SITE_ASNS.length }} 个自治系统
+          </Badge>
+          <h1 class="text-4xl font-semibold tracking-tighter text-balance sm:text-5xl md:text-6xl">
+            为全球互联而生的<br>独立 Anycast 网络
+          </h1>
+          <p class="max-w-xl text-lg text-pretty text-muted-foreground">
+            Pysio Networks 在全球运营 Anycast 节点，接入多个互联网交换中心，并基于 RIPE RIS 与 Globalping 等公共数据提供 BGP 路由查询、全球 Ping、路由追踪等开放网络工具。
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <Button size="lg" as-child class="px-4">
+              <NuxtLink to="/bgp">BGP 路由查询 <ArrowRight data-icon="inline-end" /></NuxtLink>
+            </Button>
+            <Button size="lg" variant="outline" as-child class="px-4">
+              <NuxtLink to="/anycast">了解网络</NuxtLink>
+            </Button>
           </div>
+        </div>
 
-          <!-- Downstream Connection Card -->
-          <div class="apple-service-card apple-service-card-green">
-            <div class="apple-service-header">
-              <div class="apple-service-icon">
-                <i class="fas fa-network-wired"></i>
-              </div>
-              <h3 class="apple-service-title">下游连接</h3>
-            </div>
-            <p class="apple-service-description">
-              支持所有地区和所有人的下游连接，无门槛，仅限非商业用途。
-            </p>
-            <NuxtLink to="/downstream" class="apple-service-link">
-              <span>查看政策</span>
-              <i class="fas fa-arrow-right apple-service-arrow"></i>
-            </NuxtLink>
+        <Card class="gap-0 py-0 font-mono text-sm">
+          <div class="flex items-center justify-between border-b px-5 py-3">
+            <span class="text-xs uppercase tracking-widest text-muted-foreground">你的连接</span>
+            <Badge v-if="viaOurNetwork" class="bg-success/15 text-success">经由本网络</Badge>
+          </div>
+          <dl class="grid grid-cols-[5rem_1fr] gap-x-4 gap-y-3 px-5 py-5">
+            <template v-for="row in [
+              { k: 'IP', v: visitor.data.value?.ip },
+              { k: '网络', v: visitor.data.value?.org },
+              { k: '位置', v: visitor.data.value && [visitor.data.value.city, visitor.data.value.region, visitor.data.value.country].filter(Boolean).join(', ') },
+            ]" :key="row.k">
+              <dt class="text-muted-foreground">{{ row.k }}</dt>
+              <dd class="min-w-0 break-all">
+                <Skeleton v-if="isPending(visitor)" class="h-5 w-full max-w-48" />
+                <span v-else>{{ row.v || '—' }}</span>
+              </dd>
+            </template>
+          </dl>
+        </Card>
+      </div>
+    </section>
+
+    <section class="page-container py-16">
+      <div class="grid grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border lg:grid-cols-4">
+        <StatCard label="IPv4 前缀" :value="prefixCount.v4" :loading="prefixLoading" hint="全部 ASN 当前公告" />
+        <StatCard label="IPv6 前缀" :value="prefixCount.v6" :loading="prefixLoading" hint="全部 ASN 当前公告" />
+        <StatCard label="BGP 邻居" :value="neighbours.data.value?.neighbour_counts.unique" :loading="isPending(neighbours)" :hint="neighbours.data.value ? `上游 ${neighbours.data.value.neighbour_counts.left} · 下游 ${neighbours.data.value.neighbour_counts.right}` : `AS${PRIMARY_ASN}`" />
+        <StatCard label="IX 接入" :value="ixCount" :loading="isPending(ixlans)" hint="PeeringDB 登记" />
+      </div>
+      <p class="mt-3 text-xs text-muted-foreground">
+        {{ SITE_ASNS.length }} 个 ASN 合计 · 数据实时来自
+        <a href="https://stat.ripe.net" target="_blank" rel="noopener" class="underline-offset-4 hover:text-foreground hover:underline">RIPEstat</a>
+        与
+        <a :href="`https://www.peeringdb.com/net/${PEERINGDB_NET_ID}`" target="_blank" rel="noopener" class="underline-offset-4 hover:text-foreground hover:underline">PeeringDB</a>
+      </p>
+
+      <div class="mt-10 grid gap-px overflow-hidden rounded-xl border bg-border md:grid-cols-3">
+        <div v-for="group in orgGroups" :key="group.org.id" class="flex flex-col gap-3 bg-background p-6">
+          <div class="flex items-center justify-between gap-2">
+            <p class="font-medium">{{ group.org.name }}</p>
+            <a :href="group.org.website" target="_blank" rel="noopener" class="text-muted-foreground hover:text-foreground" :aria-label="`${group.org.name} 官网`">
+              <ArrowUpRight class="size-4" />
+            </a>
+          </div>
+          <p class="text-sm text-muted-foreground">{{ group.org.description }}</p>
+          <div class="mt-auto flex flex-wrap gap-1.5 pt-1">
+            <Badge v-for="a in group.asns" :key="a.asn" variant="outline" as-child class="font-mono">
+              <NuxtLink :to="`/bgp?q=AS${a.asn}`">AS{{ a.asn }}</NuxtLink>
+            </Badge>
           </div>
         </div>
       </div>
-    </div>
+      <div class="mt-3 flex justify-end">
+        <Button variant="ghost" size="sm" as-child>
+          <NuxtLink to="/asn">查看全部自治系统 <ArrowRight data-icon="inline-end" /></NuxtLink>
+        </Button>
+      </div>
+    </section>
+
+    <section class="page-container flex flex-col gap-8 pb-16">
+      <div class="flex items-end justify-between gap-4">
+        <div class="flex flex-col gap-2">
+          <h2 class="text-2xl font-semibold tracking-tight">网络</h2>
+          <p class="text-muted-foreground">节点、互联与服务。</p>
+        </div>
+        <Button variant="ghost" size="sm" as-child>
+          <a :href="`https://bgp.tools/as/${PRIMARY_ASN}`" target="_blank" rel="noopener">bgp.tools <ArrowUpRight data-icon="inline-end" /></a>
+        </Button>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <LinkCard v-for="link in networkLinks" :key="link.to" v-bind="link" />
+      </div>
+    </section>
+
+    <section class="page-container flex flex-col gap-8 pb-24">
+      <div class="flex items-end justify-between gap-4">
+        <div class="flex flex-col gap-2">
+          <h2 class="text-2xl font-semibold tracking-tight">工具</h2>
+          <p class="text-muted-foreground">从我们的网络出发，诊断任何地址。</p>
+        </div>
+        <Button variant="ghost" size="sm" as-child>
+          <NuxtLink to="/tools">全部工具 <ArrowRight data-icon="inline-end" /></NuxtLink>
+        </Button>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <LinkCard v-for="link in toolLinks" :key="link.to" v-bind="link" />
+      </div>
+    </section>
   </div>
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue'
-
-const organization = ref('')
-
-async function fetchOrganizationData() {
-  try {
-    const response = await fetch('https://ip.akaere.online/')
-    const data = await response.json()
-    return data.org || '未知组织'
-  } catch (error) {
-    console.error('Error fetching IP data:', error)
-    return '未知组织'
-  }
-}
-
-onMounted(async () => {
-  organization.value = await fetchOrganizationData()
-})
-</script>
-
-<style scoped>
-@reference "tailwindcss";
-
-.apple-page {
-  @apply min-h-screen px-6 py-8;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-}
-
-.apple-main-content {
-  @apply max-w-6xl mx-auto space-y-10;
-}
-
-.apple-hero-section {
-  @apply text-center py-12 space-y-6;
-}
-
-.apple-hero-title {
-  @apply text-4xl md:text-5xl font-bold text-gray-900 leading-tight;
-}
-
-.apple-hero-from-container {
-  @apply inline-block;
-}
-
-.apple-hero-org-wrapper {
-  @apply relative inline-block;
-  min-width: 300px;
-  min-height: 1.2em;
-  display: inline-block;
-}
-
-.apple-hero-org {
-  @apply text-transparent bg-clip-text;
-  background: linear-gradient(135deg, #007AFF, #5AC8FA);
-}
-
-.apple-hero-subtitle {
-  @apply text-2xl md:text-3xl font-semibold text-gray-700;
-}
-
-.apple-hero-description {
-  @apply text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed;
-}
-
-.apple-services-section {
-  @apply space-y-8;
-}
-
-.apple-section-header {
-  @apply flex items-center justify-center space-x-3;
-}
-
-.apple-section-icon {
-  @apply text-2xl;
-}
-
-.apple-section-title {
-  @apply text-2xl font-bold text-gray-900;
-}
-
-.apple-services-grid {
-  @apply grid md:grid-cols-2 gap-4;
-}
-
-.apple-service-card {
-  @apply p-6 rounded-xl shadow-sm backdrop-blur-sm transition-all duration-300 ease-out;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.apple-service-card:hover {
-  @apply transform -translate-y-1 shadow-lg;
-}
-
-.apple-service-card-blue {
-  border-left: 3px solid #007AFF;
-}
-
-.apple-service-card-green {
-  border-left: 3px solid #34C759;
-}
-
-.apple-service-header {
-  @apply flex items-center space-x-3 mb-3;
-}
-
-.apple-service-icon {
-  @apply w-10 h-10 rounded-lg flex items-center justify-center text-white text-sm;
-}
-
-.apple-service-card-blue .apple-service-icon {
-  background: linear-gradient(135deg, #007AFF, #5AC8FA);
-}
-
-.apple-service-card-green .apple-service-icon {
-  background: linear-gradient(135deg, #34C759, #30D158);
-}
-
-.apple-service-title {
-  @apply text-lg font-bold text-gray-900;
-}
-
-.apple-service-description {
-  @apply text-gray-600 leading-relaxed mb-4 text-sm;
-}
-
-.apple-service-link {
-  @apply inline-flex items-center space-x-2 font-medium transition-all duration-200 ease-out;
-}
-
-.apple-service-card-blue .apple-service-link {
-  @apply text-blue-600 hover:text-blue-700;
-}
-
-.apple-service-card-green .apple-service-link {
-  @apply text-green-600 hover:text-green-700;
-}
-
-.apple-service-arrow {
-  @apply text-sm transition-transform duration-200;
-}
-
-.apple-service-link:hover .apple-service-arrow {
-  @apply transform translate-x-1;
-}
-
-@media (prefers-color-scheme: dark) {
-  .apple-page {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  }
-
-  .apple-service-card {
-    background: rgba(0, 0, 0, 0.8);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .apple-hero-title,
-  .apple-section-title,
-  .apple-service-title {
-    @apply text-white;
-  }
-
-  .apple-hero-subtitle {
-    @apply text-gray-300;
-  }
-
-  .apple-hero-description,
-  .apple-service-description {
-    @apply text-gray-400;
-  }
-}
-</style>

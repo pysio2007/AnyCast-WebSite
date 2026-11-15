@@ -16,11 +16,23 @@ function getGitHash(): string {
 const gitHash = getGitHash();
 
 export default defineNuxtConfig({
-  modules: ['@nuxtjs/sitemap', '@nuxt/image'],
+  modules: ['@nuxtjs/sitemap', '@nuxt/image', 'shadcn-nuxt', '@nuxtjs/color-mode', '@vueuse/nuxt'],
+  shadcn: {
+    prefix: '',
+    componentDir: './components/ui',
+  },
+  colorMode: {
+    classSuffix: '',
+    preference: 'system',
+    fallback: 'light',
+  },
   vite: {
     plugins: [
       tailwindcss(),
     ],
+    optimizeDeps: {
+      include: ['@lucide/vue', 'class-variance-authority', 'clsx', 'reka-ui', 'tailwind-merge', 'vue-sonner', 'leaflet'],
+    },
   },
   image: {
     format: ['webp', 'avif', 'jpg', 'png'],
@@ -38,6 +50,13 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
+  // Our own Looking Glass (lg.pysio.online) is retired; its routes now point to the public RIPE RIS route lookup.
+  routeRules: {
+    '/lg': { redirect: { to: '/bgp', statusCode: 301 } },
+    '/detail/**': { redirect: { to: '/bgp', statusCode: 301 } },
+    // Root DNS mirror page removed.
+    '/root-dns': { redirect: { to: '/', statusCode: 301 } },
+  },
   runtimeConfig: {
     public: {
       gitHash: gitHash,
@@ -54,15 +73,15 @@ export default defineNuxtConfig({
             lastmod: new Date().toISOString()
           },
           {
-            url: '/tools',
-            changefreq: 'weekly',
+            url: '/asn',
+            changefreq: 'daily',
             priority: 0.9,
             lastmod: new Date().toISOString()
           },
           {
-            url: '/lg',
-            changefreq: 'daily',
-            priority: 0.8,
+            url: '/tools',
+            changefreq: 'weekly',
+            priority: 0.9,
             lastmod: new Date().toISOString()
           },
           {
@@ -118,12 +137,6 @@ export default defineNuxtConfig({
             changefreq: 'weekly',
             priority: 0.8,
             lastmod: new Date().toISOString()
-          },
-          {
-            url: '/root-dns',
-            changefreq: 'daily',
-            priority: 0.8,
-            lastmod: new Date().toISOString()
           }
         ]
       }
@@ -133,23 +146,19 @@ export default defineNuxtConfig({
     head: {
       htmlAttrs: {
         lang: 'zh-CN',
-        'data-theme': 'light'
       },
       title: 'Pysio Networks - Anycast Tools',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'format-detection', content: 'telephone=no' },
-        { name: 'color-scheme', content: 'light only' },
-        { name: 'forced-colors', content: 'none' },
-        { name: 'prefers-color-scheme', content: 'light' },
         {
           name: 'description',
-          content: 'Pysio Networks 提供 Anycast 网络服务与专业网络工具集，包括 Looking Glass、路由追踪、BGP分析器、WHOIS查询和Tor节点查询等功能。'
+          content: 'Pysio Networks 提供 Anycast 网络服务与开放网络工具集，包括 BGP 路由查询、全球 Ping、路由追踪、WHOIS 查询和 Tor 节点查询等功能。'
         },
         {
           name: 'keywords',
-          content: 'Pysio Networks, Anycast, BGP, Looking Glass, 路由追踪, WHOIS, Tor, DN42, 网络工具'
+          content: 'Pysio Networks, Anycast, BGP, Looking Glass, 路由查询, 全球 Ping, 路由追踪, WHOIS, RDAP, Tor, DN42, 网络工具'
         },
         // Open Graph
         {
@@ -158,7 +167,7 @@ export default defineNuxtConfig({
         },
         {
           property: 'og:description',
-          content: 'Pysio Networks 提供 Anycast 网络服务与专业网络工具集，包括 Looking Glass、路由追踪、BGP分析器、WHOIS查询和Tor节点查询等功能。'
+          content: 'Pysio Networks 提供 Anycast 网络服务与开放网络工具集，包括 BGP 路由查询、全球 Ping、路由追踪、WHOIS 查询和 Tor 节点查询等功能。'
         },
         {
           property: 'og:type',
@@ -179,7 +188,7 @@ export default defineNuxtConfig({
         },
         {
           name: 'twitter:description',
-          content: 'Pysio Networks 提供 Anycast 网络服务与专业网络工具集，包括 Looking Glass、路由追踪、BGP分析器、WHOIS查询和Tor节点查询等功能。'
+          content: 'Pysio Networks 提供 Anycast 网络服务与开放网络工具集，包括 BGP 路由查询、全球 Ping、路由追踪、WHOIS 查询和 Tor 节点查询等功能。'
         }
       ],
       script: [
@@ -203,44 +212,8 @@ export default defineNuxtConfig({
           src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6547593871065949',
           crossorigin: 'anonymous'
         },
-        {
-          innerHTML: `
-            // 强制亮色模式
-            if (typeof document !== 'undefined') {
-              document.documentElement.setAttribute('data-theme', 'light');
-              document.documentElement.style.colorScheme = 'light only';
-              // 阻止任何暗色模式切换
-              const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                  if (mutation.attributeName === 'data-theme' || mutation.attributeName === 'class') {
-                    if (document.documentElement.getAttribute('data-theme') !== 'light') {
-                      document.documentElement.setAttribute('data-theme', 'light');
-                    }
-                  }
-                });
-              });
-              observer.observe(document.documentElement, {
-                attributes: true,
-                attributeFilter: ['data-theme', 'class']
-              });
-            }
-          `
-        }
       ],
       link: [
-        { rel: "preconnect", href: "https://fonts.googleapis.com" },
-        { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
-        {
-          href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap",
-          rel: "stylesheet",
-        },
-        {
-          rel: "stylesheet",
-          href: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css",
-          integrity: "sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==",
-          crossorigin: "anonymous",
-          referrerpolicy: "no-referrer"
-        },
         {
           rel: "stylesheet",
           href: "https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css"

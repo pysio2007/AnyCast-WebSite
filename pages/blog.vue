@@ -1,200 +1,228 @@
-<template>
-  <div class="container mx-auto p-4">
-    <div v-if="isLoading" class="flex justify-center">
-      <span class="loading loading-dots loading-lg"></span>
-    </div>
-    <div v-else>
-      <!-- 分类和标签过滤器 -->
-      <div class="mb-8">
-        <div class="flex flex-wrap gap-2 mb-4">
-          <button v-for="category in categories" :key="category" @click="toggleCategory(category)" class="btn btn-sm"
-            :class="selectedCategory === category ? 'btn-primary' : 'btn-ghost'">
-            {{ getCategoryDisplayName(category) }}
-          </button>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <span v-for="tag in tags" :key="tag" @click="toggleTag(tag)" class="badge badge-lg cursor-pointer"
-            :class="selectedTags.includes(tag) ? 'badge-primary' : 'badge-ghost'">
-            {{ tag }}
-          </span>
-        </div>
-      </div>
+<script setup lang="ts">
+import { ArrowUpRight, ChevronLeft, ChevronRight, CircleAlert, RefreshCw, Rss } from '@lucide/vue'
 
-      <!-- 文章列表 -->
-      <div class="flex flex-col gap-6">
-        <div v-for="post in displayedPosts" :key="post.link" class="card hover:shadow-2xl transition-shadow">
-          <div class="flex flex-col lg:flex-row">
-            <figure v-if="post.image" class="lg:w-1/3">
-              <img :src="post.image" :alt="post.title"
-                class="h-64 w-full object-cover rounded-t-xl lg:rounded-l-xl lg:rounded-t-none"
-                @error="handleImageError" />
-            </figure>
-            <div class="card-body lg:w-2/3">
-              <h2 class="card-title">
-                <a :href="post.link" target="_blank" class="hover:text-primary transition-colors">
-                  {{ post.title }}
-                </a>
-              </h2>
-              <div class="flex flex-wrap gap-2 my-2">
-                <span class="badge badge-primary">{{ getCategoryDisplayName(post.category) }}</span>
-                <span v-for="tag in post.tags" :key="tag" class="badge badge-ghost">
-                  {{ tag }}
-                </span>
-              </div>
-              <p class="text-sm text-gray-500">{{ formatDate(post.pubDate) }}</p>
-              <p class="line-clamp-3 text-gray-600">{{ post.description }}</p>
-              <div class="card-actions justify-end mt-4">
-                <a :href="post.link" target="_blank" class="btn btn-primary">
-                  阅读全文
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </a>
-              </div>
+interface Post {
+  title: string
+  link: string
+  description: string
+  pubDate: Date
+  image: string | null
+  category: string
+  tags: string[]
+}
+
+const FEED_URL = 'https://www.pysio.online/rss.xml'
+const CONTENT_NS = 'http://purl.org/rss/1.0/modules/content/'
+const EXCLUDED_CATEGORIES = ['NekoXii', 'resource']
+const CATEGORY_NAMES: Record<string, string> = { daily: '日常', develop: '开发' }
+const ALL = '全部'
+const PAGE_SIZE = 5
+
+const categoryName = (category: string) => CATEGORY_NAMES[category] ?? category
+
+function htmlToText(html: string) {
+  return new DOMParser().parseFromString(html, 'text/html').body.textContent ?? ''
+}
+
+function parseFeed(xml: string): Post[] {
+  const doc = new DOMParser().parseFromString(xml, 'application/xml')
+  if (doc.getElementsByTagName('parsererror').length)
+    throw new Error('RSS 解析失败')
+
+  return Array.from(doc.querySelectorAll('channel > item'), (item) => {
+    const field = (tag: string) => item.getElementsByTagName(tag)[0]?.textContent?.trim() ?? ''
+    const description = field('description')
+    const content = item.getElementsByTagNameNS(CONTENT_NS, 'encoded')[0]?.textContent ?? ''
+    const hashtags = htmlToText(content).matchAll(/(?:^|\s)#([\w\u4E00-\u9FA5]+)/g)
+    return {
+      title: field('title'),
+      link: field('link'),
+      description: htmlToText(description).trim(),
+      pubDate: new Date(field('pubDate')),
+      image: description.match(/<img[^>]+src="([^">]+)"/i)?.[1] ?? null,
+      category: field('category') || '未分类',
+      tags: [...new Set(Array.from(hashtags, m => m[1]!))],
+    }
+  })
+    .filter(post => !EXCLUDED_CATEGORIES.includes(post.category))
+    .sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime())
+}
+
+const { data: posts, status, error, refresh } = useAsyncData(
+  'blog-rss',
+  async () => parseFeed(await $fetch<string>(FEED_URL, { responseType: 'text' })),
+  { server: false, lazy: true, default: () => [] as Post[] },
+)
+
+const loading = computed(() => status.value === 'pending' || status.value === 'idle')
+
+const selectedCategory = ref(ALL)
+const selectedTags = ref<string[]>([])
+const currentPage = ref(1)
+
+const categories = computed(() => [ALL, ...new Set(posts.value.map(post => post.category))])
+const tags = computed(() => [...new Set(posts.value.flatMap(post => post.tags))])
+
+const filteredPosts = computed(() => posts.value.filter(post =>
+  (selectedCategory.value === ALL || post.category === selectedCategory.value)
+  && selectedTags.value.every(tag => post.tags.includes(tag)),
+))
+const maxPage = computed(() => Math.max(1, Math.ceil(filteredPosts.value.length / PAGE_SIZE)))
+const displayedPosts = computed(() => {
+  const start = (currentPage.value - 1) * PAGE_SIZE
+  return filteredPosts.value.slice(start, start + PAGE_SIZE)
+})
+
+function selectCategory(category: string) {
+  selectedCategory.value = selectedCategory.value === category ? ALL : category
+  currentPage.value = 1
+}
+
+function toggleTag(tag: string) {
+  selectedTags.value = selectedTags.value.includes(tag)
+    ? selectedTags.value.filter(t => t !== tag)
+    : [...selectedTags.value, tag]
+  currentPage.value = 1
+}
+
+const formatDate = (date: Date) => Number.isNaN(date.getTime())
+  ? '—'
+  : date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('/', '-')
+
+function hideImage(event: Event) {
+  (event.target as HTMLElement).style.display = 'none'
+}
+</script>
+
+<template>
+  <div>
+    <PageSeo title="博客" description="Pysio 的最新文章，实时同步自 pysio.online RSS。" />
+
+    <PageHeader eyebrow="资源" title="博客" description="日常与开发笔记，实时同步自 pysio.online。">
+      <template #actions>
+        <Button variant="outline" size="sm" as-child>
+          <a href="https://www.pysio.online/" target="_blank" rel="noopener">访问博客 <ArrowUpRight data-icon="inline-end" /></a>
+        </Button>
+        <Button variant="ghost" size="sm" as-child>
+          <a :href="FEED_URL" target="_blank" rel="noopener"><Rss data-icon="inline-start" /> RSS</a>
+        </Button>
+      </template>
+    </PageHeader>
+
+    <section class="page-container flex flex-col gap-8 py-12">
+      <Alert v-if="status === 'error'" variant="destructive">
+        <CircleAlert />
+        <AlertTitle>文章加载失败</AlertTitle>
+        <AlertDescription>{{ error?.message || '无法获取 RSS 订阅源' }}</AlertDescription>
+        <AlertAction>
+          <Button variant="outline" size="sm" @click="refresh()">
+            <RefreshCw data-icon="inline-start" /> 重试
+          </Button>
+        </AlertAction>
+      </Alert>
+
+      <template v-else-if="loading">
+        <div class="flex flex-wrap gap-2">
+          <Skeleton v-for="i in 3" :key="i" class="h-8 w-16" />
+        </div>
+        <div class="divide-y rounded-xl border">
+          <div v-for="i in PAGE_SIZE" :key="i" class="grid gap-3 p-5 md:grid-cols-[8rem_1fr] md:gap-8 md:p-6">
+            <Skeleton class="h-4 w-24" />
+            <div class="flex flex-col gap-3">
+              <Skeleton class="h-5 w-2/3" />
+              <Skeleton class="h-4 w-full" />
+              <Skeleton class="h-4 w-4/5" />
             </div>
           </div>
         </div>
-      </div>
+      </template>
 
-      <!-- 分页控制 -->
-      <div class="join grid grid-cols-2 w-60 mx-auto mt-8">
-        <button class="join-item btn btn-outline" :disabled="currentPage === 1" @click="currentPage--">
-          上一页
-        </button>
-        <button class="join-item btn btn-outline" :disabled="currentPage >= maxPage" @click="currentPage++">
-          下一页
-        </button>
-      </div>
-    </div>
+      <template v-else>
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-wrap gap-2">
+            <Button
+              v-for="category in categories"
+              :key="category"
+              size="sm"
+              :variant="selectedCategory === category ? 'secondary' : 'ghost'"
+              :aria-pressed="selectedCategory === category"
+              @click="selectCategory(category)"
+            >
+              {{ categoryName(category) }}
+            </Button>
+          </div>
+          <div v-if="tags.length" class="flex flex-wrap gap-2">
+            <Badge
+              v-for="tag in tags"
+              :key="tag"
+              as="button"
+              type="button"
+              class="cursor-pointer"
+              :variant="selectedTags.includes(tag) ? 'default' : 'outline'"
+              :aria-pressed="selectedTags.includes(tag)"
+              @click="toggleTag(tag)"
+            >
+              #{{ tag }}
+            </Badge>
+          </div>
+        </div>
+
+        <p v-if="!displayedPosts.length" class="py-12 text-center text-sm text-muted-foreground">
+          没有符合条件的文章。
+        </p>
+
+        <ul v-else class="divide-y rounded-xl border">
+          <li
+            v-for="post in displayedPosts"
+            :key="post.link"
+            class="grid gap-3 p-5 md:grid-cols-[8rem_1fr] md:gap-8 md:p-6"
+          >
+            <time :datetime="formatDate(post.pubDate)" class="font-mono text-sm tabular-nums text-muted-foreground md:pt-0.5">
+              {{ formatDate(post.pubDate) }}
+            </time>
+            <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+              <div class="flex min-w-0 flex-col gap-2">
+                <a
+                  :href="post.link"
+                  target="_blank"
+                  rel="noopener"
+                  class="group inline-flex items-start gap-1 text-lg font-medium tracking-tight underline-offset-4 hover:underline"
+                >
+                  {{ post.title }}
+                  <ArrowUpRight class="mt-1 size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
+                </a>
+                <p class="line-clamp-3 text-sm text-pretty text-muted-foreground">{{ post.description }}</p>
+                <div class="flex flex-wrap gap-1.5 pt-1">
+                  <Badge variant="secondary">{{ categoryName(post.category) }}</Badge>
+                  <Badge v-for="tag in post.tags" :key="tag" variant="outline">#{{ tag }}</Badge>
+                </div>
+              </div>
+              <img
+                v-if="post.image"
+                :src="post.image"
+                :alt="post.title"
+                loading="lazy"
+                class="aspect-video w-full shrink-0 rounded-lg border object-cover sm:w-48"
+                @error="hideImage"
+              >
+            </div>
+          </li>
+        </ul>
+
+        <div v-if="filteredPosts.length" class="flex items-center justify-between gap-4">
+          <span class="font-mono text-sm tabular-nums text-muted-foreground">
+            {{ currentPage }} / {{ maxPage }} · 共 {{ filteredPosts.length }} 篇
+          </span>
+          <div class="flex gap-2">
+            <Button variant="outline" size="sm" :disabled="currentPage <= 1" @click="currentPage--">
+              <ChevronLeft data-icon="inline-start" /> 上一页
+            </Button>
+            <Button variant="outline" size="sm" :disabled="currentPage >= maxPage" @click="currentPage++">
+              下一页 <ChevronRight data-icon="inline-end" />
+            </Button>
+          </div>
+        </div>
+      </template>
+    </section>
   </div>
 </template>
-
-<script setup>
-import { parseStringPromise } from 'xml2js'
-
-const posts = ref([])
-const isLoading = ref(true)
-const currentPage = ref(1)
-const postsPerPage = 5
-const selectedCategory = ref('全部')  // 将初始值设为'全部'
-const selectedTags = ref([])
-
-// 分类名称映射和过滤配置
-const categoryConfig = {
-  excludeList: ['NekoXii', 'resource'],
-  displayNames: {
-    'daily': '日常',
-    'develop': '开发'
-  }
-}
-
-// 提取分类和标签
-const categories = computed(() => {
-  // 确保首先过滤掉不需要的分类
-  const validPosts = posts.value.filter(post => !categoryConfig.excludeList.includes(post.category))
-  const uniqueCategories = [...new Set(validPosts.map(post => post.category))]
-  return ['全部', ...uniqueCategories]
-})
-
-const tags = computed(() => [...new Set(posts.value.flatMap(post => post.tags))])
-
-// 过滤后的文章
-const filteredPosts = computed(() => {
-  return posts.value
-    .filter(post => !categoryConfig.excludeList.includes(post.category))
-    .filter(post => {
-      const categoryMatch = !selectedCategory.value || selectedCategory.value === '全部' ||
-        post.category === selectedCategory.value
-      const tagsMatch = selectedTags.value.length === 0 ||
-        selectedTags.value.every(tag => post.tags.includes(tag))
-      return categoryMatch && tagsMatch
-    })
-})
-
-// 当前页显示的文章
-const displayedPosts = computed(() => {
-  const start = (currentPage.value - 1) * postsPerPage
-  const filtered = filteredPosts.value.map(post => ({
-    ...post,
-    displayCategory: getCategoryDisplayName(post.category)
-  }))
-  return filtered.slice(start, start + postsPerPage)
-})
-
-// 最大页数
-const maxPage = computed(() => Math.ceil(filteredPosts.value.length / postsPerPage))
-
-// 分类显示名称转换
-const getCategoryDisplayName = (category) => {
-  if (category === '全部') return category
-  return categoryConfig.displayNames[category] || category
-}
-
-// 分类和标签过滤方法
-const toggleCategory = (category) => {
-  selectedCategory.value = selectedCategory.value === category ? '全部' : category
-  currentPage.value = 1
-}
-
-const toggleTag = (tag) => {
-  if (selectedTags.value.includes(tag)) {
-    selectedTags.value = selectedTags.value.filter(t => t !== tag)
-  } else {
-    selectedTags.value.push(tag)
-  }
-  currentPage.value = 1
-}
-
-// 日期格式化
-const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
-
-const extractImage = (content) => {
-  const imgMatch = content.match(/<img[^>]+src="([^">]+)"/i)
-  return imgMatch ? imgMatch[1] : null
-}
-
-const handleImageError = (event) => {
-  event.target.style.display = 'none'
-}
-
-onMounted(async () => {
-  try {
-    const response = await fetch('https://www.pysio.online/rss.xml')
-    const xmlText = await response.text()
-    const result = await parseStringPromise(xmlText)
-
-    // 在数据源处就过滤掉不需要的分类
-    const filteredItems = result.rss.channel[0].item.filter(
-      item => !categoryConfig.excludeList.includes(item.category?.[0])
-    )
-
-    posts.value = filteredItems.map(item => ({
-      title: item.title[0],
-      link: item.link[0],
-      description: item.description[0],
-      pubDate: item.pubDate[0],
-      image: extractImage(item.description[0]),
-      category: item.category?.[0] || '未分类',
-      tags: item['content:encoded']?.[0].match(/#[\w\u4e00-\u9fa5]+/g)?.map(tag => tag.slice(1)) || []
-    })).sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
-  } catch (error) {
-    console.error('Error fetching RSS:', error)
-  } finally {
-    isLoading.value = false
-  }
-})
-</script>
-
-<style scoped>
-.card {
-  transition: all 0.3s ease-in-out;
-}
-</style>

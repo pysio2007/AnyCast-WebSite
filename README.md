@@ -3,15 +3,14 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/07a71781-e002-4a8b-ba2e-55b01e21109b/deploy-status)](https://app.netlify.com/sites/pysio-anycast/deploys)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-个人 BGP 站点，基于 Nuxt3 构建，使用 Tailwind CSS 和 DaisyUI 进行样式设计。提供多种网络工具和信息查询服务。
+个人 BGP 站点，基于 Nuxt 4 构建，使用 [shadcn-vue](https://www.shadcn-vue.com/) + Tailwind CSS v4 进行样式设计。提供多种网络工具和信息查询服务，页面数据在访问时实时从公开数据源（RIPEstat、PeeringDB 等）获取。
 
 ## 🌟 功能特性
 
 ### 🛠️ 网络工具箱
-- **Looking Glass**: 查看网络路由信息和BGP状态
-- **路由追踪**: 追踪网络数据包的传输路径
-- **BGP分析器**: 分析BGP路由可见性和路径信息
-- **WHOIS查询**: 查询域名和IP地址的注册信息
+- **BGP 路由查询**: 基于 RIPE RIS 全球路由采集点的公共 Looking Glass（前缀 / IP / ASN）
+- **全球 Ping / 路由追踪 / 全球路由追踪**: 基于 Globalping 开放探针网络
+- **WHOIS查询**: 基于 RDAP 查询域名、IP 与 ASN 注册信息
 - **Tor节点查询**: 检查IP是否为Tor网络节点并显示详细信息
 
 ### 🌐 网络服务
@@ -34,15 +33,16 @@
 
 ## 🚀 技术栈
 
-- **框架**: Nuxt3 + Vue3
+- **框架**: Nuxt 4 + Vue 3
 - **语言**: TypeScript
-- **样式**: Tailwind CSS + DaisyUI
+- **样式**: Tailwind CSS v4 + shadcn-vue（Reka UI）+ Lucide 图标（LIR 页面保留原 DaisyUI 设计）
 - **部署**: Netlify
-- **API集成**:
-  - BGP.Tools API
-  - Tor Metrics API
-  - RIPE RIS API
-  - DN42 Registry API
+- **数据源**:
+  - RIPEstat Data API（前缀、邻居、可见性）
+  - PeeringDB API（IX 互联）
+  - Globalping API（Ping、Traceroute、MTR）
+  - RDAP（rdap.org）
+  - Tor Onionoo API
 
 ## 💻 开发
 
@@ -66,13 +66,16 @@ npm run preview
 AnyCast-WebSite/
 ├── pages/              # 页面组件
 │   ├── tools.vue       # 工具箱主页
-│   ├── lg.vue         # Looking Glass
-│   ├── traceroute.vue # 路由追踪
-│   ├── bgp.vue        # BGP分析器
+│   ├── bgp.vue        # BGP 路由查询（RIPE RIS Looking Glass）
+│   ├── ping.vue       # 全球 Ping
+│   ├── traceroute.vue # 路由追踪（MTR）
 │   ├── whois.vue      # WHOIS查询
 │   ├── tor-check.vue  # Tor节点查询
 │   └── ...
-├── components/         # 可复用组件
+├── components/         # 站点组件（SiteHeader、PageHeader 等）
+│   └── ui/             # shadcn-vue 组件
+├── composables/        # 公开数据 API 封装（useRipeStat、usePeeringDb、useGlobalping）
+├── lib/                # 站点常量与导航（site.ts）、cn 工具
 ├── public/            # 静态资源
 └── utils/             # 工具函数
 ```

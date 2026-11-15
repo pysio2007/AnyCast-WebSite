@@ -4,31 +4,6 @@ interface CacheItem<T> {
   timestamp: number;
 }
 
-// API 相关接口定义
-export interface ApiResponse<T> {
-  error: string | null;
-  result: T[];
-}
-
-export interface ApiResultPair {
-  server: string;
-  data: string;
-}
-
-export interface SummaryRowData {
-  name: string;
-  proto: string;
-  table: string;
-  state: string;
-  since: string;
-  info: string;
-}
-
-export interface ApiSummaryResultPair {
-  server: string;
-  data: SummaryRowData[];
-}
-
 // 缓存类
 export class Cache {
   // 默认缓存时间：10分钟

@@ -1,0 +1,25 @@
+/*
+ * Legacy stylesheet for the LIR pages (pages/lir.vue, pages/en/lir.vue).
+ * These pages keep their original DaisyUI design; the rest of the site uses shadcn-vue.
+ * Loaded through layouts/no-navbar.vue and only scans the LIR sources. Preflight is
+ * intentionally omitted (main.css provides it) so this file cannot reset site-wide base styles.
+ *
+ * Utilities go into the nested `utilities.lir` layer: inside `utilities`, main.css's own rules
+ * always beat a nested sub-layer, so duplicated classes here (e.g. `.w-full`) can never override
+ * the site's responsive utilities once this sheet is loaded (dev loads it everywhere; production
+ * keeps it after navigating away from /lir).
+ */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities.lir) source(none);
+@source "../../pages/lir.vue";
+@source "../../pages/en/lir.vue";
+@plugin "daisyui" {
+  themes: light;
+  root: ".lir-root";
+  logs: false;
+}
+
+.lir-root {
+  font-family: "JetBrains Mono", "PingFang SC", "Microsoft YaHei", sans-serif;
+}

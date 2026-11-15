@@ -1,245 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+
 @import "tailwindcss";
-@plugin "daisyui" {
-  themes: light;
-  root: ":root";
-  logs: true;
+@import "tw-animate-css";
+@import "shadcn-vue/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: 'Geist', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-heading: var(--font-sans);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Apple-inspired Design System */
 :root {
-  /* Apple Colors */
-  --apple-blue: #007AFF;
-  --apple-blue-light: #5AC8FA;
-  --apple-blue-dark: #0051D5;
-  --apple-green: #34C759;
-  --apple-orange: #FF9500;
-  --apple-red: #FF3B30;
-  --apple-purple: #AF52DE;
-  --apple-pink: #FF2D92;
-  --apple-yellow: #FFCC00;
-  
-  /* Apple Grays */
-  --apple-gray-1: #8E8E93;
-  --apple-gray-2: #AEAEB2;
-  --apple-gray-3: #C7C7CC;
-  --apple-gray-4: #D1D1D6;
-  --apple-gray-5: #E5E5EA;
-  --apple-gray-6: #F2F2F7;
-  
-  /* Apple System Colors */
-  --apple-label: #000000;
-  --apple-secondary-label: #3C3C434D;
-  --apple-tertiary-label: #3C3C4326;
-  --apple-background: #FFFFFF;
-  --apple-secondary-background: #F2F2F7;
-  --apple-tertiary-background: #FFFFFF;
-  
-  /* Apple Elevation */
-  --apple-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.12);
-  --apple-shadow-2: 0 4px 16px rgba(0, 0, 0, 0.12);
-  --apple-shadow-3: 0 8px 32px rgba(0, 0, 0, 0.16);
-  
-  /* Apple Blur Effects */
-  --apple-blur: blur(20px);
-  --apple-backdrop: rgba(255, 255, 255, 0.8);
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+  --success: oklch(0.627 0.17 149);
+  --warning: oklch(0.705 0.17 62);
+  --info: oklch(0.546 0.215 262.9);
 }
 
-[data-theme="dark"] {
-  /* Apple Dark Colors */
-  --apple-label: #FFFFFF;
-  --apple-secondary-label: #EBEBF54D;
-  --apple-tertiary-label: #EBEBF526;
-  --apple-background: #000000;
-  --apple-secondary-background: #1C1C1E;
-  --apple-tertiary-background: #2C2C2E;
-  --apple-backdrop: rgba(0, 0, 0, 0.8);
+.dark {
+  --background: oklch(0 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.16 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.16 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+  --success: oklch(0.723 0.19 149.6);
+  --warning: oklch(0.795 0.16 70);
+  --info: oklch(0.623 0.188 259.8);
 }
 
-/* Apple Typography System */
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
-  background-color: var(--apple-background);
-  color: var(--apple-label);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Apple Component Styles */
-@layer components {
-  .apple-card {
-    @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 backdrop-blur-sm;
-    background-color: var(--apple-tertiary-background);
-    box-shadow: var(--apple-shadow-1);
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-  
-  .apple-card:hover {
-    box-shadow: var(--apple-shadow-2);
-    transform: translateY(-2px);
-  }
-  
-  .apple-button {
-    @apply px-6 py-3 rounded-xl font-medium transition-all duration-200 ease-out;
-    background: linear-gradient(135deg, var(--apple-blue), var(--apple-blue-dark));
-    color: white;
-    border: none;
-    box-shadow: var(--apple-shadow-1);
-  }
-  
-  .apple-button:hover {
-    box-shadow: var(--apple-shadow-2);
-    transform: translateY(-1px);
-  }
-  
-  .apple-button:active {
-    transform: translateY(0);
-    box-shadow: var(--apple-shadow-1);
-  }
-  
-  .apple-button-secondary {
-    @apply px-6 py-3 rounded-xl font-medium transition-all duration-200 ease-out;
-    background-color: var(--apple-secondary-background);
-    color: var(--apple-label);
-    border: 1px solid var(--apple-gray-4);
-  }
-  
-  .apple-glass {
-    background: var(--apple-backdrop);
-    backdrop-filter: var(--apple-blur);
-    -webkit-backdrop-filter: var(--apple-blur);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  
-  .apple-nav {
-    @apply sticky top-0 z-50;
-    background: var(--apple-backdrop);
-    backdrop-filter: var(--apple-blur);
-    -webkit-backdrop-filter: var(--apple-blur);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  }
-  
-  .apple-text-large {
-    @apply text-3xl font-bold tracking-tight;
-    color: var(--apple-label);
-  }
-  
-  .apple-text-headline {
-    @apply text-xl font-semibold;
-    color: var(--apple-label);
-  }
-  
-  .apple-text-body {
-    @apply text-base;
-    color: var(--apple-secondary-label);
-  }
-  
-  .apple-text-caption {
-    @apply text-sm;
-    color: var(--apple-tertiary-label);
-  }
-  
-  .apple-gradient-blue {
-    background: linear-gradient(135deg, var(--apple-blue-light), var(--apple-blue));
-  }
-  
-  .apple-gradient-green {
-    background: linear-gradient(135deg, #34C759, #30D158);
-  }
-  
-  .apple-gradient-orange {
-    background: linear-gradient(135deg, #FF9500, #FF8C00);
-  }
-  
-  .apple-gradient-purple {
-    background: linear-gradient(135deg, #AF52DE, #BF5AF2);
-  }
-}
-
-/* 强制亮色模式配置 */
-:root,
-html,
-html[data-theme] {
-  color-scheme: light only !important;
-  --theme-color: #1a1a1a;
-  --theme-bg: #ffffff;
-}
-
-/* 禁用所有暗色模式样式 */
-[data-theme="dark"],
-@media (prefers-color-scheme: dark) {
-  color-scheme: light only !important;
-}
-
-/* 强制禁用所有 dark: 类样式 */
-html {
-  color-scheme: light only !important;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   * {
-    color-scheme: light only !important;
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: 'ss01', 'cv11';
+  }
+  ::selection {
+    @apply bg-foreground text-background;
   }
 }
 
-/* 基础样式 */
-body {
-  font-family: "JetBrains Mono", PingFang SC, "Microsoft YaHei", sans-serif;
+/* Page width container shared by every redesigned page */
+@utility page-container {
+  @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
 }
 
-/* 响应式布局 */
-.container {
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
+/* Subtle engineering grid (Vercel-style) for hero sections */
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
 }
 
-/* 博客卡片样式 */
-.card {
-  background-color: var(--b1);
-  box-shadow: var(--shadow-xl);
-  transition: all 0.3s ease-in-out;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
-
-.card:hover {
-  box-shadow: var(--shadow-2xl);
-}
-
-.card-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.card-body {
-  padding: 1.5rem;
-}
-
-/* 标签样式 */
-.badge {
-  cursor: pointer;
-  transition: colors 0.2s ease;
-}
-
-/* 按钮样式 */
-.btn {
-  transition: all 0.2s ease;
-}
-
-/* 加载动画 */
-.loading {
-  color: var(--p);
-}
-
-/* 底部栏样式 */
-.footer {
-  border-top: 1px solid var(--b3);
-}
-
-.footer a {
-  color: var(--bc);
-  transition: color 0.2s ease;
-}
-
-.footer a:hover {
-  color: var(--p);
-} 

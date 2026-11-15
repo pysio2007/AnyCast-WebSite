@@ -296,7 +296,8 @@
 import { onMounted } from 'vue'
 
 definePageMeta({
-  layout: 'no-navbar'
+  layout: 'no-navbar',
+  colorMode: 'light'
 })
 
 // Preload key images for better performance

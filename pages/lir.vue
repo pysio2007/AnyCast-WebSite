@@ -298,7 +298,8 @@
 import { onMounted } from 'vue'
 
 definePageMeta({
-  layout: 'no-navbar'
+  layout: 'no-navbar',
+  colorMode: 'light'
 })
 
 // 预加载关键图片以提高性能
