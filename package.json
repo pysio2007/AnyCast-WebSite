@@ -10,27 +10,27 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.7.2",
-    "@fortawesome/free-brands-svg-icons": "^6.7.2",
-    "@fortawesome/free-solid-svg-icons": "^6.7.2",
-    "@fortawesome/vue-fontawesome": "^3.0.8",
-    "@nuxt/image": "^1.10.0",
-    "@nuxtjs/sitemap": "^7.2.6",
-    "@tailwindcss/vite": "^4.1.1",
-    "@types/leaflet": "^1.9.20",
-    "@vesp/nuxt-fontawesome": "^1.2.1",
-    "echarts": "^5.6.0",
+    "@fortawesome/fontawesome-svg-core": "^7.3.1",
+    "@fortawesome/free-brands-svg-icons": "^7.3.1",
+    "@fortawesome/free-solid-svg-icons": "^7.3.1",
+    "@fortawesome/vue-fontawesome": "^3.3.3",
+    "@nuxt/image": "^2.2.1",
+    "@nuxtjs/sitemap": "^9.1.0",
+    "@tailwindcss/vite": "^4.3.5",
+    "@types/leaflet": "^1.9.22",
+    "@vesp/nuxt-fontawesome": "^2.0.0",
+    "echarts": "^6.1.0",
     "leaflet": "^1.9.4",
-    "nuxt": "^3.17.5",
-    "tailwindcss": "^4.1.1",
+    "nuxt": "^4.6.4",
+    "tailwindcss": "^4.3.5",
     "vue": "latest",
     "vue-router": "latest",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "@types/node": "^24.0.1",
-    "cross-env": "^7.0.3",
-    "daisyui": "^5.3.8",
-    "lightningcss": "^1.29.3"
+    "@types/node": "^26.6.6",
+    "cross-env": "^10.1.0",
+    "daisyui": "^5.8.0",
+    "lightningcss": "^1.33.0"
   }
 }
