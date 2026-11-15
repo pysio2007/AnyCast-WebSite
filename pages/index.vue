@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { GeoLookupResponse } from '#shared/types/xmsl'
 import { ArrowRight, ArrowUpRight } from '@lucide/vue'
 import { networkLinks, OPERATED_ASNS, ORGANIZATIONS, PEERINGDB_NET_ID, PRIMARY_ASN, SITE_ASNS, toolLinks } from '@/lib/site'
 
@@ -26,6 +27,21 @@ const prefixCount = computed(() => {
 })
 const ixCount = computed(() => ixlans.data.value ? new Set(ixlans.data.value.map(x => x.ix_id)).size : null)
 const viaOurNetwork = computed(() => SITE_ASNS.some(asn => visitor.data.value?.org?.includes(`AS${asn}`)))
+
+/** One cheap lookup (DB-IP, cached 24h server-side) instead of the full ~11-provider comparison; full view lives on /ip. */
+const visitorIp = computed(() => visitor.data.value?.ip ?? '')
+const visitorGeo = useFetch<GeoLookupResponse>('/api/geo', {
+  query: computed(() => ({ ip: visitorIp.value, providers: 'dbip' })),
+  immediate: false,
+  server: false,
+  lazy: true,
+  key: 'visitor-geo',
+})
+watch(visitorIp, (ip) => { if (ip) visitorGeo.execute() }, { immediate: true })
+const geoLabel = computed(() => {
+  const r = visitorGeo.data.value?.results[0]?.record
+  return r ? [r.city, r.region, r.country].filter(Boolean).join(', ') : ''
+})
 
 const isPending = (s: { status: Ref<string> }) => s.status.value === 'pending' || s.status.value === 'idle'
 
@@ -72,7 +88,7 @@ const orgGroups = Object.values(ORGANIZATIONS).map(org => ({ org, asns: OPERATED
             <template v-for="row in [
               { k: 'IP', v: visitor.data.value?.ip },
               { k: '网络', v: visitor.data.value?.org },
-              { k: '位置', v: visitor.data.value && [visitor.data.value.city, visitor.data.value.region, visitor.data.value.country].filter(Boolean).join(', ') },
+              { k: '位置', v: geoLabel || (visitor.data.value && [visitor.data.value.city, visitor.data.value.region, visitor.data.value.country].filter(Boolean).join(', ')) },
             ]" :key="row.k">
               <dt class="text-muted-foreground">{{ row.k }}</dt>
               <dd class="min-w-0 break-all">
@@ -81,6 +97,12 @@ const orgGroups = Object.values(ORGANIZATIONS).map(org => ({ org, asns: OPERATED
               </dd>
             </template>
           </dl>
+          <div v-if="visitorIp" class="flex items-center justify-between gap-2 border-t px-5 py-3 font-sans text-xs text-muted-foreground">
+            <span>{{ geoLabel ? '位置来自 DB-IP · xmsl.Dev' : '位置来自 ip.akaere.online' }}</span>
+            <NuxtLink :to="{ path: '/ip', query: { q: visitorIp } }" class="inline-flex items-center gap-1 text-foreground underline-offset-4 hover:underline">
+              多库定位对比 <ArrowRight class="size-3" />
+            </NuxtLink>
+          </div>
         </Card>
       </div>
     </section>
