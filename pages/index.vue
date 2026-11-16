@@ -114,12 +114,6 @@ const orgGroups = Object.values(ORGANIZATIONS).map(org => ({ org, asns: OPERATED
         <StatCard label="BGP 邻居" :value="neighbours.data.value?.neighbour_counts.unique" :loading="isPending(neighbours)" :hint="neighbours.data.value ? `上游 ${neighbours.data.value.neighbour_counts.left} · 下游 ${neighbours.data.value.neighbour_counts.right}` : `AS${PRIMARY_ASN}`" />
         <StatCard label="IX 接入" :value="ixCount" :loading="isPending(ixlans)" hint="PeeringDB 登记" />
       </div>
-      <p class="mt-3 text-xs text-muted-foreground">
-        {{ SITE_ASNS.length }} 个 ASN 合计 · 数据实时来自
-        <a href="https://stat.ripe.net" target="_blank" rel="noopener" class="underline-offset-4 hover:text-foreground hover:underline">RIPEstat</a>
-        与
-        <a :href="`https://www.peeringdb.com/net/${PEERINGDB_NET_ID}`" target="_blank" rel="noopener" class="underline-offset-4 hover:text-foreground hover:underline">PeeringDB</a>
-      </p>
 
       <div class="mt-10 grid gap-px overflow-hidden rounded-xl border bg-border md:grid-cols-3">
         <div v-for="group in orgGroups" :key="group.org.id" class="flex flex-col gap-3 bg-background p-6">

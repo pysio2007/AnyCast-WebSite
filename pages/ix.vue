@@ -72,7 +72,7 @@ const requiredInfo = ['您的 ASN', '您的 IPv6 地址', '您所在的 IX 交�
 
 <template>
   <div>
-    <PageSeo title="IX 互联" description="AS213605 接入的互联网交换中心、对等地址与互联政策，数据实时来自 PeeringDB。" />
+    <PageSeo title="IX 互联" description="AS213605 接入的互联网交换中心、对等地址与互联政策。" />
 
     <PageHeader eyebrow="网络" title="AS213605 IX 互联政策">
       <template #description>
@@ -95,10 +95,6 @@ const requiredInfo = ['您的 ASN', '您的 IPv6 地址', '您所在的 IX 交�
         <StatCard label="IPv4 接入" :value="netixlans.data.value ? stats.v4 : null" :loading="isPending(netixlans)" hint="其余仅 IPv6" />
         <StatCard label="端口总速率" :value="netixlans.data.value ? formatSpeed(stats.capacity) : null" :loading="isPending(netixlans)" hint="运行中端口合计" />
       </div>
-      <p class="text-xs text-muted-foreground">
-        数据实时来自
-        <a :href="`https://www.peeringdb.com/net/${PEERINGDB_NET_ID}`" target="_blank" rel="noopener" class="underline-offset-4 hover:text-foreground hover:underline">PeeringDB</a>
-      </p>
     </section>
 
     <section class="page-container flex flex-col gap-8 pb-12">

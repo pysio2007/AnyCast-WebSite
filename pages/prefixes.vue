@@ -167,7 +167,7 @@ const rpkiBadge: Record<Exclude<RpkiState, 'pending'>, { label: string, class: s
 
 <template>
   <div>
-    <PageSeo title="网络前缀" description="Pysio Networks、Akaere Networks 与 Skimit 各 ASN 当前公告的 IPv4 / IPv6 前缀与 RPKI 验证状态，数据实时来自 RIPEstat。" />
+    <PageSeo title="网络前缀" description="Pysio Networks、Akaere Networks 与 Skimit 各 ASN 当前公告的 IPv4 / IPv6 前缀与 RPKI 验证状态。" />
 
     <PageHeader
       eyebrow="网络"
@@ -199,11 +199,6 @@ const rpkiBadge: Record<Exclude<RpkiState, 'pending'>, { label: string, class: s
           :hint="rpkiEnabled ? (rpkiErrors ? `${rpkiErrors} 条查询失败` : `共 ${rows.length} 条前缀`) : '前缀过多，已跳过验证'"
         />
       </div>
-      <p class="text-xs text-muted-foreground">
-        数据实时来自
-        <a href="https://stat.ripe.net" target="_blank" rel="noopener" class="underline-offset-4 hover:text-foreground hover:underline">RIPEstat</a>
-        （RIS 路由收集器 announced-prefixes 与 rpki-validation）
-      </p>
     </section>
 
     <section class="page-container flex flex-col gap-6 pb-24">

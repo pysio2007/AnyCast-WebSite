@@ -690,12 +690,6 @@ const whoisQuery = computed(() => {
             </Button>
           </AlertAction>
         </Alert>
-
-        <p class="text-xs text-muted-foreground">
-          数据实时来自
-          <a href="https://stat.ripe.net" target="_blank" rel="noopener" class="underline-offset-4 hover:text-foreground hover:underline">RIPEstat</a>
-          （RIPE RIS 路由采集点），可见度按 RIS 全表对等体统计。
-        </p>
       </section>
 
       <!-- Prefix / IP mode -->

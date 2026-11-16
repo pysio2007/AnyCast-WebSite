@@ -120,8 +120,6 @@ function retryFailed() {
     if (req.status.value === 'error') req.refresh()
   }
 }
-
-const linkClass = 'underline-offset-4 hover:text-foreground hover:underline'
 </script>
 
 <template>
@@ -161,19 +159,8 @@ const linkClass = 'underline-offset-4 hover:text-foreground hover:underline'
         />
         <StatCard label="IX 接入" :value="ixlans.data.value ? exchanges.length : null" :loading="isPending(ixlans)" hint="PeeringDB 登记" />
       </div>
-      <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-        <p>
-          数据实时来自
-          <a href="https://stat.ripe.net" target="_blank" rel="noopener" :class="linkClass">RIPEstat</a>
-          与
-          <a :href="`https://www.peeringdb.com/net/${PEERINGDB_NET_ID}`" target="_blank" rel="noopener" :class="linkClass">PeeringDB</a>
-        </p>
-        <Button
-          v-if="prefixError || neighbours.status.value === 'error' || ixlans.status.value === 'error'"
-          variant="outline"
-          size="xs"
-          @click="retryFailed"
-        >
+      <div v-if="prefixError || neighbours.status.value === 'error' || ixlans.status.value === 'error'" class="flex justify-end">
+        <Button variant="outline" size="xs" @click="retryFailed">
           <RefreshCw data-icon="inline-start" /> 部分数据加载失败，重试
         </Button>
       </div>

@@ -57,13 +57,13 @@ const externalLinks = (meta: OperatedAsn) => [
   <div>
     <PageSeo
       title="自治系统"
-      :description="`Pysio Networks、Akaere Networks 与 Skimit 运营的 ${OPERATED_ASNS.length} 个自治系统：${OPERATED_ASNS.map(a => `AS${a.asn}`).join('、')}，实时路由数据来自 RIPEstat。`"
+      :description="`Pysio Networks、Akaere Networks 与 Skimit 运营的 ${OPERATED_ASNS.length} 个自治系统：${OPERATED_ASNS.map(a => `AS${a.asn}`).join('、')}。`"
     />
 
     <PageHeader
       eyebrow="网络"
       title="自治系统"
-      description="我们在 RIPE NCC、APNIC 与 ARIN 注册并运营的全部 ASN。名称、公告前缀与 BGP 邻居均实时来自 RIPEstat。"
+      description="我们在 RIPE NCC、APNIC 与 ARIN 注册并运营的全部 ASN。"
     >
       <template #actions>
         <Button variant="outline" size="sm" as-child>

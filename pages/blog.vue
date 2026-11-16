@@ -96,9 +96,9 @@ function hideImage(event: Event) {
 
 <template>
   <div>
-    <PageSeo title="博客" description="Pysio 的最新文章，实时同步自 pysio.online RSS。" />
+    <PageSeo title="博客" description="Pysio 的最新文章。" />
 
-    <PageHeader eyebrow="资源" title="博客" description="日常与开发笔记，实时同步自 pysio.online。">
+    <PageHeader eyebrow="资源" title="博客" description="日常与开发笔记。">
       <template #actions>
         <Button variant="outline" size="sm" as-child>
           <a href="https://www.pysio.online/" target="_blank" rel="noopener">访问博客 <ArrowUpRight data-icon="inline-end" /></a>

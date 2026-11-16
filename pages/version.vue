@@ -117,9 +117,9 @@ const shownCount = computed(() => groups.value.reduce((n, g) => n + g.items.leng
 
 <template>
   <div>
-    <PageSeo title="更新日志" description="Pysio Networks 网站的版本信息与提交记录，实时来自 GitHub。" />
+    <PageSeo title="更新日志" description="Pysio Networks 网站的版本信息与提交记录。" />
 
-    <PageHeader eyebrow="资源" title="更新日志" description="网站源码的最新提交，实时来自 GitHub。">
+    <PageHeader eyebrow="资源" title="更新日志" description="网站源码的最新提交。">
       <template #actions>
         <Button variant="outline" size="sm" as-child>
           <a :href="REPO_URL" target="_blank" rel="noopener">GitHub 仓库 <ArrowUpRight data-icon="inline-end" /></a>
